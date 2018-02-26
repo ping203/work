@@ -1,0 +1,21 @@
+{
+  "development": {
+    "resource-1": {
+      "useCluster": false,
+      "useSSL": true,
+      "static": true,
+      "views": true,
+      "http": {
+        "host": "127.0.0.1",
+        "port": 4001
+      },
+      "https": {
+        "host": "127.0.0.1",
+        "port": 4002,
+        "keyFile": "shared/server.key",
+        "certFile": "shared/server.crt"
+      }
+    }
+  },
+  "production": {}
+}

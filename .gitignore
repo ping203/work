@@ -1,0 +1,28 @@
+.project
+*/node-log.log
+logs/*.log
+logs/*.log.*
+*.log
+*.log.*
+!.gitignore
+.project
+.settings/
+**/*.svn
+*.svn
+*.swp
+*.sublime-project
+*.sublime-workspace
+/.idea
+/.vscode
+node_modules/*
+/node_modules
+admin/.vscode/
+tools/gulpPack/*.zip
+tools/gulpPack/*.zip
+tools/gulpPack/dist/
+*.zip
+stressTest/omelo-admin-web
+stressTest/omelo-robot
+stressTest/omelo-robot - 副本
+stressTest/omelo-robot - 副本 (2)
+stressTest/omelo-robot - 副本 (3)

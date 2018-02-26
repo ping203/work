@@ -1,0 +1,138 @@
+{
+  "development": {
+    "gate": [{
+      "id": "gate",
+      "host": "127.0.0.1",
+      "clientPort": 3001,
+      "frontend": true,
+      "args": " --inspect=13001"
+    }],
+    "auth": [{
+      "id": "auth",
+      "host": "127.0.0.1",
+      "port": 3101,
+      "args": " --inspect=13101"
+    }],
+    "balance": [{
+      "id": "balance",
+      "host": "127.0.0.1",
+      "port": 3201,
+      "args": " --inspect=13201"
+    }],
+    "dataSync": [{
+      "id": "dataSync",
+      "host": "127.0.0.1",
+      "port": 3301,
+      "args": " --inspect=13301"
+    }],
+    "matching": [{
+      "id": "matching",
+      "host": "127.0.0.1",
+      "port": 3401,
+      "args": "--inspect=13401"
+    }],
+    "resource": [{
+      "id": "resource",
+      "host": "127.0.0.1",
+      "port": 3501,
+      "args": " --inspect=13501"
+    }],
+    "hall": [{
+        "id": "hall-1",
+        "host": "127.0.0.1",
+        "port": 3601,
+        "args": " --inspect=13601"
+      },
+      {
+        "id": "hall-2",
+        "host": "127.0.0.1",
+        "port": 3603,
+        "args": " --inspect=13603"
+      }
+    ],
+    "chat": [{
+      "id": "chat",
+      "host": "127.0.0.1",
+      "port": 3701,
+      "args": " --inspect=13701"
+    }],
+    "admin": [{
+      "id": "admin",
+      "host": "127.0.0.1",
+      "port": 3801,
+      "args": " --inspect=13801"
+    }],
+    "game": [{
+      "id": "game-1",
+      "host": "127.0.0.1",
+      "port": "",
+      "clientHost": "127.0.0.1",
+      "clientPort": 4001,
+      "frontend": true,
+      "args": " --inspect=14001",
+      "maxLoad": 300
+    }],
+    "rankMatch": [{
+      "id": "rankMatch-1",
+      "host": "127.0.0.1",
+      "port": 5001,
+      "args": "--inspect=15001"
+    }]
+  },
+  "production": {
+    "gate": [{
+      "id": "gate",
+      "host": "127.0.0.1",
+      "clientPort": 3001,
+      "frontend": true,
+      "args": " --inspect=13001"
+    }],
+    "auth": [{
+      "id": "auth",
+      "host": "127.0.0.1",
+      "port": 3101,
+      "args": " --inspect=13101"
+    }],
+
+    "balance": [{
+      "id": "balance",
+      "host": "127.0.0.1",
+      "port": 3201,
+      "args": " --inspect=13201"
+    }],
+    "dataSync": [{
+      "id": "dataSync",
+      "host": "127.0.0.1",
+      "port": 3301,
+      "args": " --inspect=13301"
+    }],
+    "matching": [{
+      "id": "matching",
+      "host": "127.0.0.1",
+      "port": 3401,
+      "args": "--inspect=13401"
+    }],
+    "resource": [{
+      "id": "resource",
+      "host": "127.0.0.1",
+      "port": 3501,
+      "args": " --inspect=13501"
+    }],
+    "game": [{
+      "id": "game-1",
+      "host": "127.0.0.1",
+      "port": "",
+      "clientHost": "127.0.0.1",
+      "clientPort": 4001,
+      "frontend": true,
+      "args": " --inspect=14001",
+      "maxLoad": 300
+    }],
+    "rankMatch": [{
+      "id": "rankMatch-1",
+      "host": "127.0.0.1",
+      "port": 5001,
+      "args": "--inspect=15001"
+    }]
+  }
+}
