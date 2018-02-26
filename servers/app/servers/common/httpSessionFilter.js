@@ -10,13 +10,14 @@ class HttpSessionFilter {
 
     before(ctx, next) {
         let ignore = false;
-        if(ctx.session.uid){
-            
-        }
-        for (let route of this._ignoreRouteMap) {
-            if (ctx.url.search(route) >= 0) {
-                ignore = true;
-                break;
+        if (!!ctx.session.uid || ctx.session.uid !== 'undefined') {
+            ignore = true;
+        } else {
+            for (let route of this._ignoreRouteMap) {
+                if (ctx.url.search(route) >= 0) {
+                    ignore = true;
+                    break;
+                }
             }
         }
 
