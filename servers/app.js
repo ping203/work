@@ -202,7 +202,7 @@ app.configure('production|development', 'dataSync', function () {
 
   // todo deprecated
   app.beforeStopHook(function () {
-    app.dataCenter.stop();
+    app.dataSync.stop(); 
   });
 });
 
