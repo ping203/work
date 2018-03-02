@@ -1,16 +1,9 @@
-﻿const DateUtil = require('../../src/utils/DateUtil');
-const logger = loggerEx(__filename);
-const logicResponse = require('../../../common/logicResponse');
+﻿const logicResponse = require('../../../common/logicResponse');
 
 exports.shutdownWithCrash = shutdownWithCrash;
 exports.shutdown = shutdown;
 exports.saveAll = saveAll;
 
-//------------------------------------------------------------------------------
-// implement
-//------------------------------------------------------------------------------
-
-////////////////////////////////////////
 function shutdownWithCrash(pool) {
     logger.info("CALL shutdown: Server Crash");
     
@@ -21,35 +14,35 @@ function shutdownWithCrash(pool) {
 
 }
 
-function shutdown(req, res) {
-    logger.info("CALL shutdown: Server Update");
-    // 验证管理员身份
-    _checkAdmin(function () {
+async function shutdown(data) {
+    return new Promise(function(resolve, reject){
         myDao.saveAll(function (err, results) {
-            res.success({ type: 1, msg: '缓存数据已经全部导入数据库，服务器可以安全关闭' });
+            if(err){
+                logger.error('缓存数据已经全部导入数据库，服务器可以安全关闭 err:', err);
+                reject(err);
+            }
             _exit();
+            resolve(logicResponse.ask({}));
         });
-    });
-
+    }); 
 }
 
 ////////////////////////////////////////
 /**
  * 仅存入数据库, 不关闭服务器(用于调试时能立即看到数据库变化)
  */
-function saveAll(req, res) {
-    logger.info("CALL saveAll");
-    // TODO: 验证管理员身份
-    myDao.saveAll(function (err, results) {
-        res.success({ type: 1, msg: '缓存数据已经全部导入数据库' });
+async function saveAll(data) {
+    return new Promise(function(resolve, reject){
+        myDao.saveAll(function (err, results) {
+            if(err){
+                logger.error('缓存数据已经全部导入数据库 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask({}));
+        });
     });
-
 }
 
-
-//==============================================================================
-// private
-//==============================================================================
 // TODO: 验证管理员身份
 function _checkAdmin(cb) {
     cb();

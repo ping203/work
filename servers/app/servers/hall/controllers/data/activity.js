@@ -1,5 +1,4 @@
-﻿const logger = loggerEx(__filename);
-const logicResponse = require('../../../common/logicResponse');
+﻿const logicResponse = require('../../../common/logicResponse');
 
 exports.showMeActivity = showMeActivity;
 exports.getReward = getReward;

@@ -1,41 +1,17 @@
-﻿//==============================================================================
-// import
-//==============================================================================
-var _ = require('underscore');
-var admin_common = require('./admin_common');
-var CacheUtil = require('../../src/buzz/cache/CacheUtil');
-var CacheAccount = require('../../src/buzz/cache/CacheAccount');
-var CacheMail = require('../../src/buzz/cache/CacheMail');
-var CacheGold = require('../../src/buzz/cache/CacheGold');
-
-var buzz_charts = require('../../src/buzz/buzz_charts');
-var buzz_bigdata = require('../../src/buzz/buzz_bigdata');
-
-var DateUtil = require('../../src/utils/DateUtil');
-
-//------------------------------------------------------------------------------
-// Redis
-//------------------------------------------------------------------------------
-var RedisUtil = require('../../src/utils/RedisUtil');
-var SYS_LOG = require('../../src/buzz/cst/buzz_cst_log').SYS_LOG,
+﻿const _ = require('underscore');
+const CacheAccount = require('../../src/buzz/cache/CacheAccount');
+const CacheMail = require('../../src/buzz/cache/CacheMail');
+const CacheGold = require('../../src/buzz/cache/CacheGold');
+const buzz_charts = require('../../src/buzz/buzz_charts');
+const buzz_bigdata = require('../../src/buzz/buzz_bigdata');
+const DateUtil = require('../../src/utils/DateUtil');
+const RedisUtil = require('../../src/utils/RedisUtil');
+const SYS_LOG = require('../../src/buzz/cst/buzz_cst_log').SYS_LOG,
     SYS_LOG_TYPE = SYS_LOG.TYPE;
 const logicResponse = require('../../../common/logicResponse');
-//==============================================================================
-// const
-//==============================================================================
-var ERROR = 1;
-var DEBUG = 0;
 
-var TAG = "【routes/api/admin_backdoor】";
+const TAG = "【routes/api/admin_backdoor】";
 
-
-//==============================================================================
-// public
-//==============================================================================
-
-//------------------------------------------------------------------------------
-// definition
-//------------------------------------------------------------------------------
 exports.getCacheAccount = getCacheAccount;
 exports.delCacheAccount = delCacheAccount;
 exports.getCacheAccountStatistics = getCacheAccountStatistics;
@@ -57,159 +33,140 @@ exports.queryAdminLog = queryAdminLog;
 exports.queryGold = queryGold;
 exports.queryLog = queryLog;
 
-//------------------------------------------------------------------------------
-// implement
-//------------------------------------------------------------------------------
-
-////////////////////////////////////////
-function accountForbidden(req, res) {
-    const FUNC = TAG + "accountForbidden()---";
-    
-    var data = admin_common.getDataObj(req);
-
-    myDao.accountForbidden(data, function (err, results) {
-        handleDaoResult(res, err, results, "重置账号", FUNC);
+async function accountForbidden(data) {
+    return new Promise(function (resolve, reject) {
+        myDao.accountForbidden(data, function (err, results) {
+            if (err) {
+                logger.error('重置账号 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(results));
+        });
     });
 }
 
-////////////////////////////////////////
-function accountAuth(req, res) {
-    const FUNC = TAG + "accountAuth()---";
-    
-    var data = admin_common.getDataObj(req);
-
-    myDao.accountAuth(data, function (err, results) {
-        handleDaoResult(res, err, results, "账号权限设置", FUNC);
+async function accountAuth(data) {
+    return new Promise(function (resolve, reject) {
+        myDao.accountAuth(data, function (err, results) {
+            if (err) {
+                logger.error('账号权限设置 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(results));
+        });
     });
 }
 
-////////////////////////////////////////
-function switchMatch(req, res) {
-    const FUNC = TAG + "accountAuth()---";
-    
-    var data = admin_common.getDataObj(req);
-
-    myDao.switchMatch(data, function (err, results) {
-        handleDaoResult(res, err, results, "排位赛开关", FUNC);
+async function switchMatch(data) {
+    return new Promise(function (resolve, reject) {
+        myDao.switchMatch(data, function (err, results) {
+            if (err) {
+                logger.error('排位赛开关 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(results));
+        });
     });
 }
 
-////////////////////////////////////////
-function switchCik(req, res) {
-    const FUNC = TAG + "switchCik()---";
-    
-    var data = admin_common.getDataObj(req);
-
-    myDao.switchCik(data, function (err, results) {
-        handleDaoResult(res, err, results, "实物兑换开关", FUNC);
+async function switchCik(data) {
+    return new Promise(function (resolve, reject) {
+        myDao.switchCik(data, function (err, results) {
+            if (err) {
+                logger.error('实物兑换开关 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(results));
+        });
     });
 }
 
-function generateCycleReward(req, res) {
-    const FUNC = TAG + "generateCycleReward()---";
-    
-    var data = admin_common.getDataObj(req);
-
-    switch(data.type) {
+async function generateCycleReward(data) {
+    switch (data.type) {
         case 1:
             buzz_charts.generateDailyReward();
-        break;
+            break;
         case 2:
             buzz_charts.generateWeeklyReward();
-        break;
+            break;
         case 3:
             buzz_charts.generateMonthlyReward();
-        break;
+            break;
     }
     var err = null;
     if (!data.type) {
-        err = {code:100001, msg: "请传入生成的类型"};
+        err = {
+            code: 100001,
+            msg: "请传入生成的类型"
+        };
     }
-    handleDaoResult(res, err, "success:" + data.type, "生成排行奖励", FUNC);
+
+    if (err) {
+        throw err;
+    }
+    return logicResponse.ask("success:" + data.type, "生成排行奖励")
 }
 
-////////////////////////////////////////
-function kickUser(req, res) {
-    const FUNC = TAG + "kickUser()---";
-    
-    var data = admin_common.getDataObj(req);
-    var uid_list = data.uid_list;
-
-    console.log(FUNC + "uid_list:", uid_list);
-
-    myDao.kickUser(data, function (err, results) {
-        handleDaoResult(res, err, results, "踢出玩家", FUNC);
+async function kickUser(data) {
+    return new Promise(function (resolve, reject) {
+        myDao.kickUser(data, function (err, results) {
+            if (err) {
+                logger.error('踢出玩家 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(results));
+        });
     });
 }
 
-////////////////////////////////////////
-function modifyUserData(req, res) {
-    const FUNC = TAG + "modifyUserData() --- ";
-    
-    var data = admin_common.getDataObj(req);
-    var uid = data.uid;
-    var field = data.field;
-    var value = data.value;
-
-    console.log(FUNC + "uid:", uid);
-    console.log(FUNC + "field:", field);
-    console.log(FUNC + "value:", value);
-
-    myDao.modifyUserData(data, function (err, results) {
-        handleDaoResult(res, err, results, "修改玩家数据", FUNC);
+async function modifyUserData(data) {
+    return new Promise(function (resolve, reject) {
+        myDao.modifyUserData(data, function (err, results) {
+            if (err) {
+                logger.error('修改玩家数据 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(results));
+        });
     });
 }
 
-////////////////////////////////////////
-function generateRetention(req, res) {
-    const FUNC = TAG + "generateRetention()---";
-    
-    var data = admin_common.getDataObj(req);
-    var start_time = data.start_time;
-    var end_time = data.end_time;
-
-    console.log(FUNC + "start_time:", start_time);
-    console.log(FUNC + "end_time:", end_time);
-
-    myDao.fillDayData(data, function (err, results) {
-        handleDaoResult(res, err, results, "手动生成留存数据", FUNC);
+async function generateRetention(data) {
+    return new Promise(function (resolve, reject) {
+        myDao.fillDayData(data, function (err, results) {
+            if (err) {
+                logger.error('手动生成留存数据 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(results));
+        });
     });
 }
 
-////////////////////////////////////////
-function resetDaily(req, res) {
-    const FUNC = TAG + "resetDaily()---";
-    
-    var data = admin_common.getDataObj(req);
-    var id_list = data.id_list;
-
-    console.log(FUNC + "id_list:", id_list);
-
+async function resetDaily(data) {
+    let id_list = data.id_list;
     CacheAccount.dailyReset(id_list);
-    myDao.resetDayInfoForAll(id_list, function (err, results) {
-        if (err) {
-            console.error(FUNC + "重置每日数据失败");
-            console.error(FUNC + "err:", err);
-        }
-        else {
-            console.error(FUNC + "重置每日数据成功");
-            console.log(FUNC + "results:", results);
-        }
-        admin_common.response('重置每日数据', res, err, results);
+    return new Promise(function (resolve, reject) {
+        myDao.resetDayInfoForAll(id_list, function (err, results) {
+            if (err) {
+                logger.error('重置每日数据失败 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(results));
+        });
     });
 }
 
-////////////////////////////////////////
-function resetWeekly(req, res) {
-    const FUNC = TAG + "resetWeekly()---";
-    
-    var data = admin_common.getDataObj(req);
-    var id_list = data.id_list;
-
-    console.log(FUNC + "id_list:", id_list);
-
-    myDao.resetWeeklyInfoForAll(id_list, function (err, results) {
-        handleDaoResult(res, err, results, "重置每周数据", FUNC);
+async function resetWeekly(data) {
+    let id_list = data.id_list;
+    return new Promise(function (resolve, reject) {
+        myDao.resetWeeklyInfoForAll(id_list, function (err, results) {
+            if (err) {
+                logger.error('重置每周数据 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(results));
+        });
     });
 }
 
@@ -217,24 +174,30 @@ function resetWeekly(req, res) {
 
 function cacheAndRedisDiff(cache_data, redis_data) {
 
-    let diff = {diffVal:{}, cacheOwn:{}, redisOwn:{}};
-    if(JSON.stringify(cache_data) === JSON.stringify(redis_data)){
+    let diff = {
+        diffVal: {},
+        cacheOwn: {},
+        redisOwn: {}
+    };
+    if (JSON.stringify(cache_data) === JSON.stringify(redis_data)) {
         return diff;
     }
 
-    for(let key in cache_data){
-        if(redis_data[key]){
-            if(redis_data[key] !== cache_data[key]){
-                diff.diffVal[key] = {cache:cache_data[key], redis:redis_data[key]};
+    for (let key in cache_data) {
+        if (redis_data[key]) {
+            if (redis_data[key] !== cache_data[key]) {
+                diff.diffVal[key] = {
+                    cache: cache_data[key],
+                    redis: redis_data[key]
+                };
             }
-        }
-        else {
+        } else {
             diff.cacheOwn[key] = cache_data[key];
         }
     }
 
-    for(let key in redis_data){
-        if(!cache_data[key]){
+    for (let key in redis_data) {
+        if (!cache_data[key]) {
             diff.redisOwn[key] = redis_data[key];
         }
     }
@@ -242,75 +205,55 @@ function cacheAndRedisDiff(cache_data, redis_data) {
     return diff;
 }
 
-////////////////////////////////////////
-function getCacheAccount(req, res) {
-    const FUNC = TAG + "getCacheAccount() --- ";
-    
-    if (DEBUG) console.log("CALL...");
-    
-    var data = admin_common.getDataObj(req);
-    var uid = data.account_id;
-    var field = data.field;
-    
-    console.log(FUNC + "uid:", uid);
-    console.log(FUNC + "field:", field);
-    
-    if (CacheAccount.contains(uid)) {
-        var ret = {cacheData:null, redisData:null, diffData:null};
-        if (isNull(field)) {
-            console.log(FUNC + "请求字段为空, 返回全部字段数据");
+async function getCacheAccount(data) {
+    let uid = data.account_id;
+    let field = data.field;
+
+    return new Promise(function (resolve, reject) {
+        if (CacheAccount.contains(uid)) {
+            var ret = {
+                cacheData: null,
+                redisData: null,
+                diffData: null
+            };
+            if (isNull(field)) {
+                CacheAccount.getAccountById(uid, function (err, account) {
+                    if (account) {
+                        ret.redisData = account;
+                    }
+                    resolve(logicResponse.ask(ret));
+                });
+            } else {
+                CacheAccount.getAccountById(uid, function (err, account) {
+                    if (account) {
+                        ret.redisData = account[field];
+                    }
+                    resolve(logicResponse.ask(ret));
+                });
+            }
+        } else {
+            var ret = {};
             CacheAccount.getAccountById(uid, function (err, account) {
                 if (account) {
                     ret.redisData = account;
                 }
-                admin_common.response('获取玩家信息', res, null, ret);
+                resolve(logicResponse.ask(ret));
             });
         }
-        else {
-            console.log(FUNC + "请求字段不为空, 返回单独字段数据:", field);
-            CacheAccount.getAccountById(uid, function (err, account) {
-                if (account) {
-                    ret.redisData = account[field];
-                }
-                admin_common.response('获取玩家信息', res, null, ret);
-            });
-        }
-
-    }
-    else {
-        var ret = {};
-        CacheAccount.getAccountById(uid, function (err, account) {
-            if (account) {
-                ret.redisData = account;
-            }
-            admin_common.response('获取玩家信息', res, null, ret);
-        });
-        // console.error(FUNC + "没有在内存中找到联系人");
-        // admin_common.response('没有在内存中找到联系人', res, '数据不存在', {});
-
-    }
-
+    });
 }
 
-////////////////////////////////////////
-function delCacheAccount(req, res) {
-    const FUNC = TAG + "delCacheAccount() --- ";
-    
-    if (DEBUG) console.log(FUNC + "CALL...");
-    
-    var data = admin_common.getDataObj(req);
-    var uid = data.account_id;
-    
-    console.log(FUNC + "uid:", uid);
-    
+async function delCacheAccount(data) {
+    let uid = data.account_id;
     if (CacheAccount.contains(uid)) {
         var err = null;
-        var ret = {msg:"删除缓存数据完成"};
+        var ret = {
+            msg: "删除缓存数据完成"
+        };
         CacheAccount.remove(uid);
-        admin_common.response('获取玩家信息', res, err, ret);
-    }
-    else {
-        console.error(FUNC + "没有在内存中找到联系人");
+        return logicResponse.ask(ret);
+    } else {
+        logger.error("没有在内存中找到联系人");
     }
 
 }
@@ -322,177 +265,121 @@ function delCacheAccount(req, res) {
  * (1) 内存中的玩家总数
  * (2) 内存中的玩家updated_at字段
  */
-function getCacheAccountStatistics(req, res) {
-    const FUNC = TAG + "getCacheAccountStatistics()---";
-    console.log(FUNC + "CALL...");
-    
-    //var data = admin_common.getDataObj(req);
-
-    var ret = [];
-
-    // for (var uid in CacheAccount.cache()) {
-    //     var account = CacheAccount.getAccountById(uid);
-    //     ret.push({
-    //         uid: account.id,
-    //         gold: account.gold,
-    //         pearl: account.pearl,
-    //         level: account.level,
-    //         rmb: account.rmb,
-    //         updated_at: account.updated_at,
-    //     });
-    // }
-
-    admin_common.response('缓存已干掉，当前操作无法进行：获取玩家统计信息, 返回需要的信息, 排序及求和求平均操作在客户端完成', res, null, ret);
+async function getCacheAccountStatistics(data) {
+    return logicResponse.ask({});
 }
 
-////////////////////////////////////////
-function getCacheMail(req, res) {
+async function getCacheMail(data) {
     const FUNC = TAG + "getCacheMail()---";
-    console.log("【CALL】 getCacheMail");
-    
-    var data = admin_common.getDataObj(req);
     var min = data.min;
     var max = data.max;
-    
+
     if (!isNull(min)) min = parseInt(min);
     if (!isNull(max)) max = parseInt(max);
-    
-    console.log(FUNC + "min:", min);
-    console.log(FUNC + "max:", max);
-    
+
     var err = null;
     var ret = {};
     var mail = CacheMail.cache();
     if (isNull(min) && isNull(max)) {
-        console.log(FUNC + "没有参数, 返回整个邮件列表");
+        logger.info(FUNC + "没有参数, 返回整个邮件列表");
         ret = _.keys(mail);
-    }
-    else if (!isNull(min) && !isNull(max)) {
-        console.log(FUNC + "设置返回邮件ID的最大最小值");
+    } else if (!isNull(min) && !isNull(max)) {
+        logger.info(FUNC + "设置返回邮件ID的最大最小值");
         ret = _.filter(mail, function (obj) {
             return obj.id >= min && obj.id <= max;
         });
         ret = _.pluck(ret, "id");
-    }
-    else if (!isNull(min) && isNull(max)) {
-        console.log(FUNC + "设置返回邮件ID的最小值");
+    } else if (!isNull(min) && isNull(max)) {
+        logger.info(FUNC + "设置返回邮件ID的最小值");
         ret = _.filter(mail, function (obj) {
             return obj.id >= min;
         });
         ret = _.pluck(ret, "id");
-    }
-    else if (isNull(min) && !isNull(max)) {
-        console.log(FUNC + "设置返回邮件ID的最大值");
+    } else if (isNull(min) && !isNull(max)) {
+        logger.info(FUNC + "设置返回邮件ID的最大值");
         ret = _.filter(mail, function (obj) {
             return obj.id <= max;
         });
         ret = _.pluck(ret, "id");
     }
-    console.log(FUNC + "ret:\n", ret);
-    admin_common.response('获取邮件信息', res, err, ret);
+    logger.info(FUNC + "ret:\n", ret);
+
+    return logicResponse.ask(ret);
 
 }
 
-////////////////////////////////////////
-function queryCfgs(req, res) {
+async function queryCfgs(data) {
     const FUNC = TAG + "queryCfgs()---";
-    console.log("【CALL】 queryCfgs");
-    
-    var data = admin_common.getDataObj(req);
+
     var cfg_name = data.cfg_name;
-    
-    console.log(FUNC + "cfg_name:", cfg_name);
 
     try {
         var target = require('../../../../utils/imports').GAME_CFGS[cfg_name];
-        admin_common.response('获取配置表信息成功', res, null, target);
-    }
-    catch(err) {
-        admin_common.response('获取配置表信息失败', res, err);
+        return logicResponse.ask(target);
+    } catch (err) {
+        throw err;
     }
 
 }
 
-////////////////////////////////////////
-function getGoldLog(req, res) {
+async function getGoldLog(data) {
     const FUNC = TAG + "getGoldLog()---";
-    console.log("【CALL】 getGoldLog");
-    
+    logger.info("【CALL】 getGoldLog");
+
     var data = admin_common.getDataObj(req);
     var account_id = data.account_id;
-    
-    console.log(FUNC + "account_id:", account_id);
+
+    logger.info(FUNC + "account_id:", account_id);
 
     var ret = CacheGold.getLogListByAccountId(account_id);
 
-    admin_common.response('获取用户' + account_id + '的金币记录', res, null, ret);
+    return logicResponse.ask(ret);
 
 }
 
-////////////////////////////////////////
-function queryAdminLog(req, res) {
-    const FUNC = TAG + "queryAdminLog()---";
-    
-    if (DEBUG) console.info(FUNC + "CALL...");
+async function queryAdminLog(data) {
+    let redis_key = SYS_LOG_TYPE[0].redis_key;
 
-    var redis_key = SYS_LOG_TYPE[0].redis_key;
-
-    // 直接从Redis中的日志获取
-    RedisUtil.lrange(redis_key, 0, 10, function (err, ret) {
-        if (err) {
-            admin_common.response('获取管理员日志失败:' + redis_key, res, err);
-        }
-        else {
-            console.log(FUNC + "redis_key:", redis_key);
-            console.log(FUNC + "ret:", ret);
+    return new Promise(function (resolve, reject) {
+        RedisUtil.lrange(redis_key, function (err, ret) {
+            if (err) {
+                logger.error('获取管理员日志失败 err:', err);
+                reject(err);
+            }
             for (var i = 0; i < ret.length; i++) {
                 ret[i] = JSON.parse(ret[i]);
                 ret[i].timestamp = DateUtil.format(new Date(ret[i].timestamp), "yyyy-MM-dd hh:mm:ss");
             }
-            admin_common.response('获取管理员日志成功:' + redis_key, res, null, ret);
-        }
+            resolve(logicResponse.ask(ret));
+        });
     });
 }
 
-////////////////////////////////////////
-function queryGold(req, res) {
-    const FUNC = TAG + "queryGold()---";
-    
-    if (DEBUG) console.info(FUNC + "CALL...");
-    
-    var data = admin_common.getDataObj(req);
-    var start_date = data.start_date || DateUtil.getCurrentByFormat('yyyy-MM-dd');
-    var end_date = data.end_date || DateUtil.getCurrentByFormat('yyyy-MM-dd');
-
-    buzz_bigdata.queryGold(start_date, end_date, function (err, ret) {
-        if (err) {
-            admin_common.response('获取金币数据失败', res, err);
-        }
-        else {
-            console.log(FUNC + "ret:", ret);
-            admin_common.response('获取金币数据成功', res, null, ret);
-        }
+async function queryGold(data) {
+    let start_date = data.start_date || DateUtil.getCurrentByFormat('yyyy-MM-dd');
+    let end_date = data.end_date || DateUtil.getCurrentByFormat('yyyy-MM-dd');
+    return new Promise(function (resolve, reject) {
+        buzz_bigdata.queryGold(start_date, end_date, function (err, ret) {
+            if (err) {
+                logger.error('获取金币数据失败 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(ret));
+        });
     });
 }
 
-////////////////////////////////////////
-function queryLog(req, res) {
-    const FUNC = TAG + "queryLog()---";
-    
-    if (DEBUG) console.info(FUNC + "CALL...");
-    
-    var data = admin_common.getDataObj(req);
-    var start_date = data.start_date || DateUtil.getCurrentByFormat('yyyy-MM-dd');
-    var end_date = data.end_date || DateUtil.getNextDayByFormat('yyyy-MM-dd');
-
-    buzz_bigdata.queryLog(data, start_date, end_date, function (err, ret) {
-        if (err) {
-            admin_common.response('获取日志数据', res, err);
-        }
-        else {
-            console.log(FUNC + "ret:", ret);
-            admin_common.response('获取日志数据', res, null, ret);
-        }
+async function queryLog(data) {
+    let start_date = data.start_date || DateUtil.getCurrentByFormat('yyyy-MM-dd');
+    let end_date = data.end_date || DateUtil.getNextDayByFormat('yyyy-MM-dd');
+    return new Promise(function (resolve, reject) {
+        buzz_bigdata.queryLog(data, start_date, end_date, function (err, ret) {
+            if (err) {
+                logger.error('获取日志数据 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(ret));
+        });
     });
 }
 
@@ -502,16 +389,4 @@ function queryLog(req, res) {
 
 function isNull(field) {
     return field == null || field == undefined || field == "";
-}
-
-function handleDaoResult(res, err, results, hint, FUNC) {
-    if (err) {
-        console.error(FUNC + hint + "失败");
-        console.error(FUNC + "err:", err);
-    }
-    else {
-        console.error(FUNC + hint + "成功");
-        console.log(FUNC + "results:", results);
-    }
-    admin_common.response(hint, res, err, results);
 }

@@ -1,53 +1,54 @@
-﻿//==============================================================================
-// import
-//==============================================================================
-var admin_common = require('./admin_common');
-const logicResponse = require('../../../common/logicResponse');
+﻿const logicResponse = require('../../../common/logicResponse');
 
-//==============================================================================
-// public
-//==============================================================================
-
-//------------------------------------------------------------------------------
-// definition
-//------------------------------------------------------------------------------
 exports.add = _add;
 exports.delete = _delete;
 exports.valid = _valid;
 exports.edit = _edit;
 
-//------------------------------------------------------------------------------
-// implement
-//------------------------------------------------------------------------------
-
-////////////////////////////////////////
-function _add(req, res) {
-    myDao.addRole(admin_common.getDataObj(req), function (err, rows) {
-        console.log("addRole complete...");
-        admin_common.response('添加角色', res, err, rows);
+function _add(data) {
+    return new Promise(function(resolve, reject){
+        myDao.addRole(data, function(err, rows) {
+            if(err){
+                logger.error('添加角色 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(rows));
+        });
     });
 }
 
-////////////////////////////////////////
-function _delete(req, res) {
-    myDao.deleteRole(admin_common.getDataObj(req), function (err, rows) {
-        console.log("deleteRole complete...");
-        admin_common.response('禁止角色', res, err, rows);
+async function _delete(data) {
+    return new Promise(function(resolve, reject){
+        myDao.deleteRole(data, function(err, rows) {
+            if(err){
+                logger.error('禁止角色 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(rows));
+        });
     });
 }
 
-////////////////////////////////////////
-function _valid(req, res) {
-    myDao.validRole(admin_common.getDataObj(req), function (err, rows) {
-        console.log("validRole complete...");
-        admin_common.response('激活角色', res, err, rows);
+async function _valid(data) {
+    return new Promise(function(resolve, reject){
+        myDao.validRole(data, function(err, rows) {
+            if(err){
+                logger.error('激活角色 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(rows));
+        });
     });
 }
 
-////////////////////////////////////////
-function _edit(req, res) {
-    myDao.editRole(admin_common.getDataObj(req), function (err, rows) {
-        console.log("editRole complete...");
-        admin_common.response('修改角色', res, err, rows);
+async function _edit(data) {
+    return new Promise(function(resolve, reject){
+        myDao.editRole(data, function(err, rows) {
+            if(err){
+                logger.error('修改角色 err:', err);
+                reject(err);
+            }
+            resolve(logicResponse.ask(rows));
+        });
     });
 }
