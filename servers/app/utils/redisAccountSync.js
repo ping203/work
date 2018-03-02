@@ -6,6 +6,7 @@ const accountParser = require('./account/accountParser');
 accountConf.addDataDef(keyTypeDef.AccountDef);
 accountConf.addDataDef(keyTypeDef.OtherDef);
 const REDISKEY = require('../database/consts/').REDISKEY;
+const ERROR_OBJ = require('../consts/error').ERROR_OBJ;
 
 class Util {
     constructor() {}
@@ -69,12 +70,12 @@ class Util {
 function _exist(uid, cb) {
     redisConnector.cmd.hget(REDISKEY.PLATFORM, uid, function (err, result) {
         if (!!err) {
-            utils.invokeCallback(cb, 500);
+            utils.invokeCallback(cb, ERROR_OBJ.DB_ERR);
             return;
         }
 
         if (!result) {
-            utils.invokeCallback(cb, 404);
+            utils.invokeCallback(cb, ERROR_OBJ.USER_NOT_EXIST);
             return;
         }
 
@@ -89,9 +90,8 @@ function _exist(uid, cb) {
  * @param cb
  */
 function _setAccount(id, data, cb) {
-
     if (!id || !data) {
-        utils.invokeCallback(cb, '参数错误');
+        utils.invokeCallback(cb, ERROR_OBJ.PARAM_MISSING);
         return;
     }
 
@@ -112,27 +112,30 @@ function _setAccount(id, data, cb) {
     }
 
     let cmds = [];
+    let fieldKeys = [];
     fields.forEach(function (item) {
         for (let key in item) {
+            fieldKeys.push(key);
             cmds.push([Account.getCmd(key), REDISKEY.getKey(key), id, accountParser.serializeValue(key, item[key])])
         }
     });
 
     redisConnector.cmd.multi(cmds).exec(function (err, result) {
         if (!!err) {
-            utils.invokeCallback(cb, err);
+            logger.error('SET REDIS OPERATE ERROR:', err);
+            utils.invokeCallback(cb, ERROR_OBJ.DB_ERR);
             return;
         }
         //dfc 记录改变数据k-v
         redisConnector.cmd.sadd(REDISKEY.UPDATED_DELTA_UIDS, id);
-        redisConnector.cmd.sadd(`${REDISKEY.UPDATED_DELTA_FIELDS}:${id}`, fields);
+        redisConnector.cmd.sadd(`${REDISKEY.UPDATED_DELTA_FIELDS}:${id}`, fieldKeys);
 
         utils.invokeCallback(cb, null, result);
     });
 }
 
 function _setAccountAsync(id, data) {
-    let promise = new Promise(function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
         _setAccount(id, data, function (err, result) {
             if (err) {
                 reject(err);
@@ -141,8 +144,6 @@ function _setAccountAsync(id, data) {
             }
         })
     });
-
-    return promise;
 }
 
 /**
@@ -153,7 +154,7 @@ function _setAccountAsync(id, data) {
  */
 function _getAccount(uid, fields, cb) {
     if (!uid) {
-        utils.invokeCallback(cb, '参数错误');
+        utils.invokeCallback(cb, ERROR_OBJ.PARAM_MISSING);
         return;
     }
 
@@ -189,7 +190,8 @@ function _getAccount(uid, fields, cb) {
 
             redisConnector.cmd.multi(cmds).exec(function (err, docs) {
                 if (!!err) {
-                    utils.invokeCallback(cb, err);
+                    logger.error('GET MULTI REDIS OPERATE ERROR:', err);
+                    utils.invokeCallback(cb, ERROR_OBJ.DB_ERR);
                     return;
                 }
 
@@ -202,7 +204,8 @@ function _getAccount(uid, fields, cb) {
         } else {
             redisConnector.cmd.hget(REDISKEY.getKey(fields[0]), uid, function (err, doc) {
                 if (!!err) {
-                    utils.invokeCallback(cb, err);
+                    logger.error('GET REDIS OPERATE ERROR:', err);
+                    utils.invokeCallback(cb, ERROR_OBJ.DB_ERR);
                     return;
                 }
 
@@ -217,17 +220,15 @@ function _getAccount(uid, fields, cb) {
 }
 
 function _getAccountAsync(uid, fields) {
-    let promise = new Promise(function (resolve, reject) {
-        _getAccount(uid, fields, function (err, result) {
+    return new Promise(function (resolve, reject) {
+        _getAccount(uid, fields, function (err, account) {
             if (err) {
                 reject(err);
             } else {
-                resolve(result);
+                resolve(account);
             }
         })
     });
-
-    return promise;
 }
 
 /**

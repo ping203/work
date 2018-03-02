@@ -519,7 +519,9 @@ function updateSingleValue(pool, uid, field, value, cb) {
                         CacheAccount.setGold(account, parseInt(value));
                         break;
                     case 'pearl':
-                        CacheAccount.setPearl(account, parseInt(value));
+                       // 直接设置钻石数据,注意钻石是增量
+                        account.pearl = parseInt(value) - account.pearl;
+                        account.commit();
                         break;
                     case 'weapon':
                         CacheAccount.setWeapon(account, parseInt(value));

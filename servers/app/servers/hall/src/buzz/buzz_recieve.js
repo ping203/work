@@ -4,7 +4,7 @@ const ERROR_OBJ = CstError.ERROR_OBJ;
 const ObjUtil = require('./ObjUtil');
 const ArrayUtil = require('../utils/ArrayUtil');
 const BuzzUtil = require('../utils/BuzzUtil');
-const RandomUtil = require('../utils/RandomUtil');
+const RandomUtil = require('../../../../utils/RandomUtil');
 const HttpUtil = require('../utils/HttpUtil');
 const DaoUtil = require('../utils/DaoUtil');
 let GameLog = require('../log/GameLog');
@@ -637,7 +637,7 @@ function _didChangeInKind(req, dataObj, cb) {
                     account.gold = item_num;
                 break;
                 case ItemType.PEARL:
-                    account.pearl += item_num;
+                    account.pearl = item_num;
                 break;
                 default:
                     // 兑换道具

@@ -10,6 +10,7 @@ const fishCmd = require('../../../../cmd/fishCmd');
 const ACCOUNTKEY = require('../../../../database').dbConsts.ACCOUNTKEY;
 const REDISKEY = require('../../../../database').dbConsts.REDISKEY;
 const configReader = require('../configReader');
+const SAVE_DT = 30 * 1000;
 
 class GoddessPlayer extends ChannelPlayer {
     constructor (data) {
@@ -34,10 +35,11 @@ class GoddessPlayer extends ChannelPlayer {
         return GoddessPlayer.sBaseField();
     }
 
-    getCurGod () {
+    getCurGod (godIdx) {
+        godIdx = godIdx || this._godIdx;
         let goddess = this.account.goddess;
-        if (goddess && goddess.length > this._godIdx) {
-            return goddess[this._godIdx];
+        if (goddess && goddess.length > godIdx) {
+            return goddess[godIdx];
         }
         return null;
     }
@@ -47,30 +49,33 @@ class GoddessPlayer extends ChannelPlayer {
         return god.startWaveIdx;
     }
 
+    _isGodUnlocked (godIdx) {
+        let god = this.getCurGod(godIdx);
+        if (god) {
+            let unlock = god.unlock;
+            for (let i = 0 ; i < unlock.length; i ++) {
+                if (unlock[i] != 2) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 准备就绪
      * @param {*} data 
      * @param {*} cb 
      */
     c_god_ready (data, cb) {
-        this._godIdx = data.godIdx;
+        let godIdx = data.godIdx;
+        if (!this._isGodUnlocked(godIdx)) {
+            return utils.invokeCallback(cb, FishCode.LOCK_GOD);
+        }
+
+        this._godIdx = godIdx;
         let god = this.getCurGod();
-        let isUnlocked = god != null;
-        if (god) {
-            let unlock = god.unlock;
-            isUnlocked = god.hp > 0 && god.level > 0;
-            for (let i = 0; i < unlock.length; i ++) {
-                if (unlock[i] != 2) {
-                    isUnlocked = false;
-                    break;
-                }
-            }
-        }
-        if (!isUnlocked) {
-            utils.invokeCallback(cb, FishCode.LOCK_GOD);
-            return;
-        }
-        
         this._godHp = god.hp;
         this._setPauseAwayFlag();//进入房间，则标记暂离
 
@@ -88,13 +93,16 @@ class GoddessPlayer extends ChannelPlayer {
      * @param {*} cb 
      */
     c_god_pause (data, cb) {
-        if (this._godIdx != data.godIdx) {
-            utils.invokeCallback(cb, FishCode.INVALID_GOD);
-            return;
+        let godIdx = data.godIdx;
+        if (!this._isGodUnlocked(godIdx)) {
+            return utils.invokeCallback(cb, FishCode.LOCK_GOD);
         }
-        logger.error('---client is pause.', data.godIdx)
+        if (this._godIdx != godIdx) {
+            return utils.invokeCallback(cb, FishCode.INVALID_GOD);
+        }
         utils.invokeCallback(cb, null, {});
         this.emit(fishCmd.push.god_pause.route, {player: this});
+        this.save();
     } 
 
     /**
@@ -103,12 +111,13 @@ class GoddessPlayer extends ChannelPlayer {
      * @param {*} cb 
      */
     c_god_continue (data, cb) {
-        if (this._godIdx != data.godIdx) {
-            utils.invokeCallback(cb, FishCode.INVALID_GOD);
-            return;
+        let godIdx = data.godIdx;
+        if (!this._isGodUnlocked(godIdx)) {
+            return utils.invokeCallback(cb, FishCode.LOCK_GOD);
         }
-
-        logger.error('---client is conitue.', data.godIdx);
+        if (this._godIdx != godIdx) {
+            return utils.invokeCallback(cb, FishCode.INVALID_GOD);
+        }
         utils.invokeCallback(cb, null, {});
         this.emit(fishCmd.push.god_continue.route, {player: this});
     } 
@@ -119,12 +128,15 @@ class GoddessPlayer extends ChannelPlayer {
      * @param {*} cb 
      */
     c_god_hurt (data, cb) {         
-        logger.error('---client is c_god_hurt.', data.godIdx, data.fishKey, data.isInGroup);
-
-        if (this._godIdx != data.godIdx) {
-            utils.invokeCallback(cb, FishCode.INVALID_GOD);
-            return;
+        logger.debug('---client is c_god_hurt.', data.godIdx, data.fishKey, data.isInGroup);
+        let godIdx = data.godIdx;
+        if (!this._isGodUnlocked(godIdx)) {
+            return utils.invokeCallback(cb, FishCode.LOCK_GOD);
         }
+        if (this._godIdx != godIdx) {
+            return utils.invokeCallback(cb, FishCode.INVALID_GOD);
+        }
+
         let fish = this.fishModel.getActorData(data.fishKey);
         if (!fish) {
             logger.error('该鱼不存在或已死，为啥还要碰撞？');
@@ -142,7 +154,7 @@ class GoddessPlayer extends ChannelPlayer {
             utils.invokeCallback(cb, null);
             return;
         }
-        logger.error('hurtVal = ', hurtVal);
+        logger.debug('hurtVal = ', hurtVal);
         let god = this.getCurGod();
         let cfg = configReader.getGodLevelData(god.id, god.level);
         this._godHp -= hurtVal;
@@ -156,7 +168,26 @@ class GoddessPlayer extends ChannelPlayer {
             hurtVal: hurtVal,
         });
         this.emit(fishCmd.push.god_hurt.route, {player: this, hpPercent: hpPercent, fishKey: data.fishKey});
+    }
 
+    /**
+     * 定时轮序逻辑
+     * @param {*轮询时间差，单位秒} dt 
+     */
+    update (dt) {
+        super.update(dt);
+
+        //定时存档
+        let now = new Date().getTime();
+        if (this._lastTime) {
+            let pass = now - this._lastTime;
+            if (pass >= SAVE_DT) {
+                this.save();
+                this._lastTime = now;
+            }
+        }else{
+            this._lastTime = now;
+        }
     }
 
     save(){

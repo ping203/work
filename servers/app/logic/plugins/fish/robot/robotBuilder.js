@@ -2,7 +2,7 @@ const config = require('../config');
 const consts = require('../consts');
 const async = require('async');
 const redisClient = require('../../../../utils/dbclients').redisClient;
-const randomUtil = require('../../../../utils/randomUtil');
+const randomUtil = require('../../../../utils/RandomUtil');
 const redisAccountSync = require('../../../../utils/redisAccountSync');
 const omeloNickname = require('omelo-nickname');
 const GAMECFG = require('../../../../utils/imports').GAME_CFGS;
@@ -12,6 +12,7 @@ class RobotBuilder {
         for (let k in this._weaponLevels) {
             this._weaponLevels[k] = parseInt(this._weaponLevels[k]);
         }
+
         this._weaponSkins = Object.keys(GAMECFG.newweapon_weapons_cfg);
         this._roleMaxLevel = GAMECFG.player_level_cfg.length;
     }
@@ -104,6 +105,7 @@ class RobotBuilder {
     }
 
     _calcRank(rank) {
+        logger.error('randomUtil = ',randomUtil);
         let random = randomUtil.randomNum(-3, 2);
         rank = rank + random;
         if (rank < 1) {

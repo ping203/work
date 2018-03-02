@@ -8,7 +8,7 @@ const dao_reward = require('../dao/dao_reward');
 const DateUtil = require('../utils/DateUtil');
 const RedisUtil = require('../utils/RedisUtil');
 const async = require('async');
-const redisSync = require('./redisSync');
+const redisAccountSync = require('../../../../utils/redisAccountSync');
 const CacheAccount = require('./cache/CacheAccount');
 const buzz_mail = require('./buzz_mail');
 const buzz_cst_game = require('./cst/buzz_cst_game');
@@ -111,7 +111,7 @@ function _give_reward(req, dataObj, cb) {
                     charm_change = true;
                 }
             });
-            redisSync.getAccountById(id, function (err, res) {
+            redisAccountSync.getAccount(id, function (err, res) {
 
                 if (BuzzUtil.isNotice(needitem)) {
                     cb(err, res, account, cost_info);

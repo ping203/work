@@ -1,4 +1,4 @@
-// const logWriter = require('../dataSync/utils/logWriter');
+// const logWriter = require('../event/utils/logWriter');
 // function testLog() {
 //     let initId = 0;
 //     // account_id', 'log_at', 'nickname

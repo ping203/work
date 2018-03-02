@@ -144,10 +144,6 @@ module.exports.AccountDef = {
         "def": '0000-00-00 00:00:00',
         "type": "timestamp"
     },
-    "channel_account_name": {
-        "def": null,
-        "type": "string"
-    },
     "channel_account_info": {
         "def": {},
         "type": "object"
@@ -423,6 +419,10 @@ module.exports.AccountDef = {
     "bp": {
         "def": 0,
         "type": "number"
+    },
+    "phone": {
+        "def": '',
+        "type": "string"
     }
 };
 
@@ -621,7 +621,7 @@ exports.OtherDef = {
         "type": "number"
     },
     "figure_url": {
-        "def": "default.jpeg",
+        "def": "default.png",
         "type": "string"
     },
     "new_player": {
@@ -643,7 +643,34 @@ exports.OtherDef = {
     "vip_fill_this_time": {
         "def": 0,
         "type": "number"
-    }
+    },
+    "flower_receive_weekly":{
+        "def": 0,
+        "type": "number",
+        "name": "flower_receive_weekly"
+    },
+    //2018.2.25 add dfc
+    "month_sign_extra_reward": {
+        "def": {},
+        "type": "object",
+        "name": "month_sign_extra_reward"
+    },
+    //2018.2.28 add dfc
+    "social_daily_invite_reward": {
+        "def": 0,
+        "type": "number",
+        "name": "social_daily_invite_reward"
+    },
+    "social_invite_week": {
+        "def": 0,
+        "type": "number",
+        "name": "social_invite_week"
+    },
+    "social_invite_month": {
+        "def": 0,
+        "type": "number",
+        "name": "social_invite_month"
+    },
 };
 
 /**

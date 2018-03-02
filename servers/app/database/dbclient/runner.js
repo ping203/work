@@ -1,7 +1,7 @@
 const RedisConnector = require('./redis/connector');
 const MysqlConnector = require('./mysql/connector');
 const utils = require('../../utils/utils');
-const Sequelize = require('sequelize');
+// const Sequelize = require('sequelize');
 const async = require('async');
 const logger = loggerEx(__filename);
 
@@ -88,25 +88,25 @@ module.exports.connectMysql = function (opts, cb) {
     });
 };
 
-module.exports.connectDBBySequelize = function (opts, cb) {
+// module.exports.connectDBBySequelize = function (opts, cb) {
 
-    const sequelize = new Sequelize(opts.server.db, opts.server.user, opts.server.password, {
-        host: opts.server.host,
-        dialect: 'mysql',
-        pool: {
-            max: opts.ext.max,
-            min: opts.ext.min,
-            idle: 10000
-        }
-    });
+//     const sequelize = new Sequelize(opts.server.db, opts.server.user, opts.server.password, {
+//         host: opts.server.host,
+//         dialect: 'mysql',
+//         pool: {
+//             max: opts.ext.max,
+//             min: opts.ext.min,
+//             idle: 10000
+//         }
+//     });
 
-    sequelize.authenticate().then(() => {
-        logger.info('sequelize连接数据库成功');
-        global.sequelize = sequelize;
-        utils.invokeCallback(cb, null, sequelize);
-    }).catch(err => {
-        console.error('sequelize连接数据库失败', err);
-        utils.invokeCallback(cb, err);
-    });
+//     sequelize.authenticate().then(() => {
+//         logger.info('sequelize连接数据库成功');
+//         global.sequelize = sequelize;
+//         utils.invokeCallback(cb, null, sequelize);
+//     }).catch(err => {
+//         console.error('sequelize连接数据库失败', err);
+//         utils.invokeCallback(cb, err);
+//     });
 
-};
+// };

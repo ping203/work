@@ -483,7 +483,10 @@ class FishModel {
         }
         let goldVal = 0;
         if (fish) {
-            if (fish.display_type == 3) {
+            let temp = fish.nameKey.split('#');
+            let fishID = temp[0];
+            let cfg = this.getFishCfgWithID(fishID);
+            if (cfg && cfg.display_type == 3) {
                 this._curBoosCount --;
                 this._emitEvent(FishModel.EventType.EVENT_BOSS_OVER);
             }

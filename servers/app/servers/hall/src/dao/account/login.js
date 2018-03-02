@@ -4,14 +4,15 @@ const redisKeys = require('../../../../../database').dbConsts.REDISKEY;
 const ObjUtil = require('../../buzz/ObjUtil');
 const DateUtil = require('../../utils/DateUtil');
 const CharmUtil = require('../../utils/CharmUtil');
-const account_def = require('./account_def');
-const redisSync = require('../../buzz/redisSync');
+const account_def = require('../../../../../database/consts').KEYTYPEDEF;
+const redisAccountSync = require('../../../../../utils/redisAccountSync');
 const common = require('./common');
 const utils = require('../../buzz/utils');
+const buzz_cst_game = require('../../buzz/cst/buzz_cst_game');
 const vip_vip_cfg = require('../../../../../utils/imports').GAME_CFGS.vip_vip_cfg;
-const mission = require('../../mission/mission');
 const channel = require('./channel');
 const logger = loggerEx(__filename);
+const RewardModel = require('../../../../../utils/account/RewardModel');
 
 /**
  * 产生一个新玩家，并及时写入redis
@@ -42,7 +43,7 @@ let _generateAccount = function (id, data, cb) {
         newAccount.nickname = 'fj_' + id;
         newAccount.tempname = 'fj_' + id;
 
-        redisSync.setAccountById(id, newAccount, function () {
+        redisAccountSync.setAccount(id, newAccount, function () {
             logger.info('generate temp account done!');
         });
 
@@ -63,7 +64,7 @@ let _generateAccount = function (id, data, cb) {
         async.waterfall([function (cb) {
                 RedisUtil.hset("pair:openid:uid", channel_account_id, id, cb);
             }, function (ret, cb) {
-                redisSync.setAccountById(id, newAccount, cb);
+                redisAccountSync.setAccount(id, newAccount, cb);
             }], function (err, res) {
                 cb && cb(err, [{id: id, tempname: "fj_" + id}]);
             }
@@ -162,7 +163,7 @@ let _someOptAfterLogin = function (account, cb) {
     account.login_count = account.login_count + 1;
 
     //
-    common.addFamousOnlineBroadcast(account, account.platform);
+    buzz_cst_game.addFamousOnlineBroadcast(account, account.platform);
     //重设魅力值
     CharmUtil.getCurrentCharmPoint(account, function (charmPoint) {
         if (charmPoint) {
@@ -170,17 +171,17 @@ let _someOptAfterLogin = function (account, cb) {
         }
 
         cb && cb(null, account);
-        let updateMission = false;
         if (account.first_login === 1) {
             account.first_login = 0;
-            updateMission = true;
+            //累计登录任务数据统计dfc
+            let mission = new RewardModel();
+            mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+            mission.addProcess(RewardModel.TaskType.CONTINUE_LOGIN, 1);
+            account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+            account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
         }
         // 下面的代码执行后效果等同于account.commit().
-        redisSync.setAccountById(account.id, account.toJSON());
-        //累计登录任务数据统计dfc
-        if (updateMission) {
-            mission.add(account.id, mission.MissionType.CONTINUE_LOGIN, 0, 1);
-        }
+        redisAccountSync.setAccount(account.id, account.toJSON());
     });
 };
 
@@ -199,7 +200,7 @@ exports.login = function (data, cb) {
     async.waterfall(
         [
             function (cb) {
-                redisSync.getAccountById(id, cb);
+                redisAccountSync.getAccount(id, cb);
             }
             , function (account, cb) {
             logger.info("登录信息account:", account);
@@ -235,7 +236,6 @@ exports.login_channel = function (data, cb) {
         , function (uid, cb) {
             if (uid) {
                 logger.info("玩家能找到openid对应关系:", uid);
-                // redisSync.getAccountById(uid, cb);
                 RedisUtil.hget(redisKeys.PLATFORM, uid, function (err, res) {
                     if (res) {
                         cb(err, uid);
@@ -272,7 +272,7 @@ exports.login_channel = function (data, cb) {
             } else {
                 _redisId = uid;
                 logger.info("玩家数据在Redis中能找到:", uid);
-                redisSync.getAccountById(uid, cb);
+                redisAccountSync.getAccount(uid, cb);
             }
         }
         , function (account, cb) {

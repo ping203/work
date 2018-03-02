@@ -1,9 +1,6 @@
-const Task = require('../../base/task/task');
-const REDISKEY = require('../../database/consts').REDISKEY;
-const ACCOUNTKEY = require('../../database/consts').ACCOUNTKEY;
-const dbUtils = require('../../database/').dbUtils;
-const rank_rankgame_cfg = require('../../config/index').data_cfg.rank_rankgame_cfg;
 const async = require('async');
+const Task = require('../../../utils/task/task');
+const rank_rankgame_cfg = require('../../../utils/imports').GAME_CFGS.rank_rankgame_cfg;
 const utils = require('../../../utils/utils');
 const SUBTASK_TYPE = require('../src/consts').SUBTASK_TYPE;
 /**

@@ -1,7 +1,7 @@
-const REDISKEY = require('../../database/consts').REDISKEY;
-const ACCOUNTKEY = require('../../database/consts').ACCOUNTKEY;
-const dbUtils = require('../../database/').dbUtils;
-const rank_rankgame_cfg = require('../../config/index').data_cfg.rank_rankgame_cfg;
+const REDISKEY = require('../../../database/consts').REDISKEY;
+const ACCOUNTKEY = require('../../../database/consts').ACCOUNTKEY;
+const redisAccountSync = require('../../../utils/redisAccountSync');
+const rank_rankgame_cfg = require('../../../utils/imports').GAME_CFGS.rank_rankgame_cfg;
 
 class MatchReset{
 
@@ -32,16 +32,16 @@ class MatchReset{
         let self = this;
 
         let promise = new Promise(function (resolve, reject) {
-            dbUtils.redisAccountSync.getHashValueLimit(REDISKEY.PLATFORM, 0, task.limit, async (res, next) => {
-                let uids = dbUtils.redisAccountSync.Util.parseHashKey(res);
+            redisAccountSync.getHashValueLimit(REDISKEY.PLATFORM, 0, task.limit, async (res, next) => {
+                let uids = redisAccountSync.Util.parseHashKey(res);
                 if(0 == uids.length){
                     next();
                     return;
                 }
 
-                let platforms = dbUtils.redisAccountSync.Util.parseHashValue(ACCOUNTKEY.PLATFORM, res);
-                let match_points = await dbUtils.redisAccountSync.multiAsync([['HMGET', REDISKEY.MATCH_POINTS, uids]]);
-                match_points = dbUtils.redisAccountSync.Util.convertValue(ACCOUNTKEY.MATCH_POINTS, match_points[0]);
+                let platforms = redisAccountSync.Util.parseHashValue(ACCOUNTKEY.PLATFORM, res);
+                let match_points = await redisAccountSync.multiAsync([['HMGET', REDISKEY.MATCH_POINTS, uids]]);
+                match_points = redisAccountSync.Util.convertValue(ACCOUNTKEY.MATCH_POINTS, match_points[0]);
 
                 let resetCmds = [];
                 let match_points_new = {};
@@ -96,7 +96,7 @@ class MatchReset{
                     resetCmds.push(['ZADD', `${REDISKEY.RANK.MATCH}:${REDISKEY.PLATFORM_TYPE.IOS}`, match_zadd_ios]);
                 }
 
-                await dbUtils.redisAccountSync.multiAsync(resetCmds);
+                await redisAccountSync.multiAsync(resetCmds);
 
                 recordUid = recordUid.concat(uids);
 
@@ -114,7 +114,7 @@ class MatchReset{
 
     async handle(task) {
         for(let platform of Object.values(REDISKEY.PLATFORM_TYPE)){
-            await dbUtils.redisAccountSync.oneCmdAsync(['del', `${task.redisKey}:${platform}`]);
+            await redisAccountSync.oneCmdAsync(['del', `${task.redisKey}:${platform}`]);
         }
 
         let recordUid = await this._matchResetRedis(task);

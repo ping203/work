@@ -32,6 +32,10 @@ class GoddessRoom extends Room {
     _addPlayerEvent(player) {
         super._addPlayerEvent(player);
 
+        this._fishModel.setNextWaveFunc(function () {
+            player && player.save();
+        });
+
         player.on(fishCmd.push.god_ready.route, function (event) {
             this._isPause = true;
         }.bind(this));
@@ -52,11 +56,11 @@ class GoddessRoom extends Room {
         player.on(fishCmd.push.god_hurt.route, function (event) {
             this._fishModel.removeActorData(event.fishKey);
             if (event.hpPercent === 0) {
+                player.save();
                 this._isGodDead = true;
                 this._fishModel.pass(false, event.player.getCurGod().id);
             }
-            
-        logger.error('left count = ', this._fishModel.getActorTotal());
+            logger.debug('left count = ', this._fishModel.getActorTotal());
         }.bind(this));
     }
 }

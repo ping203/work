@@ -18,7 +18,7 @@ class Room {
 
         this.createFishModel();
 
-        this._flushFishTimer = -1;
+        this._logicTimer = -1;
         this.playerMap = new Map();
         this.channel = omelo.app.get('channelService').getChannel(this._roomId, true);
 
@@ -210,24 +210,7 @@ class Room {
 
     start() {
         this._evtor.on(consts.FLUSH_EVENT, this.onFlushFish.bind(this));
-        let fish_dt = 1; //秒
-        this._flushFishTimer = setInterval(function () {
-            //前后两次时间差，单位秒,注意向下取整
-            let now = new Date().getTime();
-            let dt = now - this._lastFishTimestamp;
-            dt /= 1000;
-            dt = Math.floor(dt);
-            this._lastFishTimestamp = now;
-
-            for (let v of this.playerMap.values()) {
-                v.update(dt);
-            }
-
-            if (!this.isNewFishEnabled()) {
-                return;
-            }
-            this._fishModel.checkNewFish(dt);
-        }.bind(this), fish_dt * 1000);
+        this._logicTimer = setInterval(this._logicUpdate.bind(this), 1000);
         this._startBroadcashTimer();
     }
 
@@ -240,8 +223,8 @@ class Room {
         this._fishModel = null;
 
         this._clearSkillIceTicker();
-        clearInterval(this._flushFishTimer);
-        this._flushFishTimer = null;
+        clearInterval(this._logicTimer);
+        this._logicTimer = null;
 
         clearInterval(this._broadCashTimer);
         this._broadCashTimer = null;
@@ -253,6 +236,27 @@ class Room {
             this.channel.destroy();
             this.channel = null;
         }
+    }
+
+    /**
+     * 定时更新逻辑
+     */
+    _logicUpdate () {
+        //前后两次时间差，单位秒,注意向下取整
+        let now = new Date().getTime();
+        let dt = now - this._lastFishTimestamp;
+        dt /= 1000;
+        dt = Math.floor(dt);
+        this._lastFishTimestamp = now;
+
+        for (let v of this.playerMap.values()) {
+            v.update(dt);
+        }
+
+        if (!this.isNewFishEnabled()) {
+            return;
+        }
+        this._fishModel && this._fishModel.checkNewFish(dt);
     }
 
     _genPlayerProcolInfo(player, isPlayerSelf) {

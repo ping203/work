@@ -61,8 +61,7 @@
         "Symbol": true,
         "cache": true,
         "answer": true,
-        "redisClient": true
-
-
+        "redisClient": true,
+        "exports":true
     }
 }

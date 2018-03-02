@@ -805,7 +805,7 @@ function _updateCardCommon(pool, data, account, cb, start_date, update_items, ca
     //--------------------------------------------------------------------------
     // 更新缓存中的数据(重要:数据库操作将会被删除)
     //--------------------------------------------------------------------------
-    account.pearl += diamond;
+    account.pearl = diamond;
 
     CacheAccount.setCard(account, newCard);
     //--------------------------------------------------------------------------

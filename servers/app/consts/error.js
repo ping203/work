@@ -29,10 +29,11 @@ const _errorCode = {
     USERNAME_EXIST: 1021, //用户名已经存在
     USERNAME_PASSWORD_ERROR: 1022, //用户名或者密码错误
     OLD_PASSWORD_ERROR: 1023, //原密码错误
-    SESSION_INVALID: 1024, //SESSION 无效
     SERVER_INTERNAL_ERROR: 1025, //服务器内部错误
     USER_NOT_EXIST: 1026, //用户不存在
-    
+    USER_ILLEGAL_LOGIN: 1027, //用户非法登录
+    LOGINOUT_FAIL: 1028, //退出账户失败
+
     // 游戏逻辑错误(从1101开始)
     REPEAT_OPERATION:   1101,//重复操作(重复购买，重复领取)
     VIP_NOT_ENOUFH:     1102,//玩家VIP等级不足
@@ -199,10 +200,10 @@ const _errorObj = {
     USERNAME_EXIST:{ code: _errorCode.USERNAME_EXIST, msg: i18n.PLAYER_CHEAT[lan] },
     USERNAME_PASSWORD_ERROR:{ code: _errorCode.USERNAME_PASSWORD_ERROR, msg: i18n.PLAYER_CHEAT[lan] },
     OLD_PASSWORD_ERROR:{ code: _errorCode.OLD_PASSWORD_ERROR, msg: i18n.PLAYER_CHEAT[lan] },
-    SESSION_INVALID:{ code: _errorCode.SESSION_INVALID, msg: i18n.PLAYER_CHEAT[lan] },
     SERVER_INTERNAL_ERROR:{ code: _errorCode.SERVER_INTERNAL_ERROR, msg: i18n.PLAYER_CHEAT[lan] },
     USER_NOT_EXIST:{ code: _errorCode.USER_NOT_EXIST, msg: i18n.PLAYER_CHEAT[lan] },
-
+    USER_ILLEGAL_LOGIN:{ code: _errorCode.USER_ILLEGAL_LOGIN, msg: i18n.PLAYER_CHEAT[lan] },
+    LOGINOUT_FAIL:{code:_errorCode.LOGINOUT_FAIL,msg:i18n.PLAYER_CHEAT[lan]},
     //
     REPEAT_OPERATION: { code: _errorCode.REPEAT_OPERATION, msg: i18n.REPEAT_OPERATION[lan] },
     VIP_NOT_ENOUFH: { code: _errorCode.VIP_NOT_ENOUFH, msg: i18n.VIP_NOT_ENOUFH[lan] },

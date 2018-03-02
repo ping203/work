@@ -74,7 +74,7 @@ class MatchingUser {
      */
     getMatchingInfo () {
         return {
-            uid: this.account.uid,
+            uid: parseInt(this.account.uid),
             rank: this.account.match_rank,
             nickname: this.account.nickname,
             figure_url: this.account.figure_url,

@@ -1,5 +1,5 @@
-const REDISKEY = require('../../database/consts').REDISKEY;
-const dbUtils = require('../../database/').dbUtils;
+const REDISKEY = require('../../../database/consts').REDISKEY;
+const redisAccountSync = require('../../../utils/redisAccountSync');
 class RankReset {
     constructor() {
 
@@ -15,8 +15,7 @@ class RankReset {
                 cmds.push(['del', key]);
             });
         }
-        // console.log("====>>>>>>>>>", cmds)
-        await dbUtils.redisAccountSync.multiAsync(cmds);
+        await redisAccountSync.multiAsync(cmds);
     }
 }
 

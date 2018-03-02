@@ -19,5 +19,6 @@ module.exports = {
         GAIN_LOST:0,
         DATA_SYNC:1,
         MISSION:2,
+        PLAYER_DATA_CHANGE_SYNC:3, //玩家重要数据同步
     }
 };

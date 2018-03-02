@@ -14,15 +14,14 @@ const consts = require('../consts');
 const GAMECFG = require('../../../../utils/imports').GAME_CFGS;
 const configReader = require('../configReader');
 const redisAccountSync = require('../../../../utils/redisAccountSync');
-const import_def = require('../../../../utils/imports');
+const import_def = require('../../../../database/consts');
 const ACCOUNTKEY = import_def.ACCOUNTKEY;
 const REDISKEY = import_def.REDISKEY;
 const playerChangeEvent = require('../../../../cache/playerChangeEvent');
 const gamePlay = require('../gamePlay/gamePlay');
 const Pirate = require('./pirate');
 const RmatchHelper = require('./rmatchHelper');
-const mission = require('../../../../utils/account/mission');
-const missionConsts = require('../../../../utils/account/missionConsts');
+const RewardModel = require('../../../../utils/account/RewardModel');
 const FishingLog = require('./fishingLog');
 const rpc = require('../../../net/rpc');
 const FIRE_DELAY = 50; //开炮事件服务端与客户端的延时,单位毫秒
@@ -62,7 +61,7 @@ class FishPlayer extends Player {
         this._lastFireIdx = 0;
         this._pirate = null;
         this._pirateTimestamp = null;
-        this._log = new FishingLog(this.account.id, this.account.gold, this.account.pearl);
+        this._log = new FishingLog(this.account);
         this._log.setCheatProc(function (msg, cheatCode) {
             this._cheatOnce(msg, cheatCode);
         }.bind(this));
@@ -74,7 +73,11 @@ class FishPlayer extends Player {
             msg: ''
         };
         this._skinDt = 200;
-	    this._rmHelper = null;
+        this._rmHelper = null;
+        this._isForbided = this.account.test < 0;
+        this._mission = new RewardModel();
+        this._mission.resetLoginData(this.account.mission_only_once, this.account.mission_daily_reset);
+
         playerChangeEvent.on(this.uid, this._playerChangeEvt.bind(this));
     }
 
@@ -192,8 +195,10 @@ class FishPlayer extends Player {
             ACCOUNTKEY.PIRATE,
             ACCOUNTKEY.BP,
             ACCOUNTKEY.PLATFORM,
-	    ACCOUNTKEY.TOKEN,
-	    ACCOUNTKEY.TEST,
+            ACCOUNTKEY.TOKEN,
+            ACCOUNTKEY.TEST,
+            ACCOUNTKEY.MISSION_DAILY_RESET,
+            ACCOUNTKEY.MISSION_ONLY_ONCE,
         ];
         return baseField;
     }
@@ -202,25 +207,34 @@ class FishPlayer extends Player {
         return FishPlayer.sBaseField();
     }
 
-    _regetField(cb) {
-        redisAccountSync.getAccount(this.uid, this.getBaseField(), function (err, account) {
+
+    syncData () {
+        logger.error('收到来自数据服的同步通知 ');
+        this.account.commit(function () {
+            this._regetField();
+        }.bind(this));
+    }
+
+    _regetField() {
+        let tfs = this.getBaseField();
+        redisAccountSync.getAccount(this.uid, tfs, function (err, account) {
             if (!!err) {
-                utils.invokeCallback(cb, CONSTS.SYS_CODE.DB_ERROR);
+                logger.error('err = ', err, ' code = ', CONSTS.SYS_CODE.DB_ERROR.code);
                 return;
             }
             if (!account) {
-                utils.invokeCallback(cb, CONSTS.SYS_CODE.PLAYER_NOT_EXIST);
+                logger.error('err = ', err, ' code = ', CONSTS.SYS_CODE.PLAYER_NOT_EXIST.code);
                 return
             }
-            //注意：.comeback 可能未undefined
-            if (!account.comeback) {
-                account.comeback = {};
-            }
-            let wpEng = account.weapon_energy;
+
             this.account = account;
+            if (this._log) {
+                this._log.logAll(this.account);
+            }
+
+            this._mission && this._mission.resetLoginData(this.account.mission_only_once, this.account.mission_daily_reset);
             this._resetDIY();
 
-            utils.invokeCallback(cb, null);
             this.emit(fishCmd.push.player_notify.route, {
                 player: this,
                 data: {
@@ -232,18 +246,6 @@ class FishPlayer extends Player {
                 }
             });
         }.bind(this));
-    }
-
-    c_player_notify(data, cb) {
-        if (this._wait2WriteRedis) {
-            this._wait2WriteRedis = false;
-            this._writeRedisTimestamp = new Date().getTime();
-            this.account.commit(function () {
-                this._regetField(cb);
-            }.bind(this));
-        } else {
-            this._regetField(cb);
-        }
     }
 
     /**
@@ -284,8 +286,8 @@ class FishPlayer extends Player {
 
         let timeNow = new Date().getTime();
         redisConnector.cmd.hset(REDISKEY.CHEAT_FORBID_TIME, this.account.id, timeNow);
-
-        logger.error('作弊封号：', this.account.id);
+        this._isForbided = true;
+        logger.error('作弊封号，终止操作：', this.account.id);
     }
 
     /**
@@ -307,7 +309,7 @@ class FishPlayer extends Player {
     }
 
     getCheatingData () {
-        return this._cheat.count >= CHEAT_MAX ? this._cheat : 0;
+        return this._isForbided || (this._cheat.count >= CHEAT_MAX ? this._cheat : 0);
     }
 
     /**
@@ -395,6 +397,9 @@ class FishPlayer extends Player {
      * 开炮
      */
     c_fire(data, cb) {
+        if (this._isForbided) {
+            return utils.invokeCallback(cb, null);
+        }
         if (!data) {
             utils.invokeCallback(cb, null);
         }
@@ -450,17 +455,24 @@ class FishPlayer extends Player {
                 level: this.account.level,
                 exp: this.account.exp,
             };
+            let star = this.getSkinStar(curSkin);
+            let wpStarCfg = null;
+            star && (wpStarCfg = configReader.getWeaponStarData(curSkin, star));
+
             let gainExp = this.cost.fire_gain_exp({
                 gold: costGold,
                 godId: -1, //todo
                 godLevel: -1, //todo
+                starExp: wpStarCfg && wpStarCfg.exp || 0, //星级加成经验
             });
+
             if (gainExp > 0) {
                 let oldLv = saveData.level;
                 let result = this.cost.reset_exp_level(oldLv, saveData.exp, gainExp);
                 if (!result.full) {
                     if (result.level > oldLv) {
                         saveData.level = result.level; //升级了，数据服负责发放升级奖励
+                        this._mission.addProcess(RewardModel.TaskType.UPDATE_USER_LV, saveData.level);////角色等级x级
                     }
                     saveData.exp = result.exp; //注意经验是增量
                 }
@@ -476,6 +488,7 @@ class FishPlayer extends Player {
                 energy: energy,
                 godId: -1, //todo 
                 godLevel: -1, //todo
+                starLaser: wpStarCfg && wpStarCfg.powerspeed || 0, //星级加成激光累计速度
             });
             this.DIY.weapon_energy[curWpLv] = gainLaser;
             saveData.weapon_energy = this.DIY.weapon_energy;
@@ -576,6 +589,8 @@ class FishPlayer extends Player {
                 }
                 this._addBkCost(wbk, -1, srcSkin == consts.WP_SKIN_ID.PAOPAOTANG);//克隆子弹特殊标记
             }
+        }else if (clones.length === 1 && clones[0] == srcWbk) {
+            this._addBkCost(clones[0], -1, false);
         }else {
             this._cheatOnce('非克隆子弹发克隆消息，疑似作弊');
         }
@@ -586,6 +601,10 @@ class FishPlayer extends Player {
      * 碰撞鱼捕获率判定
      */
     c_catch_fish(data, cb) {
+        if (this._isForbided) {
+            return utils.invokeCallback(cb, null);
+        }
+
         let isReal = this.isRealPlayer();
         //校验子弹是否真的存在过 //子弹不存在，则无消耗，不能碰撞
         let bFishes = data.b_fishes;
@@ -643,46 +662,53 @@ class FishPlayer extends Player {
         let rewardFishNum = 0;
         let pirateData = null;
         let fireFlagGolds = {};
-        let mc = 0;
+        let gotC = 0;
         for (let fk in ret) {
             let rd = ret[fk];
             let gold = rd.gold;
             if (gold >= 0) {
                 let fireFlag = rd.fireFlag;
-                fireFlagGolds[fireFlag] = fireFlagGolds[fireFlag] || {count: 0, gold: 0 };
-                let td = fireFlagGolds[fireFlag];
-                td.gold += gold;
-                if (fireFlag === consts.FIRE_FLAG.BOMB && td.gold > 100) {
-                    td.gold = 100; //炸弹鱼最多炸死获得100分
-                    gold = td.gold - 100;
-                }else {
-                    td.count ++;
+                fireFlagGolds[fireFlag] = fireFlagGolds[fireFlag] || {
+                    count: 0,
+                    gold: 0,
+                    score: 0,
+                };
+                let score = this.fishModel.getActorData(fk).goldVal;
+                let fg = fireFlagGolds[fireFlag];
+                if (fireFlag === consts.FIRE_FLAG.BOMB) {
+                    fg.score += score;
+                    if (fg.score < 100) {
+                        fg.count ++;
+                        fg.gold += gold;
+                    }else{
+                        fg.score = 100;
+                    }
+                }else{
+                    fg.score += score;
+                    fg.count ++;
+                    fg.gold += gold;
                 }
-                gainGold += gold;
-                mc ++;
-
-                let temp = this._missionCoutWithFish(fk, gold);
+                let temp = this._missionCoutWithFish(fk, gold, rd.skin);
                 temp.rewardFishFlag === 1 && (rewardFishNum ++);
                 temp.pirateFlag > 0 && this._pirate && (pirateData = this._pirate.getProgress());
+                fg.fish_id = temp.fish_id;
+                gotC ++;
             }
         }
-        //爆炸鱼闪电鱼任务统计
-        let lc = fireFlagGolds[consts.FIRE_FLAG.LIGHTING] && fireFlagGolds[consts.FIRE_FLAG.LIGHTING].count || 0;
-        let bc = fireFlagGolds[consts.FIRE_FLAG.BOMB] && fireFlagGolds[consts.FIRE_FLAG.BOMB].count || 0;
-        if (lc > 0) {
-            mission.add(this.account.id, missionConsts.MissionType.USE_FISH_CATCH_FISH, 17, lc);
-        }
-        if (bc > 0) {
-            mission.add(this.account.id, missionConsts.MissionType.USE_FISH_CATCH_FISH, 19, bc);
-        }
-        //单次开炮捕获鱼,单次开炮获得金币
-        if (mc > 1) {
-            mission.add(this.account.id, missionConsts.MissionType.ONE_CATCH_FISH, 0, mc);
-            mission.add(this.account.id, missionConsts.MissionType.ONE_GET_GOLD, 0, gainGold);
+        for (let fk in fireFlagGolds) {
+            gainGold += fireFlagGolds[fk].gold;
         }
         let newRrewardFishGold = this.account.bonus && this.account.bonus.gold_count || 0;
         newRrewardFishGold -= oldRrewardFishGold;
         newRrewardFishGold = Math.max(newRrewardFishGold, 0);
+        this._mission.addProcess(RewardModel.TaskType.ONE_GET_GOLD, gainGold);//单次开炮获得金币x
+        for (let fk in fireFlagGolds) {       
+            let flag = parseInt(fk);
+            if (flag === consts.FIRE_FLAG.LIGHTING || flag === consts.FIRE_FLAG.BOMB) {
+                let fg = fireFlagGolds[fk];
+                this._mission.addProcess(RewardModel.TaskType.USE_FISH_CATCH_FISH, fg.count, fg.fish_id);//利用x鱼炸死y条其他鱼
+            }
+        }
 
         //打死已经被捕获的鱼，补偿其开炮金币
         let fireCostBack = tData.costGold;
@@ -759,18 +785,13 @@ class FishPlayer extends Player {
                 id: skillId,
                 ct: ret.skillC,
             }
+            this._mission.addProcess(RewardModel.TaskType.USE_SKILL, 1, skillId);//使用x技能y次，如果x为0则为任意技能
         }
         let costVal = 0;
         ret.costPearl > 0 && (saveData.pearl = -ret.costPearl, costVal = ret.costPearl);
         ret.costGold > 0 && (saveData.gold = -ret.costGold, costVal = ret.costGold);
 
-        let sceneFlag = GAMECFG.common_log_const_cfg.GAME_FIGHTING;
-        if (costVal > 0 && this.isRealPlayer()) {
-            if (this._isNbomb(skillId)) {
-                sceneFlag = GAMECFG.common_log_const_cfg.NUCLER_COST;
-            }
-        }
-        this._save(saveData, sceneFlag);
+        this._save(saveData);
 
         let common = {
             skill_id: skillId,
@@ -786,6 +807,9 @@ class FishPlayer extends Player {
      * 开始使用技能
      */
     c_use_skill(data, cb) {
+        if (this._isForbided) {
+            return utils.invokeCallback(cb, null);
+        }
         let skillId = data.skill;
         if (!this._skState) {
             this._skState = {};
@@ -811,7 +835,14 @@ class FishPlayer extends Player {
                 skill_id: skillId,
             },
         };
-        data.call && (sdata.call_ready = data.call);
+        if (data.call) {
+            let callFish = data.call.fish;
+            const cfg = configReader.getValue('skill_skill_cfg', skillId);
+            if (!callFish || !cfg || !cfg.summon_type || cfg.summon_type.indexOf(callFish) === -1) {
+                return utils.invokeCallback(cb, null);
+            }
+            sdata.call_ready = data.call;
+        }
 
         //核弹在确认发射时才扣钱
         if (skillId === consts.SKILL_ID.SK_NBOMB0 || skillId === consts.SKILL_ID.SK_NBOMB1 || skillId === consts.SKILL_ID.SK_NBOMB2) {
@@ -996,20 +1027,6 @@ class FishPlayer extends Player {
         let evtData = data.event_data;
         let ret = null;
         switch (event) {
-            case consts.FIGHTING_NOTIFY.WP_SKIN: {
-                    let wpSkin = evtData.wp_skin;
-	            if (!this._checkBulletSkin(wpSkin)) {
-	                utils.invokeCallback(cb, null);
-	                return;
-	            }
-	            this.DIY.weapon_skin = wpSkin;
-	            this._resetSkinDt();
-                    this.rpcRankMatchCall(rankMatchCmd.remote.weaponChange.route, {
-                        wp_skin: wpSkin,
-                    });
-            }
-            break;
-
             case consts.FIGHTING_NOTIFY.WP_LEVEL: {
                 let wpLv = evtData.wp_level;
 	            if (this._checkBulletLevel(wpLv)) {
@@ -1042,6 +1059,7 @@ class FishPlayer extends Player {
                         now -= this._miniTimestamp;
                         const goldMax = cfg.maxscore;
                         if (now >= dt && mgold > 0 && mgold < goldMax && this.isRealPlayer()) {
+                            this._mission.addProcess(RewardModel.TaskType.PLAY_LITTLE_GAME, mtype, mgold);
                             this._save({
                                 gold: mgold,
                             }, GAMECFG.common_log_const_cfg.MINI_GAME);
@@ -1050,8 +1068,6 @@ class FishPlayer extends Player {
                             }
                         }
                         this._miniTimestamp = null;
-                        //小游戏统计dfc
-                        this.isRealPlayer() && mission.add(this.account.id, missionConsts.MissionType.PLAY_LITTLE_GAME, mtype, mgold);
                     }
                 }
             }
@@ -1062,7 +1078,6 @@ class FishPlayer extends Player {
                 if (drop && drop.isPirateReward) {
                     let pirate = this._pirate;
                     if (pirate && pirate.isFinished()) {
-                        logger.error('sdfsd--done');
                         pirate.reset();
                         this._save({
                             pirateData: -1,
@@ -1144,9 +1159,9 @@ class FishPlayer extends Player {
     c_query_rmatch(data, cb) {
         this._generateRmHelper(data);
         this.rpcRankMatchCall(rankMatchCmd.remote.query_playerInfo.route, null, function (err, playersInfos) {
-            if (err) {
-                logger.error('err = ', err);
-                //todo排位赛结束
+            if (err || !playersInfos) {
+                //排位赛结束
+                this.clearRmatch();
                 return utils.invokeCallback(cb, null, {});
             } else {
                 for (let i = 0; i < playersInfos.length; i ++) {
@@ -1188,9 +1203,7 @@ class FishPlayer extends Player {
             this._skState[skillId].ticker = setTimeout(function () {
                 let skId = this;
                 self._clearSkillTicker(skId);
-                //统计技能使用dfc
-                isReal && mission.add(id, missionConsts.MissionType.USE_SKILL, skillId, 1);
-                //广播某玩家某技能结束
+                //广播某玩家某技能结束 
                 self.emit(fishCmd.push.use_skill_end.route, {
                     player: self,
                     data: {
@@ -1231,25 +1244,35 @@ class FishPlayer extends Player {
         if (oldWpLv && weapon > oldWpLv && this.DIY && this.DIY.weapon_energy && this.DIY.weapon_energy[weapon]) {
             weapon = oldWpLv;
         }
+        //排位赛时，皮肤变化需要及时通知
+        let wpSkin = account.weapon_skin.equip;
+        if (this.DIY && this.DIY.weapon_skin != wpSkin) {
+            this.rpcRankMatchCall(rankMatchCmd.remote.weaponChange.route, {
+                wp_skin: wpSkin,
+            });
+        }
+
         this._DIY = {
             weapon: weapon,
-            weapon_skin: account.weapon_skin.equip,
+            weapon_skin: wpSkin,
             weapon_energy: account.weapon_energy,
         };
 
         //注意：原始数据可能无1倍激光能量标记，此处兼容处理
         this.DIY.weapon_energy = this.DIY.weapon_energy || {};
-        let wbks = Object.keys(GAMECFG.newweapon_upgrade_cfg);
+        let cfg = GAMECFG.newweapon_upgrade_cfg;
+        let wbks = Object.keys(cfg);
         for (let i = 0; i < wbks.length; i++) {
             let lv = parseInt(wbks[i]);
             if (lv > aw) {
                 break;
             }
             if (!this.DIY.weapon_energy[lv]) {
-                this.DIY.weapon_energy[lv] = 0;
+                this.DIY.weapon_energy[lv] = lv == aw ? cfg[lv].needpower : 0;
+                this.account.weapon_energy = this.DIY.weapon_energy;
+                this.save();
             }
         }
-
         this._makePirateFieldValid();
         this._resetSkinDt();
     }
@@ -1260,6 +1283,15 @@ class FishPlayer extends Player {
         let offset = FIRE_DELAY + Math.floor(Math.random()*50);
         this._skinDt = (SKIN_CFG.interval || 0.2) * 1000 - offset;
         this._maxWpLv = this.cost.getWpLevelMax(this.DIY.weapon_energy);
+    }
+
+    getSkinStar (skin) {
+        skin = skin || this.DIY.weapon_skin;
+        let star = 0;
+        if (this.account.weapon_skin.star) {
+            star = this.account.weapon_skin.star[skin] || 0;
+        }
+        return star;
     }
 
     /**
@@ -1293,6 +1325,18 @@ class FishPlayer extends Player {
             data.hasOwnProperty('exp') && (this.account.exp = data.exp);
             data.hasOwnProperty('level') && (this.account.level = data.level);
             this.account.comeback && data.hasOwnProperty('comeback_hitrate') && (this.account.comeback.hitrate = data.comeback_hitrate, this.account.comeback = this.account.comeback);
+           
+            let goldChange = data.gold;
+            if(goldChange > 0){
+                this._mission.addProcess(RewardModel.TaskType.GET_GOLD, goldChange);
+            }else if (goldChange < 0){
+                this._mission.addProcess(RewardModel.TaskType.USE_GOLD, -goldChange);
+            }
+
+            let mission_only_once = this._mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+            let mission_daily_reset = this._mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
+            mission_only_once && (this.account.mission_only_once = mission_only_once);
+            mission_daily_reset && (this.account.mission_daily_reset = mission_daily_reset);
 
             if (data.hasOwnProperty('pirateData') && data.pirateData) {
                 let td = this.account.pirate;
@@ -1338,12 +1382,15 @@ class FishPlayer extends Player {
     /**
      * 捕获鱼相关任务统计
      */
-    _missionCoutWithFish(fk, gold, skin, star) {
+    _missionCoutWithFish(fk, gold, skin) {
         let temp = fk.split('#');
         let fishID = temp[0];
         let cfg = fishID && this.fishModel.getFishCfgWithID(fishID) || null;
         let data = {};
         if (cfg) {
+            let star = this.getSkinStar(skin);
+            let wpStarCfg = configReader.getWeaponStarData(skin, star);
+
             //奖金鱼统计
             if (cfg.display_type === 4) {
                 let bonus = this.account.bonus;
@@ -1354,7 +1401,7 @@ class FishPlayer extends Player {
                 if (!bonus.gold_count) {
                     bonus.gold_count = 0;
                 }
-                let reward = this.cost.calGoldenFishReward(gold, skin, star);
+                let reward = this.cost.calGoldenFishReward(gold, skin, star, wpStarCfg);
                 bonus.gold_count += reward;
                 this.account.bonus = bonus;
                 data.rewardFishFlag = 1;
@@ -1366,10 +1413,15 @@ class FishPlayer extends Player {
                 fishName && (data.pirateFlag = this._pirate.countFish(fishName));
             }
 
-            //捕鱼积分统计
-            this._countBp(gold);
-            //任务统计dfc
-            this.isRealPlayer() && mission.add(this.account.id, missionConsts.MissionType.CATCH_FISH, cfg.fish_id, 1);
+            //捕鱼积分统计,注意星级加成
+            let fishingScore = gold;
+            wpStarCfg && (fishingScore *= (1 + (wpStarCfg.fishing || 0)));
+            this._countBp(fishingScore);
+
+            //日常、成就统计
+            this._mission.addProcess(RewardModel.TaskType.CATCH_FISH, 1, cfg.fish_id); //打死指定鱼1条
+            this._mission.addProcess(RewardModel.TaskType.CATCH_FISH, 1, 0); //打死任意鱼统计  
+            data.fish_id = cfg.fish_id;
         }
         return data;
     }
@@ -1441,10 +1493,8 @@ class FishPlayer extends Player {
         this._generateRmHelper(evtData);
         this.rpcRankMatchCall(rankMatchCmd.remote.ready.route, {
             gameSid: this.sid,
-        },function(err){
-            evtData.isContinue && this.send_match_players_info();
-        }.bind(this));
-
+            isContinue: evtData.isContinue,
+        });
     }
 
     /**
@@ -1454,11 +1504,25 @@ class FishPlayer extends Player {
         if (!this._rmHelper) return;
         this._rmHelper.setNbCost(evtData.nbomb_cost);
         this._rmHelper.registerUpdateFunc(function (data) {
-            logger.error('当前战绩===', data);
+            //logger.error('当前战绩===', data);
             if (data.nbomb) {
                 this.rpcRankMatchCall(rankMatchCmd.remote.useNbomb.route, data);
                 this.clearRmatch();
             } else {
+                //比赛结算时，注意皮肤星级加成
+                if (this._rmHelper.isNormalFireEnd()) {
+                    let curSkin = this.DIY.weapon_skin;
+                    let star = this.getSkinStar(curSkin);
+                    let wpStarCfg = null;
+                    star && (wpStarCfg = configReader.getWeaponStarData(curSkin, star));
+                    if (wpStarCfg) {
+                        data.star = {
+                            skin: curSkin,
+                            score : wpStarCfg.score,    //--比赛分数提高
+                            rank : wpStarCfg.rank,    //--比赛胜点提高
+                        }
+                    }
+                }
                 this.rpcRankMatchCall(rankMatchCmd.remote.fightInfo.route, data);
             }
         }.bind(this));

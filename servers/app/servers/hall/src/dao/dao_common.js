@@ -1,36 +1,16 @@
-﻿// 提供以下API作为通用方法
-// checkAccount
-
-//==============================================================================
-// import
-//==============================================================================
-var CstError = require('../buzz/cst/buzz_cst_error');
-var DaoAccountCommon = require('./account/common');
-
-var CacheAccount = require('../buzz/cache/CacheAccount');
+﻿const CstError = require('../buzz/cst/buzz_cst_error');
+const DaoAccountCommon = require('./account/common');
+const CacheAccount = require('../buzz/cache/CacheAccount');
 const async = require('async');
-var StringUtil = require('../utils/StringUtil');
-var utils = require('../utils/utils');
+const StringUtil = require('../utils/StringUtil');
+const utils = require('../utils/utils');
+const ERROR_OBJ = CstError.ERROR_OBJ;
+const logger = loggerEx(__filename);
 
-//==============================================================================
-// constant
-//==============================================================================
-var ERROR_CODE = CstError.ERROR_CODE;
-var ERROR_OBJ = CstError.ERROR_OBJ;
+let ERROR = 1;
+let DEBUG = 0;
 
-var ERROR = 1;
-var DEBUG = 0;
-
-var TAG = "【dao_common】";
-
-
-//==============================================================================
-// public
-//==============================================================================
-
-//------------------------------------------------------------------------------
-// definition
-//------------------------------------------------------------------------------
+const TAG = "【dao_common】";
 
 exports.checkAccount = checkAccount;
 exports.handleError = handleError;
@@ -86,8 +66,10 @@ function checkToken(server_token, token) {
 function checkAccount(pool, token, cb) {
     const FUNC = TAG + "checkAccount() --- ";
 
-    var uid = token.split("_")[0];
+    let uid = token.split("_")[0];
 
+    pool = pool || global.mysqlPool;
+    
     async.waterfall(
         [
             function (_cb) {
@@ -97,16 +79,16 @@ function checkAccount(pool, token, cb) {
                 if (!account) {
                     DaoAccountCommon.getAccountByUid(pool, uid, function(err, account) {
                         if (err) {
-                            if (ERROR) console.error(FUNC + "数据库读写错误");
+                            logger.error(FUNC + "数据库读写错误");
                             _cb(ERROR_OBJ.DB_ERR);
                             return;
                         }
-                        if (DEBUG)console.log(FUNC + "玩家数据来自数据库:", uid);
+                        logger.error(FUNC + "玩家数据来自数据库:", uid);
                         _cb(null, account);
                     });
                 }
                 else {
-                    if (DEBUG)console.log(FUNC + "玩家数据来自缓存:", uid);
+                   // logger.error(FUNC + "玩家数据来自redis:", account);
                     _cb(null, account);
                 }
             }

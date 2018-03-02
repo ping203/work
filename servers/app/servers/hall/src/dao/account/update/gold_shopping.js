@@ -16,6 +16,7 @@ const goddess_goddessup_cfg = gameConfig.goddess_goddessup_cfg;
 const common_log_const_cfg = gameConfig.common_log_const_cfg;
 const shop_shop_buy_type_cfg = gameConfig.shop_shop_buy_type_cfg;
 const mission = require('../../../mission/mission');
+const RewardModel = require('../../../../../../utils/account/RewardModel');
 //==============================================================================
 // const
 //==============================================================================
@@ -156,7 +157,12 @@ function update(pool, data, cb, account) {
             account.commit();
 
             //统计金币购买次数dfc
-            mission.add(account.id, mission.MissionType.GOLD_TIMES, 0, times);
+            let mission = new RewardModel();
+            mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+            mission.addProcess(RewardModel.TaskType.GOLD_TIMES, times);
+            account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+            account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
+            account.commit();
             // yDONE: 金币数据记录
             // yDONE: 钻石数据记录
 

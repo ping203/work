@@ -1,94 +1,20 @@
 ﻿const Reward = require('../buzz/pojo/Reward');
 const ObjUtil = require('../buzz/ObjUtil');
-const CstError = require('../buzz/cst/buzz_cst_error');
+const buzz_limit_items = require('../buzz/buzz_limit_items');
 const ItemTypeC = require('../buzz/pojo/Item').ItemTypeC;
-const RedisUtil = require('../utils/RedisUtil');
-const CacheAccount = require('../buzz/cache/CacheAccount');
 const DaoGold = require('./dao_gold');
 const DaoPearl = require('./dao_pearl');
-const _package = require('./account/update/package');
 const _ = require('underscore');
-const item_item_cfg = require('../../../../utils/imports').GAME_CFGS;
-
-let DEBUG = 0;
-let ERROR = 1;
+const logger = loggerEx(__filename);
 
 const TAG = "【dao_reward】";
 
-//==============================================================================
-// public
-//==============================================================================
-
-//------------------------------------------------------------------------------
-// definition
-//------------------------------------------------------------------------------
 exports.getCommonReward = getCommonReward;
 exports.costCommon = costCommon;
 exports.getReward = getReward;
 exports.cost = cost;// 交换时的代价, 需要从背包中移除的物品
 exports.enough = enough;// 交换时的代价, 判断玩家是否拥有足够的物品进行交换
-
 exports.resetMonthSign = resetMonthSign;
-
-//------------------------------------------------------------------------------
-// implement
-//------------------------------------------------------------------------------
-
-/**
- * 限时道具获得时间，方便计算过期时间
- */
-function _setItemGetAt (account, reward) {
-    if (reward) {
-        let cmds = [];
-        let ts = {};
-        const HK = _package.LIMIT_ITEM_HK;
-        _package.checkItemLimitEnd(account, function (res) {
-            if (res) {
-                for (let k in res) {
-                    let pk = HK + k;
-                    ts[pk] = res[k];
-                }
-            }
-
-            for (let i = 0; i < reward.length; i ++) {
-                let tw = reward[i];
-                let itemId = tw[0];
-                let itemNum = tw[1];
-                let IT_CFG = item_item_cfg[itemId];
-                if (IT_CFG) {
-                    let ltype = IT_CFG.lengthtype;
-                    if (ltype === 1 || ltype === 2) {
-                        let pk = HK + itemId;
-                        if (!ts[pk]) {
-                            ts[pk] = [];
-                        }
-                        console.log('-itemId - itemId = ', itemId);
-                        let now = new Date().getTime();
-                        let td = [now, itemNum];//领取时间戳、该时间领取的数量
-                        ts[pk].push(td);
-                    }
-                }
-            }
-            let uid = account.id;
-            for (let k in ts) {
-                let temp = ts[k];
-                if (temp.length > 0) {
-                    let val = JSON.stringify(temp);
-                    let tt = ['hset', k, uid, val];
-                    cmds.push(tt);
-                }
-            }
-            if (cmds.length > 0) {
-                RedisUtil.multi(cmds, function (err, result) {
-                    if (err) {
-                        console.log('限时道具获得时间批量写入失败！');
-                    }
-                });
-            }
-        });
-    }
-}
-
 
 /**
  * 每月一日重置月签数据
@@ -103,8 +29,8 @@ function resetMonthSign(pool, monthSignInitStr, cb) {
     let sql_data = [monthSignInitStr];
 
     pool.query(sql, sql_data, function(err, result) {
-        if (ERROR) console.error(FUNC + "err:", err);
-        if (DEBUG) console.log(FUNC + "result:", result);
+        logger.error(FUNC + "err:", err);
+        logger.info(FUNC + "result:", result);
         cb();
     });
 }
@@ -114,10 +40,6 @@ function resetMonthSign(pool, monthSignInitStr, cb) {
  * @param data 包含两个数据account, reward.
  */
 function getCommonReward(pool, data, cb) {
-    const FUNC = TAG + "getCommonReward() --- ";
-
-    if (DEBUG) console.log(FUNC + "data:\n", data);
-
     let account = data.account;
     let reward = data.reward;
     getReward(pool, account, reward, cb);
@@ -128,10 +50,6 @@ function getCommonReward(pool, data, cb) {
  * @param data 包含两个数据account, reward.
  */
 function costCommon(pool, data, cb) {
-    const FUNC = TAG + "costCommon() --- ";
-
-    if (DEBUG) console.log(FUNC + "data:\n", data);
-
     let account = data.account;
     let reward = data.reward;
     cost(pool, account, reward, cb);
@@ -143,25 +61,21 @@ function costCommon(pool, data, cb) {
  * @param reward 获取的奖励字符串(或对象), 需要统一为对象作为Reward的输入.
  *     reward格式为
  */
-function getReward(pool, account, reward, cb) {
+function getReward(pool, account, reward,cb) {
     const FUNC = TAG + "getReward() --- ";
-    let account_id = account.id;
-    let level = account.level;
-    
-    if (DEBUG) console.log(FUNC + 'reward:', reward);
+
+    logger.info(FUNC + 'reward:', reward);
     
     reward = ObjUtil.str2Data(reward);
     //新增限时道具获得时间，方便计算过期时间
-    _setItemGetAt(account, reward);
+    buzz_limit_items.setItemGetAt(account, reward);
     let rewardInfo = new Reward(reward);
     
-    if (DEBUG) console.log(FUNC + 'rewardInfo:', rewardInfo);
+    logger.info(FUNC + 'rewardInfo:', rewardInfo);
     
     let gold = rewardInfo.gold;
     let pearl = rewardInfo.pearl;
-    let active_point = rewardInfo.active_point;
-    let achieve_point = rewardInfo.achieve_point;
-    
+
     let skill_inc = rewardInfo.skill;
     let debris_inc = rewardInfo.debris;
     let gift_inc = rewardInfo.gift;
@@ -171,7 +85,7 @@ function getReward(pool, account, reward, cb) {
     let skin_debris_inc = rewardInfo.skin_debris;
 
 
-    if (DEBUG) console.log(FUNC + "更新缓存中的玩家数据");
+    logger.info(FUNC + "更新缓存中的玩家数据");
 
     if(gold > 0){
         account.gold = gold;
@@ -181,18 +95,17 @@ function getReward(pool, account, reward, cb) {
         account.pearl += pearl;
     }
 
-    CacheAccount.addActivePoint(account, active_point);
-    CacheAccount.addAchievePoint(account, achieve_point);
+    logger.info(FUNC + "(1)cache_account.skill:", account.skill);
+    logger.info(FUNC + "skill_inc:", skill_inc);
 
-    if (DEBUG) console.log(FUNC + "(1)cache_account.skill:", account.skill);
-    if (DEBUG) console.log(FUNC + "skill_inc:", skill_inc);
-
-    if (!account.skill) {
-        account.skill = {};
+    if (skill_inc) {
+        if (!account.skill) {
+            account.skill = {};
+        }
+        account.skill = ObjUtil.update(account.skill, skill_inc);
     }
-    account.skill = ObjUtil.update(account.skill, skill_inc);
 
-    if (DEBUG) console.log(FUNC + "(2)cache_account.skill:", account.skill);
+    logger.info(FUNC + "(2)cache_account.skill:", account.skill);
 
     if (account.package[ItemTypeC.DEBRIS] == null) {
         account.package[ItemTypeC.DEBRIS] = {};
@@ -226,14 +139,7 @@ function getReward(pool, account, reward, cb) {
     account.package[ItemTypeC.SKIN_DEBRIS] = ObjUtil.update(account.package[ItemTypeC.SKIN_DEBRIS], skin_debris_inc);
 
     account.package = account.package;
-    account.commit(function (err, result) {
-        // TODO:如果金币和钻石改变量为0则不在写数据库
-        if (gold == 0 && pearl == 0) {
-            cb(null, 1);
-            return;
-        }
-
-        // TODO: tbl_gold&tbl_pearl数据入缓存
+    account.commit(function () {
         cb(null, 1);
     });
 }
@@ -243,7 +149,7 @@ function cost(pool, account, needitem, cb) {
 
     let account_id = account.id;
     
-    if (DEBUG) console.log(FUNC + 'needitem:', needitem);
+    logger.info(FUNC + 'needitem:', needitem);
     
     let rewardInfo = new Reward(needitem);
     
@@ -258,7 +164,7 @@ function cost(pool, account, needitem, cb) {
     let skin_inc = rewardInfo.skin;
     let skin_debris_inc = rewardInfo.skin_debris;
 
-    if (DEBUG) console.log(FUNC + "account.skill:", account.skill);
+    logger.info(FUNC + "account.skill:", account.skill);
 
 
     doNextWithAccount(account);
@@ -268,9 +174,12 @@ function cost(pool, account, needitem, cb) {
     // =========================================================================
 
     function doNextWithAccount(account) {
-        if (DEBUG) console.log(FUNC + "更新缓存中的玩家数据");
-
-        ObjUtil.cost(account.skill, skill_inc, cb);
+        logger.info(FUNC + "更新缓存中的玩家数据");
+        if (skill_inc) {
+            ObjUtil.cost(account.skill, skill_inc, cb);
+            account.skill = account.skill;
+        }
+        
         ObjUtil.cost(account.package[ItemTypeC.DEBRIS], debris_inc, cb);
         ObjUtil.cost(account.package[ItemTypeC.GIFT], gift_inc, cb);
         ObjUtil.cost(account.package[ItemTypeC.TOKENS], tokens_inc, cb);
@@ -278,8 +187,6 @@ function cost(pool, account, needitem, cb) {
         ObjUtil.cost(account.package[ItemTypeC.SKIN], skin_inc, cb);
         ObjUtil.cost(account.package[ItemTypeC.SKIN_DEBRIS], skin_debris_inc, cb);
 
-
-        account.skill = account.skill;
         account.package = account.package;
         if (gold > 0) {
             account.gold = -gold;//金币使用增量，等号后面是delta
@@ -297,7 +204,7 @@ function enough(account, needitem) {
 
     let account_id = account.id;
     
-    if (DEBUG) console.log(FUNC + 'needitem: ', needitem);
+    logger.info(FUNC + 'needitem: ', needitem);
     
     let rewardInfo = new Reward(needitem);
     
@@ -318,55 +225,55 @@ function enough(account, needitem) {
     let skill_old = ObjUtil.str2Data(account.skill == null ? {} : account.skill);
     let pack_old = ObjUtil.str2Data(account.package == null ? {} : account.package);
     
-    if (DEBUG) console.log(FUNC + "skill_old: ", skill_old);
-    //if (DEBUG) console.log(FUNC + "pack_old: ", pack_old);
+    logger.info(FUNC + "skill_old: ", skill_old);
+    //logger.info(FUNC + "pack_old: ", pack_old);
     
     let notEnough = {};
     
     // 技能
-    if (!ObjUtil.isEmpty(skill_inc)) {
-        if (DEBUG) console.log(FUNC + "验证技能!");
+    if (skill_inc && !ObjUtil.isEmpty(skill_inc)) {
+        logger.info(FUNC + "验证技能!");
         let diff = ObjUtil.enough(skill_old, skill_inc);
         if (ObjUtil.length(diff) > 0) notEnough["skill"] = diff;
     }
     // 碎片
     if (!ObjUtil.isEmpty(debris_inc)) {
-        if (DEBUG) console.log(FUNC + "验证碎片!");
+        logger.info(FUNC + "验证碎片!");
         pack_old[ItemTypeC.DEBRIS] = ObjUtil.noNull(pack_old[ItemTypeC.DEBRIS]);
         let diff = ObjUtil.enough(pack_old[ItemTypeC.DEBRIS], debris_inc);
         if (ObjUtil.length(diff) > 0) notEnough[ItemTypeC.DEBRIS] = diff;
     }
     // 礼包
     if (!ObjUtil.isEmpty(gift_inc)) {
-        if (DEBUG) console.log(FUNC + "验证礼包!");
+        logger.info(FUNC + "验证礼包!");
         pack_old[ItemTypeC.GIFT] = ObjUtil.noNull(pack_old[ItemTypeC.GIFT]);
         let diff = ObjUtil.enough(pack_old[ItemTypeC.GIFT], gift_inc);
         if (ObjUtil.length(diff) > 0) notEnough[ItemTypeC.GIFT] = diff;
     }
     // 代币
     if (!ObjUtil.isEmpty(tokens_inc)) {
-        if (DEBUG) console.log(FUNC + "验证代币!");
+        logger.info(FUNC + "验证代币!");
         pack_old[ItemTypeC.TOKENS] = ObjUtil.noNull(pack_old[ItemTypeC.TOKENS]);
         let diff = ObjUtil.enough(pack_old[ItemTypeC.TOKENS], tokens_inc);
         if (ObjUtil.length(diff) > 0) notEnough[ItemTypeC.TOKENS] = diff;
     }
     // 合成物品
     if (!ObjUtil.isEmpty(mix_inc)) {
-        if (DEBUG) console.log(FUNC + "验证合成物品!");
+        logger.info(FUNC + "验证合成物品!");
         pack_old[ItemTypeC.MIX] = ObjUtil.noNull(pack_old[ItemTypeC.MIX]);
         let diff = ObjUtil.enough(pack_old[ItemTypeC.MIX], mix_inc);
         if (ObjUtil.length(diff) > 0) notEnough[ItemTypeC.MIX] = diff;
     }
     // 武器皮肤
     if (!ObjUtil.isEmpty(skin_inc)) {
-        if (DEBUG) console.log(FUNC + "验证武器皮肤!");
+        logger.info(FUNC + "验证武器皮肤!");
         pack_old[ItemTypeC.SKIN] = ObjUtil.noNull(pack_old[ItemTypeC.SKIN]);
         let diff = ObjUtil.enough(pack_old[ItemTypeC.SKIN], skin_inc);
         if (ObjUtil.length(diff) > 0) notEnough[ItemTypeC.SKIN] = diff;
     }
     // 武器皮肤碎片
     if (!ObjUtil.isEmpty(skin_debris_inc)) {
-        if (DEBUG) console.log(FUNC + "验证武器皮肤碎片!");
+        logger.info(FUNC + "验证武器皮肤碎片!");
         pack_old[ItemTypeC.SKIN_DEBRIS] = ObjUtil.noNull(pack_old[ItemTypeC.SKIN_DEBRIS]);
         let diff = ObjUtil.enough(pack_old[ItemTypeC.SKIN_DEBRIS], skin_debris_inc);
         if (ObjUtil.length(diff) > 0) notEnough[ItemTypeC.SKIN_DEBRIS] = diff;
@@ -374,16 +281,16 @@ function enough(account, needitem) {
     // =========================================================================
     // 金币
     if (!ObjUtil.isEmpty(gold)) {
-        if (DEBUG) console.log(FUNC + "验证金币!");
+        logger.info(FUNC + "验证金币!");
         if (account.gold < gold) notEnough[ItemTypeC.GOLD] = 1;
     }
     // 验证钻石
     if (!ObjUtil.isEmpty(pearl)) {
-        if (DEBUG) console.log(FUNC + "验证钻石!");
+        logger.info(FUNC + "验证钻石!");
         if (account.pearl < pearl) notEnough[ItemTypeC.PEARL] = 1;
     }
 
-    if (DEBUG) console.log(FUNC + 'notEnough: ', notEnough);
+    logger.info(FUNC + 'notEnough: ', notEnough);
 
     return ObjUtil.length(notEnough) == 0;
 }
@@ -409,10 +316,10 @@ function _addGoldLog(pool, uid, gain, cost, total, level) {
     };
     DaoGold.insert(pool, data, function(err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "[ERROR][uid:" + uid + "]err:", err);
+            logger.error(FUNC + "[ERROR][uid:" + uid + "]err:", err);
             return;
         }
-        if (DEBUG) console.log(FUNC + "result:", result);
+        logger.info(FUNC + "result:", result);
     });
 }
 
@@ -429,9 +336,9 @@ function _addPearlLog(pool, uid, gain, cost, total) {
     };
     DaoPearl.insert(pool, data,function(err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "[ERROR][uid:" + uid + "]err:", err);
+            logger.error(FUNC + "[ERROR][uid:" + uid + "]err:", err);
             return;
         }
-        if (DEBUG) console.log(FUNC + "result:", result);
+        logger.info(FUNC + "result:", result);
     });
 }

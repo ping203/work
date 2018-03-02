@@ -2,10 +2,12 @@ const Player = require('../../../base/player');
 const consts = require('../consts');
 const configReader = require('../configReader');
 const SECONDS_IN_ONE_DAY = 86400;
-const import_def = require('../../../../utils/imports');
+const import_def = require('../../../../database/consts');
 const ACCOUNTKEY = import_def.ACCOUNTKEY;
 const REDISKEY = import_def.REDISKEY;
 const GAMECFG = require('../../../../utils/imports').GAME_CFGS;
+const RewardModel = require('../../../../utils/account/RewardModel');
+const config = require('../config')
 
 class RankMatchPlayer extends Player {
     /**
@@ -28,7 +30,7 @@ class RankMatchPlayer extends Player {
 
         this._statistics = {
             score: 0, //当前总得分
-            fire: 0, //剩余子弹数
+            fire: config.MATCH.FIRE, //剩余子弹数
             fish_account: {}, //普通开炮打死什么鱼，得多少分
             nuclear_fish_count: -1, //核弹打死条数,-1默认取消核弹，核弹可能存在打不死鱼
             nuclear_score: -1, //核弹打死鱼总得分
@@ -45,6 +47,9 @@ class RankMatchPlayer extends Player {
         this._firstWinBox = null; //首胜宝箱id
         this._box = null; //本次获得宝箱
         this._seasonWin = this.account.match_season_win; //赛季胜利次数
+
+        this._mission = new RewardModel();
+        this._mission.resetLoginData(this.account.mission_only_once, this.account.mission_daily_reset);
     }
 
     set gameSid (val) {
@@ -118,6 +123,12 @@ class RankMatchPlayer extends Player {
         let winner = 0; //0平局 1赢了 2输了
         let score1 = this.statistics.score;
         let score2 = p2.statistics.score;
+        
+        let star1 = this.getSkinStar();
+        star1 && (score1 += star1.score);
+        let star2 = p2.getSkinStar();
+        star2 && (score2 += star2.score);
+
         if (score1 === 0 && score2 === 0) {
             winner = 0;
         }else {
@@ -144,6 +155,7 @@ class RankMatchPlayer extends Player {
             if (winner === 1) {
                 pc = Math.max(value2 - value1 + 20, 5);
                 pc = pc * this.getAddPoint() + this.handleWinningStreak();
+                star1 && (pc += star1.winPoint);
                 this._pointChange = pc;
                 this._win ++;
                 this._seasonWin ++;
@@ -181,7 +193,14 @@ class RankMatchPlayer extends Player {
         if (winner === 1) {
             this._box = this.newBox(treasure2);
             this._firstWinBox = this._newFirstWinBoxEnabled(matchRank) ? treasure1 : null;
+
+            //排位赛胜利统计
+            if (this._mission) {
+                this._mission.addProcess(RewardModel.TaskType.CHALLENGE_WIN, 1);
+                this._mission.addProcess(RewardModel.TaskType.CHALLENGE_DUANWEI, matchRank);
+            }
         }
+        return winner === 1;
     }
 
     /**
@@ -372,7 +391,24 @@ class RankMatchPlayer extends Player {
             nuclear_fish_count: this.statistics.nuclear_fish_count,
             nuclear_score: this.statistics.nuclear_score,
         };
+        let star = this.getSkinStar();
+        star && (detail.star = star);
         return detail;
+    }
+
+    /**
+     * 返回档期皮肤星级加成属性
+     */
+    getSkinStar() {
+        let star = this._skinStar;
+        if (star) {
+            return {
+                skin: star.skin,
+                winPoint: star.rank,
+                score: star.score,
+            }
+        }
+        return null;
     }
 
     /**
@@ -403,8 +439,9 @@ class RankMatchPlayer extends Player {
         this.statistics.firetime = new Date().getTime();
         this.statistics.fire = data.fire;
         this.statistics.score = data.score;
-        for (let k in data.fish_list) {
-            let temp = data.fish_list[k];
+        for (let i = 0; i < data.fish_list.length; i ++) {
+            let temp = data.fish_list[i];
+            let k = temp.name;
             if (!this.statistics.fish_account[k]) {
                 this.statistics.fish_account[k] = {
                     num: 0,
@@ -414,6 +451,7 @@ class RankMatchPlayer extends Player {
             this.statistics.fish_account[k].num += temp.num;
             this.statistics.fish_account[k].point += temp.point;
         }
+        this._skinStar = data.star;
     }
 
     set ready(value) {
@@ -478,7 +516,9 @@ class RankMatchPlayer extends Player {
             ACCOUNTKEY.VIP,
             ACCOUNTKEY.CHARM_POINT,
             ACCOUNTKEY.CHARM_RANK,
-            ACCOUNTKEY.ID
+            ACCOUNTKEY.ID,
+            ACCOUNTKEY.MISSION_DAILY_RESET,
+            ACCOUNTKEY.MISSION_ONLY_ONCE,
         ];
         return baseField;
     }

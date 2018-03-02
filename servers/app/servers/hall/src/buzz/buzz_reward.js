@@ -16,7 +16,8 @@ const common_const_cfg = gameConfig.common_const_cfg;
 const common_log_const_cfg = gameConfig.common_log_const_cfg;
 const newweapon_upgrade_cfg = gameConfig.newweapon_upgrade_cfg;
 const player_level_cfg = gameConfig.player_level_cfg;
-
+const daily_dailytarget_cfg = gameConfig.daily_dailytarget_cfg;
+const RewardModel = require('../../../../utils/account/RewardModel');
 /** 每次补签需要扣除的钻石数量 */
 const MISS_SIGN = common_const_cfg.MISS_SIGN;
 
@@ -50,6 +51,7 @@ exports.activeReward = activeReward;
 exports.onekeyReward = onekeyReward;
 exports.resetReward = resetReward;
 exports.getRewardInfo = getRewardInfo;
+exports.getDayExtraReward = getDayExtraReward;
 //------------------------------------------------------------------------------
 // implement
 //------------------------------------------------------------------------------
@@ -124,6 +126,22 @@ function getDayReward(req, dataObj, cb) {
 
     function lPrepare(input) {
         return BuzzUtil.checkParams(input, ['token', 'day'], "buzz_reward", cb);
+    }
+}
+
+/**
+ * 领取额外奖励
+ */
+function getDayExtraReward(req, dataObj, cb) {
+    const FUNC = TAG + "getDayExtraReward() --- ";
+    //----------------------------------
+    if (!lPrepare(dataObj)) return;
+    // BuzzUtil.cacheLinkDataApi(dataObj, "getDayExtraReward");
+
+    _getDayExtraReward(req, dataObj, cb);
+
+    function lPrepare(input) {
+        return BuzzUtil.checkParams(input, ['token', 'id'], "buzz_reward", cb);
     }
 }
 
@@ -281,7 +299,8 @@ function _monthSign(req, dataObj, cb) {
         let ret = {
             days: account.month_sign,
             today: today,
-        }
+            extra_states: account.month_sign_extra_reward
+        };
 
         account.commit();
 
@@ -435,6 +454,54 @@ function _getDayReward(req, dataObj, cb) {
             }
         });
     }
+}
+
+//额外领奖
+function _getDayExtraReward(req, dataObj, cb) {
+    let token = dataObj.token;
+    let id = dataObj.id;
+    DaoCommon.checkAccount(req.pool, token, function (err, account) {
+        if (err) {
+            cb(err);
+            return;
+        }
+        let month_sign = account.month_sign;
+        let count = 0;
+        for (let i = 0; i < month_sign.length; i++) {
+            if (month_sign[i] === 1) count++;
+        }
+        let item_list = null;
+        let days = 0;
+        for (let i = 0; i < daily_dailytarget_cfg.length; i++) {
+            let data = daily_dailytarget_cfg[i];
+            if (id === data.id) {
+                item_list = data.reward;
+                days = data.days;
+            }
+        }
+        if (count < days || !item_list) {
+            cb("不满足条件");
+            return;
+        }
+        let monthSignExtraReward = account.month_sign_extra_reward || {};
+        if (!monthSignExtraReward[id]) {
+            let item = BuzzUtil.getItemList(item_list);
+            BuzzUtil.putIntoPack(req, account, item, function (reward) {
+                monthSignExtraReward[id] = 1;
+                account.month_sign_extra_reward = monthSignExtraReward;
+                account.commit();
+                let change = BuzzUtil.getChange(account, reward);
+                let ret = {
+                    change: change,
+                    item_list: item
+                };
+                cb(null, ret);
+            })
+        } else {
+            cb("已经领取过了");
+        }
+
+    })
 }
 
 function _checkGetDayReward(account, day, today, cb) {
@@ -627,7 +694,6 @@ function _missionReward(req, dataObj, cb) {
 
         // 需要将成就点进行更新
         BuzzUtil.putIntoPack(req, account, item_list, function (reward) {
-            let change = BuzzUtil.getChange(account, reward);
 
             if (0 != quest_precondition) {
                 mission["" + quest_precondition] = qcv;
@@ -638,8 +704,14 @@ function _missionReward(req, dataObj, cb) {
                 mission["" + qid] = -1;
             }
 
-            _setMissionRecordByType(account, quest_type, mission);
-
+            _setMissionRecordByType(account, quest_type, mission, reward);
+            //统计成就点数dfc
+            let rewardModel = new RewardModel();
+            rewardModel.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+            rewardModel.addProcess(RewardModel.TaskType.GET_ACHIEVE_POINT, reward.achieve_point);
+            account.mission_only_once = rewardModel.getReadyData2Send(RewardModel.Type.ACHIEVE, true);
+            account.mission_daily_reset = rewardModel.getReadyData2Send(RewardModel.Type.EVERYDAY, true);
+            let change = BuzzUtil.getChange(account, reward);
             account.commit();
 
             let ret = {
@@ -773,15 +845,15 @@ function _getMissionRecordByType(account, quest_type) {
     return null;
 }
 
-function _setMissionRecordByType(account, quest_type, mession) {
+function _setMissionRecordByType(account, quest_type, mission, reward) {
     switch (quest_type) {
         case QUEST_TYPE.DAILY_RESET:
-            account.mission_daily_reset = mession;
-            console.log('------------------------------------mission_daily_reset:', mession);
+            account.mission_daily_reset = mission;
+            CacheAccount.addActivePoint(account, reward.active_point);
             break;
         case QUEST_TYPE.ACHIEVE_ONCE:
-            account.mission_only_once = mession;
-            console.log('------------------------------------mission_only_once:', mession);
+            account.mission_only_once = mission;
+            CacheAccount.addAchievePoint(account, reward.achieve_point);
             break;
     }
 }

@@ -1,8 +1,7 @@
 var DateUtil = require('../utils/DateUtil');
 var DaoUtil = require('../utils/DaoUtil');
 var RedisUtil = require('../utils/RedisUtil');
-var REDIS_KEYS = require('./cst/buzz_cst_redis_keys').REDIS_KEYS,
-    PAIR = REDIS_KEYS.PAIR,
+var REDIS_KEYS = require('../../../../database/consts').REDISKEY,
     BIG_DATA = REDIS_KEYS.BIG_DATA;
 var common_log_const_cfg = require('../../../../utils/imports').GAME_CFGS.common_log_const_cfg;
 
@@ -200,7 +199,7 @@ function recordGold(uid, cost, gain, total, scene) {
     const FUNC = TAG + "recordGold()---";
 
     // yDONE: 限制玩家等级在15级以上才进行统计
-    RedisUtil.hget(PAIR.UID_LEVEL, uid, function (err, res) {
+    RedisUtil.hget(REDIS_KEYS.LEVEL, uid, function (err, res) {
         if (err) return console.error(FUNC + "查询玩家等级数据失败！");
         if (res) {
             var level = parseInt(res);

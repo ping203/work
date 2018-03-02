@@ -20,7 +20,7 @@ class GameInfoModule {
             logger.error('not support type: %j', agent.id);
             return;
         }
-        let game = require('../logic/game/game');
+        let game = require('../servers/game/gameApp');
         let loadInfo = game.getLoadInfo();
 
         agent.notify(module.exports.moduleId, {

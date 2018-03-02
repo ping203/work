@@ -128,6 +128,84 @@ module.exports = {
         BAN_USER: "log:ban_user",// 返回所有日志信息: lrange log:ban_user 0 -1
     },
 
+    BIG_DATA: {
+        /**
+         * 时间段内产出金币总量.
+         */
+        GOLD_COST_TOTAL:"big_data:gold:cost:total",// hget big_data:gold:cost:total 69914
+        GOLD_COST_FIRE:"big_data:gold:cost:fire",// hget big_data:gold:cost:fire 69914
+        GOLD_COST_LASER:"big_data:gold:cost:laser",
+        GOLD_COST_BONUSDRAW:"big_data:gold:cost:bonusdraw",
+        GOLD_COST_MINIGAME:"big_data:gold:cost:minigame",
+        GOLD_COST_NUCLEAR:"big_data:gold:cost:nuclear",
+        GOLD_COST_PETFISH_UPGRADE:"big_data:gold:cost:petfish_upgrade",
+        GOLD_COST_CHARTS_REWARD:"big_data:gold:cost:charts_reward",
+        GOLD_COST_GOLD_SHOPPING:"big_data:gold:cost:gold_shopping",
+        GOLD_COST_ACTIVE_DRAW:"big_data:gold:cost:active_draw",
+        /** 限时礼包购买 */
+        GOLD_COST_TIMEGIFT_BUY:"big_data:gold:cost:timegift_buy",
+        GOLD_COST_DAILY_GAIN:"big_data:gold:cost:daily_gain",
+        GOLD_COST_ACHIEVE_GAIN:"big_data:gold:cost:achieve_gain",
+        GOLD_COST_FUND_BUY:"big_data:gold:cost:fund_buy",
+        GOLD_COST_MONTH_SIGN_REWARD:"big_data:gold:cost:month_sign_reward",
+
+        GOLD_COST_SHARE_REWARD:"big_data:gold:cost:share_reward",
+        GOLD_COST_VIPGIFT_BUY:"big_data:gold:cost:vipgift_buy",
+        GOLD_COST_ACTIVE_QUEST:"big_data:gold:cost:active_quest",
+        GOLD_COST_ACTIVE_EXCHANGE:"big_data:gold:cost:active_exchange",
+        GOLD_COST_ACTIVE_CHARGE:"big_data:gold:cost:active_charge",
+        GOLD_COST_INVITE_REWARD:"big_data:gold:cost:invite_reward",
+        GOLD_COST_BOX_REWARD:"big_data:gold:cost:box_reward",
+        GOLD_COST_FIRST_BUY:"big_data:gold:cost:first_buy",
+        GOLD_COST_CARD_REWARD:"big_data:gold:cost:card_reward",
+        GOLD_COST_ENSHRINE_REWARD:"big_data:gold:cost:enshrine_reward",
+
+        GOLD_COST_OTHER:"big_data:gold:cost:other",
+
+        /**
+         * 时间段内消耗金币总量.
+         */
+        GOLD_GAIN_TOTAL:"big_data:gold:gain:total",// hget big_data:gold:gain:total 69914
+        GOLD_GAIN_FIRE:"big_data:gold:gain:fire",// hget big_data:gold:gain:fire 69914
+        GOLD_GAIN_LASER:"big_data:gold:gain:laser",// hget big_data:gold:gain:laser 69914
+        GOLD_GAIN_BONUSDRAW:"big_data:gold:gain:bonusdraw",// hget big_data:gold:gain:bonusdraw 69914
+        GOLD_GAIN_MINIGAME:"big_data:gold:gain:minigame",// hget big_data:gold:gain:minigame 69914
+        GOLD_GAIN_NUCLEAR:"big_data:gold:gain:nuclear",
+        GOLD_GAIN_PETFISH_UPGRADE:"big_data:gold:gain:petfish_upgrade",
+        GOLD_GAIN_CHARTS_REWARD:"big_data:gold:gain:charts_reward",
+        GOLD_GAIN_GOLD_SHOPPING:"big_data:gold:gain:gold_shopping",
+        GOLD_GAIN_ACTIVE_DRAW:"big_data:gold:gain:active_draw",
+        /** 限时礼包购买 */
+        GOLD_GAIN_TIMEGIFT_BUY:"big_data:gold:gain:timegift_buy",
+        GOLD_GAIN_DAILY_GAIN:"big_data:gold:gain:daily_gain",
+        GOLD_GAIN_ACHIEVE_GAIN:"big_data:gold:gain:achieve_gain",
+        GOLD_GAIN_FUND_BUY:"big_data:gold:gain:fund_buy",
+        GOLD_GAIN_MONTH_SIGN_REWARD:"big_data:gold:gain:month_sign_reward",
+
+        GOLD_GAIN_SHARE_REWARD:"big_data:gold:gain:share_reward",
+        GOLD_GAIN_VIPGIFT_BUY:"big_data:gold:gain:vipgift_buy",
+        GOLD_GAIN_ACTIVE_QUEST:"big_data:gold:gain:active_quest",
+        GOLD_GAIN_ACTIVE_EXCHANGE:"big_data:gold:gain:active_exchange",
+        GOLD_GAIN_ACTIVE_CHARGE:"big_data:gold:gain:active_charge",
+        GOLD_GAIN_INVITE_REWARD:"big_data:gold:gain:invite_reward",
+        GOLD_GAIN_BOX_REWARD:"big_data:gold:gain:box_reward",
+        GOLD_GAIN_FIRST_BUY:"big_data:gold:gain:first_buy",
+        GOLD_GAIN_CARD_REWARD:"big_data:gold:gain:card_reward",
+        GOLD_GAIN_ENSHRINE_REWARD:"big_data:gold:gain:enshrine_reward",
+
+        GOLD_GAIN_OTHER:"big_data:gold:gain:other",// hget big_data:gold:gain:other 69914
+
+        /**
+         * 时间段内最终金币存量.
+         * 根据玩家ID分别存储, 获取时取总量.
+         */
+        GOLD_LEFT_TOTAL:"big_data:gold:left:total",// hget big_data:gold:left:total 69914
+        GOLD_LEFT_NUM:"big_data:gold:left:num",// 记录活跃人数
+
+        // sadd
+        SKIN_VOTE_UID:"big_data:skin:vote:uid",// 记录已经投票的玩家uid
+    },
+
     UPDATED_UIDS: 'fishjoy:sync:full_uids',
     UPDATED_DELTA_UIDS: 'fishjoy:sync:delta_uids',
     UPDATED_DELTA_FIELDS: 'fishjoy:sync:delta_fields',
@@ -312,4 +390,5 @@ module.exports = {
     ADV_REWARD_TIMES: PREFIX + "adv_reward_times",
     KEY_ACC_COUNTER: "account_counter",
     TOBE_STORED:"cache:uid_tobe_stored",
+    "MONTH_SIGN_EXTRA_REWARD": "month_sign_extra_reward",
 };

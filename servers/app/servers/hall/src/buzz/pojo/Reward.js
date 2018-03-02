@@ -36,7 +36,6 @@ function Reward(list) {
     this.pearl = 0;     // 钻石
     this.active_point = 0;   // 活跃值
     this.achieve_point = 0;   // 成就点
-    this.skill = {};    // 技能
     this.gift = {};     // 礼包
     this.debris = {};   // 碎片
     this.tokens = {};   // 代币
@@ -79,6 +78,7 @@ function Reward(list) {
                     break;
 
                 case ItemType.SKILL:
+                    this.skill = {};    // 技能
                     createOrAdd(this.skill, "" + itemInfo.id, item[IDX_NUM]);
                     break;
 

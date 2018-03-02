@@ -2,7 +2,7 @@ const BuzzUtil = require('../utils/BuzzUtil');
 const RedisUtil = require('../utils/RedisUtil');
 const redisKeys = require('../../../../database').dbConsts.REDISKEY;
 const ItemTypeC = require('./pojo/Item').ItemTypeC;
-const _package = require('../dao/account/update/package');
+const buzz_limit_items = require('../buzz/buzz_limit_items');
 const DaoCommon = require('../dao/dao_common');
 const logger = loggerEx(__filename);
 const TAG = "【buzz_info】";
@@ -24,7 +24,7 @@ exports.getItemLimitGotTime = function (req, dataObj, cb) {
         }
         let id = account.id;
         if (id) {
-            _package.checkItemLimitEnd(account, function (res) {
+            buzz_limit_items.checkItemLimitEnd(account, function (res) {
                 if (!res) {
                     cb && cb('尚无限时道具');
                 }else{
@@ -54,7 +54,7 @@ exports.getItemLimitTime = function (req, dataObj, cb) {
         }
         let id = account.id;
         if (id) {
-            _package.getLimitLeft(id, itemId, gotAt, function (left) {
+            buzz_limit_items.getLimitLeft(id, itemId, gotAt, function (left) {
                 if (left == -1) {
                     cb && cb('不是限时道具');
                 }else if (left == -2) {
@@ -115,7 +115,7 @@ exports.getHornFlower = function (req, dataObj, cb) {
 /**
  * 获取话费券数量.
  */
-function getHuafeiquan(req, dataObj, cb) {
+function getHuafeiquan(dataObj, cb) {
     const FUNC = TAG + "getHuafeiquan() --- ";
     //----------------------------------
     if (!lPrepare(dataObj)) return;
@@ -135,13 +135,11 @@ function getHuafeiquan(req, dataObj, cb) {
 /**
  * 获取话费券数量.
  */
-function _getHuafeiquan(req, dataObj, cb) {
+function _getHuafeiquan(dataObj, cb) {
     const FUNC = TAG + "_getHuafeiquan() --- ";
     let uid = dataObj.uid;
     let token = dataObj.token;
-    let pool = req.pool;
-
-    DaoCommon.checkAccount(pool, token, function(error, account) {
+    DaoCommon.checkAccount(mysqlConnector, token, function(error, account) {
         if (error) {
             cb(error);
             return;

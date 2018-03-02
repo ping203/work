@@ -3,19 +3,15 @@
         "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
     },
     {
-        "type": "auth",
-        "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
-    },
-    {
         "type": "game",
         "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
     },
     {
-        "type": "balance",
+        "type": "manager",
         "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
     },
     {
-        "type": "dataSync",
+        "type": "event",
         "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
     },
     {
@@ -40,6 +36,18 @@
     },
     {
         "type": "admin",
+        "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
+    },
+    {
+        "type": "r2mSync",
+        "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
+    },
+    {
+        "type": "rank",
+        "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
+    },
+    {
+        "type": "pay",
         "token": "agarxhqb98rpajloaxn34ga8xrunpagkjwlaw3ruxnpaagl29w4rxn"
     }
 ]

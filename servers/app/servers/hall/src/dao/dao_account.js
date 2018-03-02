@@ -2,11 +2,10 @@
 const CacheAccount = require('../buzz/cache/CacheAccount');
 const DaoCommon = require('./dao_common');
 const CstError = require('../buzz/cst/buzz_cst_error');
-// const AccountUpdate = require('./account/update');
 const AccountRanking = require('./account/ranking');
 const gameConfig = require('../../../../utils/imports').GAME_CFGS;
 const vip_vip_cfg = gameConfig.vip_vip_cfg;
-const account_def = require('./account/account_def');
+const account_def = require('../../../../database/consts').KEYTYPEDEF;
 
 let DEBUG = 0;
 let ERROR = 1;
@@ -193,7 +192,7 @@ function _addLogoutLog(pool, id, nickname) {
 
 function _createSessionToken(pool, uid, cb) {
     let token = utils.generateSessionToken(uid);
-    CacheAccount.getAccountFieldById(uid, [account_def.AccountDef.token.name], function (err, account) {
+    CacheAccount.getAccountFieldById(uid, [account_def.TOKEN], function (err, account) {
         account.token = token;
         cb(null, [account.toJSON()]);
     });

@@ -111,5 +111,6 @@
     }
   },
   "replaceConsole": true,
-  "lineDebug": false
+  "lineDebug": true,
+  "reloadSecs":10
 }

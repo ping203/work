@@ -18,8 +18,8 @@ Module.prototype.monitorHandler = function (agent, msg) {
         logger.error('not support type: %j', agent.id);
         return;
     }
-    let rankMatch = require('../logic/rankMatch/rankMatch');
-    let loadInfo = rankMatch.getLoadInfo();
+    let rankMatchApp = require('../servers/rankmatch/rankMatchApp');
+    let loadInfo = rankMatchApp.getLoadInfo();
     agent.notify(module.exports.moduleId, {
         serverId: agent.id,
         load: loadInfo

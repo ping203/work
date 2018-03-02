@@ -1,6 +1,6 @@
 const Handler = require('../../common/hander');
 const gateCmd = require('../../../cmd/gateCmd');
-const gate = require('../../../logic/gate/gate');
+const gateApp = require('../gateApp');
 
 class GateHandler extends Handler{
     constructor() {
@@ -8,7 +8,7 @@ class GateHandler extends Handler{
     }
 
     request(route, msg, session, next) {
-        gate.request(route, msg, session, (err, result)=>{
+        gateApp.request(route, msg, session, (err, result)=>{
             super.response(err, result, next);
         })
     }

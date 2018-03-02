@@ -1,11 +1,8 @@
+const fs = require('fs');
 const versions = require('../../config/versions')
 
 module.exports = {
     GAME_TYPE: 'fish',
-
-    //服务数据加密KEY
-    KEYS: 'fishjoy&2017_12_11_@12345',
-
     //负载均衡服负载信息拉取周期
     BALANCE_PERIOD:3000, //ms,默认10000
     
@@ -23,5 +20,19 @@ module.exports = {
             RANGE:[0.5, 1.5],
             DEFAULT:1
         }
-    }
+    },
+    
+    PLATFORM:{
+        ANDROID:1,
+        IOS:2,
+        PC:3,
+    },
 };
+
+if(versions.SSL){
+    module.exports.SSL_CERT = {
+        KEY:`shared/cert/${versions.VERSION_KEY[versions.PUB]}/server.key`,
+        CERT:`shared/cert/${versions.VERSION_KEY[versions.PUB]}/server.crt`,
+    }
+}
+

@@ -141,12 +141,11 @@ class RankMatchRobotPlayer extends RankMatchPlayer {
         if (rV < fP) {
             let gold = data.gold;
             this._curScore += gold;
-            let flist = {}
-            flist[name] = {
+            temp.fish_list.push({
+                name: name,
                 num: 1,
                 point: gold,
-            }
-            temp.fish_list = flist;
+            });
             temp.score = this._curScore;
         }
         this._operation(consts.RMATCH_ROBOT_OPT.FIGHTING, temp);

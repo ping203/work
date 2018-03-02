@@ -8,6 +8,7 @@ const redisAccountSync = require('../../../../utils/redisAccountSync');
 const logBuilder = require('../../../../utils/logSync/logBuilder');
 const constDef = require('../../../../consts/constDef');
 const {REDISKEY, KEYTYPEDEF} = require('../../../../database').dbConsts;
+const logger = require('omelo-logger').getLogger('gate', __filename);
 
 function createSalt(pwd) {
     const hash = crypto.createHash('sha1');
@@ -51,7 +52,6 @@ class InnerUser extends User {
             if (!uid) {
                 reject(ERROR_OBJ.USER_NOT_EXIST);
             }
-
             let account = await redisAccountSync.getAccountAsync(uid);
             if (account) {
                 let saltPassword = createSalt(account.channel_account_id + data.password);
@@ -68,30 +68,6 @@ class InnerUser extends User {
             } else {
                 reject(ERROR_OBJ.USER_NOT_EXIST);
             }
-
-            // redisAccountSync.getAccountAsync(uid, function (err, account) {
-            //     if (err) {
-            //         reject(err);
-            //         return;
-            //     }
-
-            //     if (account) {
-            //         let saltPassword = createSalt(account.channel_account_id + data.password);
-            //         if (saltPassword !== account.password) {
-            //             reject(ERROR_OBJ.USERNAME_PASSWORD_ERROR.msg);
-            //             return;
-            //         }
-
-            //         logBuilder.addSLoginLog(account.id);
-
-            //         self._someOptAfterLogin(account, function (err, account) {
-            //             resolve(account);
-            //         });
-            //     } else {
-            //         reject(ERROR_OBJ.USER_NOT_EXIST.msg);
-            //     }
-            // });
-
         });
     }
 
@@ -100,25 +76,26 @@ class InnerUser extends User {
         return new Promise(async function (resolve, reject) {
             let uid = await self.getUID(data.phone);
             if (uid) {
-                reject(ERROR_OBJ.PHONE_EXIST.msg);
+                reject(ERROR_OBJ.PHONE_EXIST);
             }
 
             redisAccountSync.getAccountById(data.uid, async function (err, account) {
                 if (err) {
+                    logger.error(err);
                     reject(err);
                     return;
                 }
 
                 if (account) {
                     if (account.phone) {
-                        reject(ERROR_OBJ.USER_NOT_EXIST.msg);
+                        reject(ERROR_OBJ.USER_NOT_EXIST);
                     } else {
                         account.phone = data.phone;
                         account.commit();
                         resolve(null);
                     }
                 } else {
-                    reject(ERROR_OBJ.USER_NOT_EXIST.msg);
+                    reject(ERROR_OBJ.USER_NOT_EXIST);
                 }
             });
 
@@ -130,10 +107,11 @@ class InnerUser extends User {
         return new Promise(async function (resolve, reject) {
             let uid = await self.getUID(data.username);
             if (!uid) {
-                reject(ERROR_OBJ.USER_NOT_EXIST.msg);
+                reject(ERROR_OBJ.USER_NOT_EXIST);
             }
             redisAccountSync.getAccountById(uid, async function (err, account) {
                 if (err) {
+                    logger.error(err);
                     reject(err);
                     return;
                 }
@@ -146,10 +124,10 @@ class InnerUser extends User {
                         account.commit();
                         resolve(null);
                     } else {
-                        reject(ERROR_OBJ.PASSWORD_ERROR.msg);
+                        reject(ERROR_OBJ.PASSWORD_ERROR);
                     }
                 } else {
-                    reject(ERROR_OBJ.USER_NOT_EXIST.msg);
+                    reject(ERROR_OBJ.USER_NOT_EXIST);
                 }
             });
 
@@ -162,8 +140,8 @@ class InnerUser extends User {
             let sqlData = [username];
             mysqlClient.query(sql, sqlData, function (err, result) {
                 if (err) {
+                    logger.error(err);
                     reject(err);
-                    return;
                 }
                 resolve(result && result[0] && result[0].id || null);
             });
@@ -176,7 +154,8 @@ class InnerUser extends User {
             let sqlData = [phone];
             mysqlClient.query(sql, sqlData, function (err, result) {
                 if (err) {
-                    reject(err);
+                    logger.error(err);
+                    reject(ERROR_OBJ.DB_ERR);
                     return;
                 }
                 resolve(result && result[0] && result[0].id || null);
@@ -189,19 +168,20 @@ class InnerUser extends User {
         return new Promise(function (resolve, reject) {
             redisClient.cmd.hget(REDISKEY.OPENID_UID, data.username, async function (err, uid) {
                 if (err) {
-                    reject(err);
+                    logger.error(err);
+                    reject(ERROR_OBJ.DB_ERR);
                     return;
                 }
 
                 if (uid) {
-                    resolve(ERROR_OBJ.USERNAME_EXIST.msg);
+                    resolve(ERROR_OBJ.USERNAME_EXIST);
                     return;
                 }
 
                 if (!uid) {
                     uid = await self._chekcUsername(data.username);
                     if (uid) {
-                        reject(ERROR_OBJ.USERNAME_EXIST.msg);
+                        reject(ERROR_OBJ.USERNAME_EXIST);
                         return;
                     }
                 }
@@ -216,7 +196,7 @@ class InnerUser extends User {
         return new Promise(function (resolve, reject) {
             redisClient.cmd.hget(REDISKEY.OPENID_UID, username, async function (err, uid) {
                 if (err) {
-                    reject(err);
+                    reject(ERROR_OBJ.DB_ERR);
                     return;
                 }
                 if (!uid) {
@@ -230,7 +210,7 @@ class InnerUser extends User {
                             redisClient.cmd.hset(REDISKEY.OPENID_UID, username, uid, cb);
                         }], function (err, result) {
                             if (err) {
-                                reject(err);
+                                reject(ERROR_OBJ.DB_ERR);
                             } else {
                                 resolve(result.id);
                             }

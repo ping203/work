@@ -10,7 +10,6 @@ module.exports = async function handler(ctx, target, method) {
     }
 
     try {
-        ctx.request.body.data.uid = ctx.session.uid;
         let {
             type,
             data
@@ -25,7 +24,7 @@ module.exports = async function handler(ctx, target, method) {
                 break;
             case logicResponse.TYPE.EJS:
                 {
-                    ctx.render(data.template, data.data);
+                    await ctx.render(data.template, data.data);
                 }
                 break;
             case logicResponse.TYPE.REDIRECT:

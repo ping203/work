@@ -1,6 +1,6 @@
 const Handler = require('../../common/hander');
 const fishCmd = require('../../../cmd/fishCmd');
-const game = require('../../../logic/game/game');
+const gameApp = require('../gameApp');
 
 class FishHandler extends Handler{
     constructor(){
@@ -8,7 +8,7 @@ class FishHandler extends Handler{
     }
 
     request(route, msg, session, next) {
-        game.request(route, msg, session, (err, result)=>{
+        gameApp.request(route, msg, session, (err, result)=>{
             super.response(err, result, next);
         })
     }

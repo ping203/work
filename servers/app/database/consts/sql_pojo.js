@@ -23,12 +23,6 @@ exports.fields = {
         "table": "tbl_account",
         "name": "who_share_me"
     },
-    "tempname": {
-        "def": "fj_",
-        "type": "string",
-        "table": "tbl_account",
-        "name": "tempname"
-    },
     "nickname": {
         "def": null,
         "type": "string",
@@ -996,11 +990,6 @@ exports.tbl_account = {
         "def": 0,
         "type": "number",
         "name": "who_share_me"
-    },
-    "tempname": {
-        "def": "fj_",
-        "type": "string",
-        "name": "tempname"
     },
     "nickname": {
         "def": null,

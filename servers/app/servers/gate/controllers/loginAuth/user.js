@@ -8,7 +8,9 @@ const vip_vip_cfg = require('../../../../utils/imports').GAME_CFGS.vip_vip_cfg;
 const utils = require('../../../../utils/utils');
 const CharmUtil = require('../../../hall/src/utils/CharmUtil');
 const common = require('../../../hall/src/dao/account/common');
+const buzz_cst_game = require('../../../hall/src/buzz/cst/buzz_cst_game');
 const logBuilder = require('../../../../utils/logSync').logBuilder;
+const RewardModel = require('../../../../utils/account/RewardModel');
 
 class User {
     constructor() {
@@ -172,7 +174,7 @@ class User {
         let id = account.id;
         let token = utils.generateSessionToken(id);
         let timeNow = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-        ;
+
         account.token = token;
         account.updated_at = timeNow;
         account.last_online_time = timeNow;
@@ -200,11 +202,14 @@ class User {
                 }
             }
             if (vip_info && account.first_login === 1) {
-                let gold = Math.max(account.gold, vip_info.vip_dailyGold);
-                if (gold - account.gold > 0) {
-                    account.gold = gold - account.gold;
+                let gold = Math.max(account.gold, vip_info.vip_dailyGold) - account.gold;
+                if (gold > 0) {
+                    account.gold = gold;
                 }
-                account.pearl = Math.max(account.pearl, vip_info.vip_dailyDiamond);
+                let pearl = Math.max(account.pearl, vip_info.vip_dailyDiamond) - account.pearl;
+                if (pearl > 0) {
+                    account.pearl = pearl;
+                }
             }
         }
 
@@ -212,19 +217,22 @@ class User {
         account.login_count = account.login_count + 1;
 
         //
-        common.addFamousOnlineBroadcast(account, account.platform);
+        buzz_cst_game.addFamousOnlineBroadcast(account, account.platform);
         //重设魅力值
         CharmUtil.getCurrentCharmPoint(account, function (charmPoint) {
             if (charmPoint) {
                 account.charm_point = charmPoint;
             }
-
             if (account.first_login === 1) {
                 account.first_login = 0;
+                //累计登录任务数据统计dfc
+                let mission = new RewardModel();
+                mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+                mission.addProcess(RewardModel.TaskType.CONTINUE_LOGIN, 1);
+                account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+                account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
             }
-
             account.commit();
-
             cb && cb(null, account);
         });
     }

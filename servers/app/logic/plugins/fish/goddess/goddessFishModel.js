@@ -34,7 +34,12 @@ class GoddessFishModel extends FishModel {
         this._curWaveFish = [];
         
         this._godWaveCount = configReader.getLength('goddess_defend_cfg');
+        this._nextWaveFunc = null;
         logger.error('welcome goddeess 保卫女神房间 刷鱼');
+    }
+
+    setNextWaveFunc (func) {
+        this._nextWaveFunc = func;
     }
 
     setStart (start) {
@@ -174,6 +179,7 @@ class GoddessFishModel extends FishModel {
         let rIdx = this._selectWaveRandomGroup(WAVE);
         let nextWave = this._startWaveIdx + 1;
         this._emitGodEvent(GoddessFishModel.EventType.EVENT_FISH_WAVE, {waveCount: nextWave, waveDt: WAVE_DT, isFirst: isFirst ? 1 : 0, rIdx: rIdx});
+        this._nextWaveFunc && this._nextWaveFunc();
     }
     
     //选择当前波随机鱼组

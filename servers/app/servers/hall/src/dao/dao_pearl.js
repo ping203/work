@@ -1,47 +1,16 @@
-﻿////////////////////////////////////////////////////////////
-// Pearl Data Related
-// 珍珠数据
-////////////////////////////////////////////////////////////
+﻿const BuzzUtil = require('../utils/BuzzUtil');
+const ObjUtil = require('../buzz/ObjUtil');
+const DaoCommon = require('./dao_common');
+const cfg = require('../buzz/cfg');
+const CstError = require('../buzz/cst/buzz_cst_error');
+const ERROR_OBJ = CstError.ERROR_OBJ;
+const CachePearl = require('../buzz/cache/CachePearl');
+const CacheAccount = require('../buzz/cache/CacheAccount');
 
-//==============================================================================
-// import
-//==============================================================================
-var utils = require('../buzz/utils');
-var BuzzUtil = require('../utils/BuzzUtil');
-var StringUtil = require('../utils/StringUtil');
-var DateUtil = require('../utils/DateUtil');
-var ObjUtil = require('../buzz/ObjUtil');
+let DEBUG = 0;
+let ERROR = 1;
 
-var DaoUtil = require('./dao_utils');
-var DaoCommon = require('./dao_common');
-var DaoAccount = require('./dao_account');
-var AccountCommon = require('./account/common');
-var cfg = require('../buzz/cfg');
-
-var buzz_cst_game = require('../buzz/cst/buzz_cst_game');
-var CstError = require('../buzz/cst/buzz_cst_error');
-var ERROR_CODE = CstError.ERROR_CODE;
-var ERROR_OBJ = CstError.ERROR_OBJ;
-
-//------------------------------------------------------------------------------
-// 缓存(Cache)
-//------------------------------------------------------------------------------
-var CachePearl = require('../buzz/cache/CachePearl');
-var CacheAccount = require('../buzz/cache/CacheAccount');
-var CacheLink = require('../buzz/cache/CacheLink');
-
-//------------------------------------------------------------------------------
-// 配置表
-//------------------------------------------------------------------------------
-var api_map = require('../../routes/api_map');
-
-//==============================================================================
-// constant
-//==============================================================================
-var DEBUG = 0;
-var ERROR = 1;
-
-var TAG = "【dao_pearl】";
+const TAG = "【dao_pearl】";
 
 
 //==============================================================================
@@ -82,7 +51,7 @@ function flush(pool, cb) {
  * 定时将金币日志写入数据库(1分钟).
  */
 function timing(pool, cb) {
-    var count = CachePearl.length();
+    let count = CachePearl.length();
     if (count > 0) {
         insertMassive(pool, CachePearl.cache(), count, cb);
     }
@@ -108,18 +77,18 @@ function insertMassive(pool, group, num, cb) {
     
     if (group.length > 0) {
         
-        var sql = '';
+        let sql = '';
         sql += 'INSERT INTO `tbl_pearl_log` ';
         sql += '(`account_id`,`log_at`,`gain`,`cost`,`total`,`scene`, `nickname`) ';
         sql += 'VALUES ';
-        for (var i = 0; i < group.length; i++) {
+        for (let i = 0; i < group.length; i++) {
             if (i > 0) sql += ',';
             sql += '(?,?,?,?,?,?,?)';
         }
         
-        var sql_data = [];
-        for (var i = 0; i < num; i++) {
-            var record = group.shift();
+        let sql_data = [];
+        for (let i = 0; i < num; i++) {
+            let record = group.shift();
             
             sql_data.push(record.account_id);
             sql_data.push(record.log_at);
@@ -161,8 +130,8 @@ function addPearlLogEx(account, data, cb) {
     if (DEBUG) console.log(FUNC + "CALL...");
     DEBUG = 0;
 
-    var account_id = data['account_id'];
-    var token = data['token'];
+    let account_id = data['account_id'];
+    let token = data['token'];
 
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "add_pearl_log");
@@ -182,8 +151,8 @@ function addPearlLog(pool, data, cb) {
     if (DEBUG) console.log(FUNC + "CALL...");
     DEBUG = 0;
 
-    var account_id = data['account_id'];
-    var token = data['token'];
+    let account_id = data['account_id'];
+    let token = data['token'];
     
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "add_pearl_log");
@@ -201,12 +170,12 @@ function addPearlLog(pool, data, cb) {
 function insert(pool, data, cb, pearl_old) {
     const FUNC = TAG + "insert() --- ";
 
-    var account_id = data['account_id'];
-    var gain = data['gain'];
-    var cost = data['cost'];
-    var total = data['total'];
-    var scene = data['scene'];
-    var nickname = data['nickname'];
+    let account_id = data['account_id'];
+    let gain = data['gain'];
+    let cost = data['cost'];
+    let total = data['total'];
+    let scene = data['scene'];
+    let nickname = data['nickname'];
     
     if (total < 0) {
         if (ERROR) console.error('=============================================');
@@ -223,13 +192,13 @@ function insert(pool, data, cb, pearl_old) {
         return;
     }
     
-    var sql = '';
+    let sql = '';
     sql += 'INSERT INTO `tbl_pearl_log` ';
     sql += '(`account_id`,`gain`,`cost`,`total`,`scene`, `nickname`) ';
     sql += 'VALUES ';
     sql += '(?,?,?,?,?,?)';
     
-    var sql_data = [account_id, gain, cost, total, scene, nickname];
+    let sql_data = [account_id, gain, cost, total, scene, nickname];
 
     if (DEBUG) console.log(FUNC + 'sql:\n', sql);
     if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
@@ -255,10 +224,10 @@ function insert(pool, data, cb, pearl_old) {
 function _prepare(data, cb) {
     const FUNC = TAG + "_prepare() --- ";
 
-    var account_id = data['account_id'];
-    var token = data['token'];
-    var total = data['total'];
-    var group = data['group'];
+    let account_id = data['account_id'];
+    let token = data['token'];
+    let total = data['total'];
+    let group = data['group'];
     
     if (!_isParamExist(account_id, "接口调用请传参数account_id(玩家ID)", cb)) return false;
     if (!_isParamExist(token, "接口调用请传参数token", cb)) return false;
@@ -267,7 +236,7 @@ function _prepare(data, cb) {
 
     // BUG: 服务器能够接受客户端传入的total值为负数的情形
     if (total < 0) {
-        var extraErrInfo = { debug_info: FUNC + '钻石数量不足，请先充值钻石!' };
+        let extraErrInfo = { debug_info: FUNC + '钻石数量不足，请先充值钻石!' };
         if (ERROR) console.error('=============================================');
         if (ERROR) console.error(extraErrInfo.debug_info);
         if (ERROR) console.error('=============================================');
@@ -292,7 +261,7 @@ function _isParamExist(param, err_info, cb) {
     const FUNC = TAG + "_isParamExist() --- ";
 
     if (param == null) {
-        var extraErrInfo = { debug_info: FUNC + err_info };
+        let extraErrInfo = { debug_info: FUNC + err_info };
         if (ERROR) console.error('=============================================');
         if (ERROR) console.error(extraErrInfo.debug_info);
         if (ERROR) console.error('=============================================');
@@ -307,27 +276,27 @@ function _isParamExist(param, err_info, cb) {
 function _checkPearlData(pool, data, account, cb) {
     const FUNC = TAG + "_checkPearlData()---";
 
-    var account_id = data['account_id'];
-    var token = data['token'];
-    var total = data['total'];
-    var group = data['group'];
+    let account_id = data['account_id'];
+    let token = data['token'];
+    let total = data['total'];
+    let group = data['group'];
     
     if (DEBUG) console.log(FUNC + "total:\n", total);
     if (DEBUG) console.log(FUNC + "group:\n", group);
 
-    var current_total = account.pearl;
+    let current_total = account.pearl;
             
-    var temp_total = current_total;
+    let temp_total = current_total;
     
-    for (var i = 0; i < group.length; i++) {
-        var one_change = group[i];
+    for (let i = 0; i < group.length; i++) {
+        let one_change = group[i];
         if (DEBUG) console.log(FUNC + "one_change:", one_change);
-        var gain = parseInt(one_change.gain);
-        var cost = parseInt(one_change.cost);
-        var scene = parseInt(one_change.scene);
+        let gain = parseInt(one_change.gain);
+        let cost = parseInt(one_change.cost);
+        let scene = parseInt(one_change.scene);
         
         if (isNaN(gain)) {
-            var extraErrInfo = { debug_info: FUNC + "gain字段请勿输入非数值: " + one_change.gain};
+            let extraErrInfo = { debug_info: FUNC + "gain字段请勿输入非数值: " + one_change.gain};
             if (ERROR) console.error('=============================================');
             if (ERROR) console.error(extraErrInfo.debug_info);
             if (ERROR) console.error('=============================================');
@@ -336,7 +305,7 @@ function _checkPearlData(pool, data, account, cb) {
         }
         
         if (isNaN(cost)) {
-            var extraErrInfo = { debug_info: FUNC + "cost字段请勿输入非数值: " + one_change.cost };
+            let extraErrInfo = { debug_info: FUNC + "cost字段请勿输入非数值: " + one_change.cost };
             if (ERROR) console.error('=============================================');
             if (ERROR) console.error(extraErrInfo.debug_info);
             if (ERROR) console.error('=============================================');
@@ -347,13 +316,13 @@ function _checkPearlData(pool, data, account, cb) {
         temp_total = temp_total + gain - cost;
     }
         
-    var nickname = (account.nickname != null);
+    let nickname = (account.nickname != null);
 
     if (temp_total == total) {
         _didAddPearlLog(pool, data, account, cb, current_total, nickname);
     }
     else {
-        var errInfo = FUNC + '用户数据异常: (计算后总量-' + temp_total + ', 客户端上传总量-' + total + ')';
+        let errInfo = FUNC + '用户数据异常: (计算后总量-' + temp_total + ', 客户端上传总量-' + total + ')';
         if (ERROR) console.error(errInfo);
         if (cfg.debug_cfg.FORCE_SAVE_PEARL_DATA) {
             _didAddPearlLog(pool, data, account, cb, current_total, nickname);
@@ -368,19 +337,19 @@ function _checkPearlData(pool, data, account, cb) {
 function _didAddPearlLog(pool, data, account, cb, current_total, nickname) {
     const FUNC = TAG + "_didAddPearlLog()---";
 
-    var account_id = data['account_id'];
-    var total = data['total'];
-    var group = data['group'];
+    let account_id = data['account_id'];
+    let total = data['total'];
+    let group = data['group'];
 
     // TODO: 缓存钻石LOG
-    var temp_total = current_total;
-    var total_gain = 0;
-    var total_cost = 0;
-    for (var i = 0; i < group.length; i++) {
-        var one_change = group[i];
+    let temp_total = current_total;
+    let total_gain = 0;
+    let total_cost = 0;
+    for (let i = 0; i < group.length; i++) {
+        let one_change = group[i];
         total_gain += one_change.gain;
         total_cost += one_change.cost;
-        var temp_total = temp_total + one_change.gain - one_change.cost;
+        let temp_total = temp_total + one_change.gain - one_change.cost;
 
         if (one_change.gain > 0 || one_change.cost > 0) {
             // CachePearl.push({
@@ -411,14 +380,15 @@ function _didAddPearlLog(pool, data, account, cb, current_total, nickname) {
 function _updatePearlTable(pool, data, account, cb, total_gain, total_cost) {
     const FUNC = TAG + "_updatePearlTable()---";
 
-    var account_id = data['account_id'];
-    var total = data['total'];
+    let account_id = data['account_id'];
+    let total = data['total'];
     
     //--------------------------------------------------------------------------
     // 更新缓存中的钻石数据(重要:数据库操作将会被删除, 注意缓存tbl_pearl的数据)
     //--------------------------------------------------------------------------
-    // 直接设置钻石数据
-    CacheAccount.setPearl(account, total);
+    // 直接设置钻石数据,注意钻石是增量
+    account.pearl = total - account.pearl;
+    account.commit();
     //--------------------------------------------------------------------------
     cb(null);
 }

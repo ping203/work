@@ -9,7 +9,7 @@ let AccountDef = {};
 let OtherDef = {};
 setValue(base);
 switch (version.PUB) {
-    case version.GAMEPLAY.CHINA:
+    case version.GAMEPLAY.WANBA:
         setValue(require('./keyTypeDef.china'));
         break;
     case version.GAMEPLAY.VIETNAM:

@@ -1,44 +1,15 @@
-﻿////////////////////////////////////////////////////////////
-// Aquarium Related
-////////////////////////////////////////////////////////////
-
-//==============================================================================
-// import
-//==============================================================================
-
-//------------------------------------------------------------------------------
-// 工具
-//------------------------------------------------------------------------------
-const BuzzUtil = require('../utils/BuzzUtil');
-const utils = require('./utils');
+﻿const BuzzUtil = require('../utils/BuzzUtil');
 const CommonUtil = require('./CommonUtil');
 const DateUtil = require('../utils/DateUtil');
 const ObjUtil = require('./ObjUtil');
-const StringUtil = require('../utils/StringUtil');
-const ArrayUtil = require('../utils/ArrayUtil');
 const CstError = require('./cst/buzz_cst_error');
 const CacheAccount = require('./cache/CacheAccount');
 const Item = require('./pojo/Item');
-
 const _ = require('underscore');
 const buzz_account = require('./buzz_account');
 const buzz_goddess = require('./buzz_goddess');
-const mission = require('../mission/mission');
-const MissionType = require('../mission/mission').MissionType;
-//------------------------------------------------------------------------------
-// 缓存(Cache)
-//------------------------------------------------------------------------------
-const CacheLink = require('./cache/CacheLink');
+const RewardModel = require('../../../../utils/account/RewardModel');
 
-//------------------------------------------------------------------------------
-// DAO
-//------------------------------------------------------------------------------
-const dao_gold = require('../dao/dao_gold');
-
-//------------------------------------------------------------------------------
-// 配置表
-//------------------------------------------------------------------------------
-const api_map = require('../../routes/api_map');
 
 //------------------------------------------------------------------------------
 // 配置表
@@ -377,7 +348,12 @@ function _checkFish(account, id, cb) {
     }
     //统计放养鱼dfc
     if(count) {
-        mission.add(account.id, MissionType.STOCKING_FISH, 0, count);
+        let mission = new RewardModel();
+        mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+        mission.addProcess(RewardModel.TaskType.STOCKING_FISH, count);
+        mission.addProcess(RewardModel.TaskType.PETFISH_TOTAL_LEVEL, account.petfish_total_level);
+        account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+        account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
     }
     account.aquarium = aquarium;
     account.commit();

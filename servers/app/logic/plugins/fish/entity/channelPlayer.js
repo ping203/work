@@ -6,7 +6,8 @@ let ChannelPlayer = null;
 switch (versions.PUB){
     case versions.GAMEPLAY.VIETNAM:
         ChannelPlayer = VietnamPlayer;
-    case versions.GAMEPLAY.CHINA:
+    case versions.GAMEPLAY.LOCAL:
+    case versions.GAMEPLAY.WANBA:
         ChannelPlayer = FishPlayer;
     default:
         break;

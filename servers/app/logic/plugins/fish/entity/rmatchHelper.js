@@ -191,13 +191,14 @@ class RmatchHelper {
                 }
             };
         }else{
-            let flist = {};
+            let flist = [];
             for (let k in this._fHistory) {
                 let td = this._fHistory[k];
-                flist[k] = {
+                flist.push({
+                    name: k,
                     num: td.num,
                     point: td.point,
-                }
+                })
             }
             temp = {
                 score: this._curScore,

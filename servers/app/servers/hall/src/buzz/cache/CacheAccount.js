@@ -1,20 +1,18 @@
 ﻿const _ = require('underscore');
-const buzz_charts = require('../buzz_charts');
 const ObjUtil = require('../ObjUtil');
 const ErrorUtil = require('../ErrorUtil');
 const ArrayUtil = require('../../utils/ArrayUtil');
 const RedisUtil = require('../../utils/RedisUtil');
 const CharmUtil = require('../../utils/CharmUtil');
 const active_activequest_cfg = require('../../../../../utils/imports').GAME_CFGS.active_activequest_cfg;
-
-const redisSync = require('../redisSync');
+const redisAccountSync = require('../../../../../utils/redisAccountSync');
 const utils = require('../../utils/utils');
-const account_def = require('../../dao/account/account_def');
+const account_def = require('../../../../../database/consts').ACCOUNTKEY;
 const async = require('async');
-const dao_account = require('../../dao/dao_account');
 const CacheSkill = require('./CacheSkill');
 const redisKeys = require('../../../../../database').dbConsts.REDISKEY;
 const logger = loggerEx(__filename);
+const RewardModel = require('../../../../../utils/account/RewardModel');
 
 const CACHE_MAX = 1000;
 const CACHE_LEN = 100;
@@ -32,8 +30,6 @@ const TAG = "【CacheAccount】";
 exports.push = push;
 exports.uid_list = uid_list;
 exports.length = length;
-exports.empty = empty;
-exports.onlySave = onlySave;
 exports.contains = contains;
 exports.getAccountById = getAccountById;
 exports.getAccountFieldById = getAccountFieldById;
@@ -76,12 +72,6 @@ exports.setAquarium = setAquarium;
 exports.setMaxPetfishLevel = setMaxPetfishLevel;
 exports.setMaxWave = setMaxWave;
 
-// 每日重置
-// exports.resetAll4Day = resetAll4Day;
-exports.resetAdvGift4Day = resetAdvGift4Day;
-
-exports.resetActive = resetActive;
-
 // 金币购买相关
 exports.setGoldShopping = setGoldShopping;
 
@@ -93,12 +83,6 @@ exports.setCard = setCard;
 
 // 破产相关
 exports.costBrokeTimes = costBrokeTimes;
-
-// 掉落相关
-exports.setDropOnce = setDropOnce;
-exports.setDropReset = setDropReset;
-exports.resetAllDropReset = resetAllDropReset;
-exports.resetAllDropOnce = resetAllDropOnce;
 
 // 奖金相关
 exports.setBonus = setBonus;
@@ -181,8 +165,6 @@ exports.setGold = setGold;
 exports.getPearl = getPearl;
 exports.addPearl = addPearl;
 exports.addPearlEx = addPearlEx;
-exports.costPearl = costPearl;
-exports.setPearl = setPearl;
 
 // 活动相关
 exports.useFreeDraw = useFreeDraw;
@@ -278,7 +260,9 @@ function resetCharmPoint(account, cb) {
                 let rank = CharmUtil.getCharmCfgLevel(charmPoint, aTempCharmRank);
                 setCharmRank(uid, rank);
                 account.charm_point = charmPoint;
-                buzz_charts.updateRankCharm(account.platform, uid, charmPoint);
+                //注释如下内容，直接调用redisutil,防止闭环require
+                // buzz_charts.updateRankCharm(account.platform, uid, charmPoint);
+                RedisUtil.updateRank(redisKeys.RANK.CHARM, account.platform, charmPoint, uid);
                 cb && cb([charmPoint, rank]);
             } else {
                 cb && cb([account.charm_point, account.charm_rank]);
@@ -312,19 +296,6 @@ function setTest(pool, uid, value) {
         account.test = value;
         account.commit();
     }
-    let data = {
-        uid: uid,
-        field_name: 'test',
-        field_value: value,
-    };
-    dao_account.setField(pool, data, function (err, result) {
-        if (err) {
-            logger.error(FUNC + "设置玩家状态失败:", data);
-        }
-        else {
-            logger.info(FUNC + "设置玩家状态成功:", data);
-        }
-    });
 }
 
 exports.CACHE_MAX = CACHE_MAX;
@@ -396,32 +367,6 @@ function setToken(uid, value) {
     });
 }
 
-//----------------------------------------------------------
-// 每日重置
-//----------------------------------------------------------
-function resetAdvGift4Day(params) {
-    redisSync.getUIDs(function (err, uids) {
-        uids.forEach(function (uid) {
-            setDayRewardAdv(uid, 0);
-        })
-    });
-}
-
-/**
- * 重置活动任务.
- */
-function resetActive(next) {
-    redisSync.getUIDs(function (err, uids) {
-        uids.forEach(function (uid) {
-            setActive(uid, {});
-            setActiveDaily(uid, {});
-            setActiveStatOnce(uid, {});
-            setActiveStatReset(uid, {});
-        })
-        next();
-    });
-
-}
 
 
 //----------------------------------------------------------
@@ -496,7 +441,7 @@ function setGoldShopping(uid, cur) {
 // 女神相关
 //----------------------------------------------------------
 function getGoddess(uid, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.goddess.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.GODDESS], function (err, account) {
         utils.invokeCallback(cb, null, account.goddess);
     });
 }
@@ -507,7 +452,19 @@ function setGoddess(uid, cur, cb) {
             //女神升级或通过碎片全部解锁后才需更新魅力值
             account.goddess = cur;
             resetCharmPoint(account, cb);
-
+            //统计女神解锁dfc
+            let goddess = account.goddess;
+            let count = 0;
+            for (let i in goddess) {
+                if (goddess[i].level > 0) {
+                    count++;
+                }
+            }
+            let mission = new RewardModel();
+            mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+            mission.addProcess(RewardModel.TaskType.UNLOCK_GODDESS, count);
+            account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+            account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
             account.commit();
         }
     });
@@ -523,15 +480,28 @@ function setAquarium(account, cur, cb) {
  * 设置宠物鱼最大等级.
  */
 function setMaxPetfishLevel(account, cur) {
+    let update = false;
     if (account.petfish_total_level) {
         if (account.petfish_total_level < cur) {
             account.petfish_total_level = cur;
+            update = true;
         }
     }
     else {
         account.petfish_total_level = cur;
+        update = true;
     }
-    buzz_charts.updateRankAquarium(account.platform, account.id, account.petfish_total_level);
+    if (update) {
+        let mission = new RewardModel();
+        mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+        mission.addProcess(RewardModel.TaskType.PETFISH_TOTAL_LEVEL, cur);
+        account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+        account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
+        account.commit();
+    }
+    //注释如下内容，直接调用redisutil,防止闭环require
+    // buzz_charts.updateRankAquarium(account.platform, account.id, account.petfish_total_level);
+    RedisUtil.updateRank(redisKeys.RANK.AQUARIUM, account.platform, account.petfish_total_level, account.id);
 }
 
 function setMaxWave(uid, cur) {
@@ -539,7 +509,9 @@ function setMaxWave(uid, cur) {
     getAccountById(uid, function (err, account) {
         let platform = 1;
         if (account) platform = account.platform;
-        buzz_charts.updateRankGoddess(platform, uid, cur);
+        //注释如下内容，直接调用redisutil,防止闭环require
+        // buzz_charts.updateRankGoddess(platform, uid, cur);
+        RedisUtil.updateRank(redisKeys.RANK.GODDESS, platform, cur, uid);
     });
 }
 
@@ -560,26 +532,26 @@ function setGoddessOngoing(uid, cur) {
 }
 
 function getGoddessFree(uid, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.goddess_free.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.GODDESS_FREE], function (err, account) {
         utils.invokeCallback(cb, null, account.goddess_free);
     });
 }
 
 function getGoddessCTimes(uid, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.goddess_ctimes.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.GODDESS_CTIMES], function (err, account) {
         utils.invokeCallback(cb, null, account.goddess_ctimes);
     });
 }
 
 function getGoddessCrossover(uid, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.goddess_crossover.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.GODDESS_CROSSOVER], function (err, account) {
         utils.invokeCallback(cb, null, account.goddess_crossover);
     });
 }
 
 function getGoddessOngoing(uid, cb) {
 
-    getAccountFieldById(uid, [account_def.AccountDef.goddess_ongoing.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.GODDESS_ONGOING], function (err, account) {
         utils.invokeCallback(cb, null, account.goddess_ongoing);
     });
 }
@@ -588,7 +560,7 @@ function getGoddessOngoing(uid, cb) {
 // Token相关
 //----------------------------------------------------------
 function getToken(uid, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.token.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.TOKEN], function (err, account) {
         utils.invokeCallback(cb, null, account.token);
     });
 }
@@ -621,42 +593,6 @@ function costBrokeTimes(uid) {
     });
 }
 
-//----------------------------------------------------------
-// 掉落相关
-//----------------------------------------------------------
-function setDropOnce(uid, cur) {
-    setField(uid, cur, 'drop_once');
-}
-
-function setDropReset(uid, cur) {
-    setField(uid, cur, 'drop_reset');
-}
-
-function resetAllDropReset() {
-    redisSync.getUIDs(function (err, uids) {
-        uids.forEach(function (uid) {
-            getAccountFieldById(uid, [account_def.AccountDef.drop_reset.name], function (err, account) {
-                if (account) {
-                    account.drop_reset = {};
-                    account.commit();
-                }
-            });
-        });
-    });
-}
-
-function resetAllDropOnce() {
-    redisSync.getUIDs(function (err, uids) {
-        uids.forEach(function (uid) {
-            getAccountFieldById(uid, [account_def.AccountDef.drop_once.name], function (err, account) {
-                if (account) {
-                    account.drop_once = {};
-                    account.commit();
-                }
-            });
-        });
-    });
-}
 
 //----------------------------------------------------------
 // 奖金相关
@@ -726,7 +662,7 @@ function addRmb(uid, cur) {
 //----------------------------------------------------------
 function setAchievePoint(uid, cur) {
     setField(uid, cur, 'achieve_point');
-    getAccountFieldById(uid, [account_def.AccountDef.platform.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.PLATFORM], function (err, account) {
     });
 }
 
@@ -779,6 +715,13 @@ function setWeaponSkin(account, cur, cb) {
         // yTODO: 验证拥有的武器是否重复, 如果重复就去掉重复并重写缓存和Redis
         weapon_skin.own = ArrayUtil.delRepeat(weapon_skin.own);
         account.weapon_skin = weapon_skin;
+        //统计武器皮肤dfc
+        let mission = new RewardModel();
+        let num = weapon_skin.own.length - 1;
+        mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+        mission.addProcess(RewardModel.TaskType.GET_WEAPON_SKIN, num);
+        account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+        account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
         account.commit();
         resetCharmPoint(account, cb);
     }
@@ -872,7 +815,7 @@ function setGuide(uid, cur) {
 }
 
 function getGuide(uid, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.guide.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.GUIDE], function (err, account) {
         utils.invokeCallback(cb, null, account.guide);
     });
 }
@@ -883,7 +826,7 @@ function setGuideWeak(uid, cur) {
 }
 
 function getGuideWeak(uid, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.guide_weak.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.GUIDE_WEAK], function (err, account) {
         utils.invokeCallback(cb, null, account.guide_weak);
     });
 }
@@ -1015,7 +958,7 @@ function setPack(uid, cur) {
 // 金币相关
 //----------------------------------------------------------
 function getGold(uid, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.gold], function (err, account) {
+    getAccountFieldById(uid, [account_def.GOLD], function (err, account) {
         utils.invokeCallback(cb, null, account.gold);
     });
 }
@@ -1049,53 +992,30 @@ function setGold(uid, cur) {
 // 钻石相关
 //----------------------------------------------------------
 function getPearl(uid, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.pearl.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.PEARL], function (err, account) {
         utils.invokeCallback(cb, null, account.pearl);
     });
 }
 
-// TODO: 钻石是否足够的判断
 function addPearl(uid, add) {
     add > 0 && setField(uid, add, 'pearl', function (account) {
-        logger.info("增加前:", account.pearl);
-        account.pearl = parseInt(account.pearl) + parseInt(add);
-        logger.info("增加后:", account.pearl);
+        account.pearl = parseInt(add);
         account.commit();
     });
 }
 
-
-// TODO: 钻石是否足够的判断
 function addPearlEx(account, add) {
     if (add > 0) {
-        logger.info("增加前:", account.pearl);
-        account.pearl = parseInt(account.pearl) + parseInt(add);
-        logger.info("增加后:", account.pearl);
+        account.pearl = parseInt(add);
         account.commit();
     }
 
 }
 
-function costPearl(uid, cost) {
-    cost > 0 && setField(uid, cost, 'pearl', function (account) {
-        logger.info("消费前:", account.pearl);
-        account.pearl = Math.max(0, parseInt(account.pearl) - parseInt(cost));
-        logger.info("消费后:", account.pearl);
-        account.commit();
-    });
-}
-
 function setPearl(account, cur) {
-
     if (cur >= 0 && account) {
-        cur = parseInt(cur);
-        if ((typeof(cur) == "undefined" || isNaN(cur))) {
-            throw new Error('err, pearl wrong.');
-        }
-        if (cur != account.pearl) {
-            account.pearl = cur;
+            account.pearl = parseInt(cur);
             account.commit();
-        }
     }
 }
 
@@ -1113,7 +1033,7 @@ function addSpecifyMail(mail_obj, player_list) {
 
     let palyer_array = player_list.split(",");
     palyer_array.forEach(function (id) {
-        getAccountFieldById(id, [account_def.AccountDef.mail_box.name], function (err, account) {
+        getAccountFieldById(id, [account_def.MAIL_BOX], function (err, account) {
             if (err) {
                 logger.error(FUNC + 'err:', err);
                 return;
@@ -1141,7 +1061,7 @@ function addSysMail(mail_obj) {
             logger.info(FUNC + "res:", res);
             for (let i = 0; i < res[1].length; i += 2) {
                 let uid = parseInt(res[1][i]);
-                getAccountFieldById(uid, [account_def.AccountDef.mail_box.name], function (err, account) {
+                getAccountFieldById(uid, [account_def.MAIL_BOX], function (err, account) {
                     if (err) {
                         logger.error(FUNC + 'err:', err);
                         return;
@@ -1186,7 +1106,7 @@ function getMailBox(id, cb) {
     const FUNC = TAG + "getMailBox()---";
     logger.info(FUNC + "CALL...");
 
-    getAccountFieldById(id, [account_def.AccountDef.mail_box.name], function (err, account) {
+    getAccountFieldById(id, [account_def.MAIL_BOX], function (err, account) {
         if (err) {
             logger.error(FUNC + 'err:', err);
             cb(err);
@@ -1213,7 +1133,7 @@ function deleteMail(account, mail_id) {
  */
 function hasMail(uid, mail_id, cb) {
     const FUNC = TAG + "hasMail()---";
-    getAccountFieldById(uid, [account_def.AccountDef.mail_box.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.MAIL_BOX], function (err, account) {
         if (err) {
             logger.error(FUNC + 'err:', err);
             cb(err);
@@ -1233,25 +1153,25 @@ function setMailBox(uid, cur) {
  */
 function getAllMailBox(cb) {
     const FUNC = TAG + "getAllMailBox()---";
-    redisSync.getUIDs(function (err, uids) {
+    // redisSync.getUIDs(function (err, uids) {
 
-        async.mapSeries(uids, function (uid, cb) {
-            getAccountFieldById(uid, [account_def.AccountDef.mail_box.name], function (err, account) {
-                if (err) {
-                    logger.error(FUNC + 'err:', err);
-                    cb(err);
-                    return;
-                }
-                cb(null, {
-                    id: uid,
-                    mail_box: account.mail_box
-                });
-            });
-        }, function (err, result) {
-            utils.invokeCallback(cb, null, result);
-        });
+    //     async.mapSeries(uids, function (uid, cb) {
+    //         getAccountFieldById(uid, [account_def.MAIL_BOX], function (err, account) {
+    //             if (err) {
+    //                 logger.error(FUNC + 'err:', err);
+    //                 cb(err);
+    //                 return;
+    //             }
+    //             cb(null, {
+    //                 id: uid,
+    //                 mail_box: account.mail_box
+    //             });
+    //         });
+    //     }, function (err, result) {
+    //         utils.invokeCallback(cb, null, result);
+    //     });
 
-    });
+    // });
 }
 
 //----------------------------------------------------------
@@ -1323,7 +1243,7 @@ function setNeedInsert(uid) {
  * {id, active, active_stat_once, active_stat_reset, free_draw}
  */
 function push(data) {
-    redisSync.setAccountById(data.id, data, function (err, result) {
+    redisAccountSync.setAccount(data.id, data, function (err, result) {
         if (err) {
             logger.error('插入玩家数据失败')
         }
@@ -1350,7 +1270,7 @@ function _safeLoadObj(field, value) {
  * 根据玩家ID获取一条记录RedisUtil.hset(PAIR.UID_SIGN_MONTH, uid, JSON.stringify(account.month_sign));
  */
 function getAccountById(id, cb) {
-    redisSync.getAccountById(id, function (err, account) {
+    redisAccountSync.getAccount(id, function (err, account) {
         if (account != null) {
             if (account.mail_box == null || account.mail_box == "" || account.mail_box == []) {
                 account.mail_box = [];
@@ -1368,65 +1288,35 @@ function getAccountById(id, cb) {
 
 function getAccountFieldById(id, fields, cb) {
     fields = fields || ['platform'];
-    redisSync.getAccountById(id, fields, function (err, account) {
+    redisAccountSync.getAccount(id, fields, function (err, account) {
         utils.invokeCallback(cb, err, account);
     })
 }
 
 
 function setAccountById(id, data, cb) {
-    redisSync.setAccountById(id, data, cb);
+    redisAccountSync.setAccount(id, data, cb);
 }
 
 
 function uid_list(cb) {
-    redisSync.getUIDs(function (err, uids) {
-        utils.invokeCallback(cb, null, uids);
-    });
+    // redisSync.getUIDs(function (err, uids) {
+    //     utils.invokeCallback(cb, null, uids);
+    // });
 }
 
 function getAllIds(cb) {
-    redisSync.getUIDs(function (err, uids) {
-        utils.invokeCallback(cb, null, uids);
-    });
+    // redisSync.getUIDs(function (err, uids) {
+    //     utils.invokeCallback(cb, null, uids);
+    // });
 }
 
 function length(cb) {
-    redisSync.getUIDs(function (err, uids) {
-        utils.invokeCallback(cb, null, uids.length);
-    });
+    // redisSync.getUIDs(function (err, uids) {
+    //     utils.invokeCallback(cb, null, uids.length);
+    // });
 }
 
-/**
- * 生成一个数组, 里面存放所有需要更新的账户信息.
- */
-function empty(cb) {
-    _sort(function (err, list) {
-        async.mapSeries(list, function (item, cb) {
-            _read(item.id, function (err, ret) {
-                cb(null, ret);
-            });
-        }, function (err, results) {
-            utils.invokeCallback(cb, null, results);
-        });
-    });
-}
-
-/**
- * 生成一个数组, 里面存放所有需要更新的账户信息.
- */
-function onlySave(cb) {
-    _sort(function (err, list) {
-        async.mapSeries(list, function (item, cb) {
-            _read(item.id, function (err, ret) {
-                cb(null, ret);
-            });
-        }, function (err, results) {
-            utils.invokeCallback(cb, null, results);
-        });
-
-    });
-}
 
 /**
  * 检测缓存中是否存在某用户信息.
@@ -1475,7 +1365,7 @@ function useFreeDraw(account, type, times) {
 }
 
 function getActualCostTimes(uid, type, times, cb) {
-    getAccountFieldById(uid, [account_def.AccountDef.free_draw.name], function (err, account) {
+    getAccountFieldById(uid, [account_def.FREE_DRAW], function (err, account) {
         let ret = times;
         if (account) {
             switch (type) {
@@ -1605,7 +1495,7 @@ function getRepeatFromActiveQuest(condition, val1) {
 // 字段值获取包装
 //------------------------------------------------------------------------------
 function getFreeDraw(id, cb) {
-    getAccountFieldById(id, [account_def.AccountDef.free_draw.name], function (err, account) {
+    getAccountFieldById(id, [account_def.FREE_DRAW], function (err, account) {
         if (account) {
             utils.invokeCallback(cb, null, account.free_draw);
         }
@@ -1616,7 +1506,7 @@ function getFreeDraw(id, cb) {
 }
 
 function getTotalDraw(id, cb) {
-    getAccountFieldById(id, [account_def.AccountDef.total_draw.name], function (err, account) {
+    getAccountFieldById(id, [account_def.TOTAL_DRAW], function (err, account) {
         if (account) {
             utils.invokeCallback(cb, null, account.total_draw);
         }
@@ -1630,27 +1520,6 @@ function getTotalDraw(id, cb) {
 function remove(uid) {
     // redisSync.delAccount(uid);
 }
-
-//==============================================================================
-// private
-//==============================================================================
-// 按时间排序
-function _sort(cb) {
-    // 从对象中抽出所有的更新时间数据, 排序一个数组, 数组的元素为用户ID
-    redisSync.getUIDs(function (err, uids) {
-        async.mapSeries(uids, function (uid, cb) {
-            getAccountFieldById(uid, [account_def.AccountDef.updated_at], function (err, account) {
-                if (account) {
-                    cb(null, {id: uid, time: account.updated_at});
-                }
-            });
-        }, function (err, results) {
-            let temp = _.sortBy(results, "time");
-            utils.invokeCallback(cb, null, temp);
-        });
-    });
-}
-
 
 //从缓存中读取一个元素.
 function _read(key, cb) {

@@ -203,9 +203,9 @@ function isEmpty(data) {
 function getPlayerName(data) {
     const FUNC = TAG + "getPlayerName() --- ";
 
-    var ret = data.channel_account_name;
+    var ret = data.nickname;
     if (ret == null) {
-        ret = data.nickname;
+        ret = data.channel_account_name;
     }
     if (ret == null) {
         ret = data.tempname;

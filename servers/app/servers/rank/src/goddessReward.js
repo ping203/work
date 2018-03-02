@@ -1,6 +1,7 @@
 const RankReward = require('./rankReward');
-const REDISKEY = require('../../database/consts').REDISKEY;
-const dbUtils = require('../../database/').dbUtils;
+const REDISKEY = require('../../../database/consts').REDISKEY;
+const redisAccountSync = require('../../../utils/redisAccountSync');
+
 class GoddessReward extends RankReward {
     constructor() {
         super();
@@ -27,7 +28,7 @@ class GoddessReward extends RankReward {
             return;
         }
 
-        let maxWaves = await dbUtils.redisAccountSync.oneCmdAsync(['hmget', `${REDISKEY.MAX_WAVE}`, uids]);
+        let maxWaves = await redisAccountSync.oneCmdAsync(['hmget', `${REDISKEY.MAX_WAVE}`, uids]);
 
         /* yxl */ console.log('maxWaves', maxWaves);
         console.log('uids', uids);
@@ -53,11 +54,11 @@ class GoddessReward extends RankReward {
             }
             // console.log("===================>",cmds);
             if (cmds.length >= task.limit) {
-                await dbUtils.redisAccountSync.multiAsync(cmds);
+                await redisAccountSync.multiAsync(cmds);
                 cmds = [];
             }
         }
-        await dbUtils.redisAccountSync.multiAsync(cmds);
+        await redisAccountSync.multiAsync(cmds);
     }
 }
 

@@ -17,9 +17,7 @@ const common_log_const_cfg = gameConfig.common_log_const_cfg;
 const shop_shop_buy_type_cfg = gameConfig.shop_shop_buy_type_cfg;
 const ERROR_OBJ = CstError.ERROR_OBJ;
 const logger = loggerEx(__filename);
-
-let DEBUG = 0;
-let ERROR = 1;
+const RewardModel = require('../../../../utils/account/RewardModel');
 
 const TAG = "【buzz_pay】";
 
@@ -432,8 +430,14 @@ function buySuccess(req, account, uid, token, shop_id, game_order_id, cb) {
         if (diamondGain > 0) {
             GameLog.addGameLog(item_list, account, scene, hint);
             //统计钻石充值dfc
-            mission.add(account.id, MissionType.CHARG_PEARL, 0, price * 10);
-            mission.add(account.id, MissionType.CHARG_PEARL, 1, price * 10);
+            let mission = new RewardModel();
+            mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+            mission.addProcess(RewardModel.TaskType.CHARG_PEARL, price * 10, 0);
+            mission.addProcess(RewardModel.TaskType.CHARG_PEARL, price * 10, 1);
+            mission.addProcess(RewardModel.TaskType.GET_VIP_LV, account.vip);
+            account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE,true);
+            account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY,true);
+            account.commit();
         }
     });
 }

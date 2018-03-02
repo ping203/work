@@ -112,7 +112,7 @@ function getDraw(pool, data, cb) {
                         cb(ERROR_OBJ.GOLD_NOT_ENOUGH);
                         return;
                     }
-                break;
+                    break;
 
                 case ItemType.PEARL:
                     let pearlTimes = buzz_draw.getActualCostTimes(account, DRAW_TYPE.PEARL, times);
@@ -124,7 +124,7 @@ function getDraw(pool, data, cb) {
                         cb(ERROR_OBJ.DIAMOND_NOT_ENOUGH);
                         return;
                     }
-                break;
+                    break;
 
                 // case ItemType.TOKENS:
                 case ItemType.SKIN_DEBRIS:
@@ -156,12 +156,11 @@ function getDraw(pool, data, cb) {
                             cb(ERROR_OBJ.DIAMOND_NOT_ENOUGH);
                             return;
                         }
-                        account.pearl = account.pearl - diamondNeed;
+                        account.pearl = -diamondNeed;
                         cost.num = tokensCount;
                     }
                     console.log(FUNC + "cost.num :", cost.num);
-
-                break;
+                    break;
             }
 
             let rand = [];
@@ -195,19 +194,19 @@ function getDraw(pool, data, cb) {
                     buzz_draw.addDrawCount(account, type, times);
                     // 新增total_draw的返回.
                     ret_account.draw = {
-                        free_draw:account.free_draw,
-                        total_draw:account.total_draw,
+                        free_draw: account.free_draw,
+                        total_draw: account.total_draw,
                     };
 
                     cb(null, ret_account);
 
 
                     let player = account.nickname;
-                    if(!player || player==""){
+                    if (!player || player == "") {
                         player == account.channel_account_name;
                         account.nickname = player;
                     }
-                    if(!player || player==""){
+                    if (!player || player == "") {
                         player == account.tempname;
                         account.nickname = player;
                     }
@@ -271,11 +270,11 @@ function getDraw(pool, data, cb) {
                             }],
                         };
                         console.log(FUNC + "插入一条金币日志:", data);
-                        dao_gold.addGoldLogCache(pool, data, function(err, res) {
+                        dao_gold.addGoldLogCache(pool, data, function (err, res) {
                             if (err) return console.error(FUNC + "err:", err);
                         });
                     }
-                    
+
 
                     // yDONE: 钻石数据记录
                     let diamondGain = 0;
@@ -383,7 +382,7 @@ function _pickup1(pool, r) {
     for (let i in pool) {
         let item = pool[i];
         r -= item.item_probability;
-        if (r <= 0) return {item: [item.item_id, item.item_count], idx: item.item};
+        if (r <= 0) return { item: [item.item_id, item.item_count], idx: item.item };
     }
 }
 

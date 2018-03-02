@@ -20,9 +20,12 @@ admin/.vscode/
 tools/gulpPack/*.zip
 tools/gulpPack/*.zip
 tools/gulpPack/dist/
-*.zip
+**/*.zip
 stressTest/omelo-admin-web
 stressTest/omelo-robot
 stressTest/omelo-robot - 副本
 stressTest/omelo-robot - 副本 (2)
 stressTest/omelo-robot - 副本 (3)
+temp
+/servers/app/servers/admin/controllers/TempMethod.js
+doc/~$玩吧版服务器列表.xlsx

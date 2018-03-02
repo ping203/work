@@ -1,6 +1,7 @@
-const Task = require('../../base/task/task');
-const REDISKEY = require('../../database/consts').REDISKEY;
-const dbUtils = require('../../database/').dbUtils;
+const Task = require('../../../utils/task/task')
+const REDISKEY = require('../../../database/consts').REDISKEY;
+const redisAccountSync = require('../../../utils/redisAccountSync');
+const redisClient = require('../../../utils/database').redisClient;
 const async = require('async');
 const utils = require('../../../utils/utils');
 const SUBTASK_TYPE = require('../src/consts').SUBTASK_TYPE;
@@ -17,8 +18,8 @@ class DailyTask extends Task {
     }
 
     _setSpecial(task, cb){
-        dbUtils.redisAccountSync.getHashValueLimit(REDISKEY.PLATFORM, 0, task.limit, (res, next) => {
-            let uids = dbUtils.redisAccountSync.Util.parseHashKey(res);
+        redisAccountSync.getHashValueLimit(REDISKEY.PLATFORM, 0, task.limit, (res, next) => {
+            let uids = redisAccountSync.Util.parseHashKey(res);
             let cmds = [];
             let cmds1 = [];//条件性重置goddess_free
             uids.forEach(function (uid) {
@@ -32,7 +33,7 @@ class DailyTask extends Task {
 
             async.waterfall([function (cb) {
                 if (REDISKEY.GODDESS_FREE == task.redisKey) {
-                    redisConnector.cmd.multi(cmds1).exec(function (err, res) {
+                    redisClient.cmd.multi(cmds1).exec(function (err, res) {
                         if (err) {
                             console.log(`执行${task.redisKey}1:`, err);
                             cb();
@@ -43,12 +44,12 @@ class DailyTask extends Task {
                                     sub_cmds.push(['hset', REDISKEY.GODDESS_FREE, uids[i], task.value]);
                                 }
                             }
-                            redisConnector.cmd.multi(sub_cmds).exec(cb);
+                            redisClient.cmd.multi(sub_cmds).exec(cb);
                         }
                     })
                 }
                 else if (REDISKEY.GODDESS_CROSSOVER == task.redisKey) {
-                    redisConnector.cmd.multi(cmds).exec(cb)
+                    redisClient.cmd.multi(cmds).exec(cb)
                 }
             }], function (err, result) {
                 next();

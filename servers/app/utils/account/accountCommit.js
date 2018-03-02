@@ -6,7 +6,7 @@ const accountConf = require('./accountConf');
 class AccountCommit {
     constructor(id) {
         this.__update = [];
-        this.__id = id;
+        this.__id = Number(id);
     }
 
     get update(){
@@ -918,6 +918,48 @@ class AccountCommit {
     }
     get bp() {
         return this._value('bp');
+    }
+
+    get flower_receive_weekly() {
+        return this._value('flower_receive_weekly');
+    }
+
+    set flower_receive_weekly(value) {
+        this._modify('flower_receive_weekly', value);
+    }
+
+    //dfc 2018/2/25
+    get month_sign_extra_reward() {
+        return this._value('month_sign_extra_reward');
+    }
+
+    set month_sign_extra_reward(value) {
+        this._modify('month_sign_extra_reward', value);
+    }
+
+    //dfc 2018/2/28
+    get social_daily_invite_reward() {
+        return this._value('social_daily_invite_reward');
+    }
+
+    set social_daily_invite_reward(value) {
+        this._modify('social_daily_invite_reward', value);
+    }
+
+    get social_invite_week() {
+        return this._value('social_invite_week');
+    }
+
+    set social_invite_week(value) {
+        this._modify('social_invite_week', value);
+    }
+
+    get social_invite_month() {
+        return this._value('social_invite_month');
+    }
+
+    set social_invite_month(value) {
+        this._modify('social_invite_month', value);
     }
 
 }

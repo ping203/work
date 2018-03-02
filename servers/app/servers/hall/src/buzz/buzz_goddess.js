@@ -8,8 +8,6 @@ const Item = require('./pojo/Item');
 const _ = require('underscore');
 const buzz_account = require('./buzz_account');
 const buzz_charts = require('./buzz_charts');
-const mission = require('../mission/mission');
-const MissionType = require('../mission/mission').MissionType;
 const cache = require('../rankCache/cache');
 const GameLog = require('../log/GameLog');
 const DaoCommon = require('../dao/dao_common');
@@ -22,6 +20,7 @@ const common_log_const_cfg = gameConfig.common_log_const_cfg;
 const shop_shop_buy_type_cfg = gameConfig.shop_shop_buy_type_cfg;
 const ERROR_OBJ = CstError.ERROR_OBJ;
 const ItemTypeC = Item.ItemTypeC;
+const RewardModel = require('../../../../utils/account/RewardModel');
 
 let DEBUG = 0;
 let ERROR = 1;
@@ -53,7 +52,6 @@ exports.levelup = levelup;
 exports.weekReward = weekReward;
 exports.queryWeekReward = queryWeekReward;
 exports.putWeekReward = putWeekReward;
-
 exports.getGoddessTop1 = getGoddessTop1;
 
 
@@ -380,20 +378,24 @@ function _didChallengeGoddess(req, data, account, cb) {
             cb(null, ret);
             return;
         }
-        account.pearl -= pearl_cost;
+        account.pearl = -pearl_cost;
         goddess_ctimes++;
-        CacheAccount.setPearl(uid, account);
         CacheAccount.setGoddessCTimes(uid, goddess_ctimes);
     }
     account.commit();
     //统计女神挑战次数dfc
-    mission.add(account.id, MissionType.DEFEND_GODDESS, 0, 1);
+    let mission = new RewardModel();
+    mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+    mission.addProcess(RewardModel.TaskType.DEFEND_GODDESS, 1);
+    mission.addProcess(RewardModel.TaskType.GODDESS_LEVEL, account.max_wave);
+    account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+    account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
+    account.commit();
     let ret = {
         pearl: account.pearl,
         free: account.goddess_free,
         ctimes: account.goddess_ctimes,
     };
-    if (DEBUG) console.log(FUNC + "返回数据:", ret);
     cb(null, ret);
 }
 

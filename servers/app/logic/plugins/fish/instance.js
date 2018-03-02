@@ -226,6 +226,29 @@ class Instance {
             utils.invokeCallback(cb, null);
         }
     }
+
+    rpc_player_data_change(data, cb) {
+        if (!data.uid) {
+            utils.invokeCallback(cb, CONSTS.SYS_CODE.ARGS_INVALID);
+            return;
+        }
+
+        let scene = this.uids.get(data.uid);
+        if (!scene) {
+            logger.info('玩家不在游戏中', data.uid);
+            utils.invokeCallback(cb, CONSTS.SYS_CODE.PALYER_GAME_ROOM_DISMISS)
+            return
+        }
+
+        let room = scene.getSceneRoom(data.uid);
+        if (room) {
+            let player = room.getPlayer(data.uid);
+            //玩家进行数据同步
+            player.syncData();
+            utils.invokeCallback(cb, null);
+        }
+    }
+    
 }
 
 module.exports = Instance;

@@ -3,7 +3,7 @@ const BuzzUtil = require('../utils/BuzzUtil');
 const DaoUtil = require('../utils/DaoUtil');
 const RedisUtil = require('../utils/RedisUtil');
 const redisKeys = require('../../../../database').dbConsts.REDISKEY;
-const redisSync = require('./redisSync');
+const redisAccountSync = require('../../../../utils/redisAccountSync');
 const CacheOperation = require('./cache/CacheOperation');
 const CacheChange = require('./cache/CacheChange');
 const CacheAccount = require('./cache/CacheAccount');
@@ -193,7 +193,7 @@ function _queryPlayer(req, dataObj, cb) {
         'gold',
         'playerCatchRate'
     ];
-    redisSync.getAccountById(uid, fields, function (err, account) {
+    redisAccountSync.getAccount(uid, fields, function (err, account) {
         account = account.toJSON();
         console.log(account);
         if (!account.playerCatchRate) {

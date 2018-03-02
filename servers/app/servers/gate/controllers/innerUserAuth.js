@@ -32,7 +32,7 @@ class InnerUserAuth {
                 data.uid = uid;
                 let account = await sdkApi.login(data);
                 account.commit();
-                logger.info(`注册新用户${uid}`)
+                logger.info(`注册新用户${uid}`);
                 return logicResponse.ask(account.toJSON());
             }
         } catch (err) {
@@ -57,7 +57,7 @@ class InnerUserAuth {
             return logicResponse.ask(account.toJSON());
         } catch (err) {
             logger.error('用户登录失败', err);
-            throw ERROR_OBJ.USERNAME_PASSWORD_ERROR;
+            throw err;
         }
     }
 
@@ -92,6 +92,16 @@ class InnerUserAuth {
             throw ERROR_OBJ.OLD_PASSWORD_ERROR;
         }
     }
+
+    async logout(){
+        try{
+            return logicResponse.ask({status: 1, msg: "成功退出"});
+        }catch (err){
+            logger.error("退出账户失败", err);
+            throw ERROR_OBJ.LOGINOUT_FAIL;
+        }
+    }
+
 }
 
 module.exports = new InnerUserAuth();

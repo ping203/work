@@ -1,7 +1,7 @@
 
 const RemoteHandler = require('../../common/remoteHandler');
 const matchingCmd = require('../../../cmd/matchingCmd');
-const matching = require('../../../logic/matching/matching');
+const matchingApp = require('../matchingApp');
 
 /**
  * 排位赛远程调用接口
@@ -15,7 +15,7 @@ function matchingRemote(app) {
 
 let remote = matchingCmd.remote;
 for(let k of Object.keys(remote)){
-    RemoteHandler.registe(remote[k].route, matchingRemote.prototype, matching);
+    RemoteHandler.registe(remote[k].route, matchingRemote.prototype, matchingApp);
 }
 
 module.exports = function (app) {

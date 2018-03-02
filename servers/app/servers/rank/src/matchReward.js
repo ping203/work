@@ -1,6 +1,6 @@
 const RankReward = require('./rankReward');
-const REDISKEY = require('../../database/consts').REDISKEY;
-const dbUtils = require('../../database/').dbUtils;
+const REDISKEY = require('../../../database/consts').REDISKEY;
+const redisAccountSync = require('../../../utils/redisAccountSync');
 const consts = require('./consts');
 class MatchReward extends RankReward {
     constructor() {
@@ -14,7 +14,6 @@ class MatchReward extends RankReward {
      * @private
      */
     _getMonthAward(rank, score) {
-        console.log("______________________",rank, score);
         let rankId = consts.getRankIdFromPointsAndRank(score, rank - 1);
         if (0 == rankId) {
             rankId = consts.getRankIdFromPoints(score);
@@ -28,7 +27,7 @@ class MatchReward extends RankReward {
         cmds.push(['HMGET', REDISKEY.MATCH_SEASON_BOX, uids]);
         cmds.push(['HMGET', REDISKEY.MATCH_SEASON_1ST_WIN, uids]);
 
-        return await dbUtils.redisAccountSync.multiAsync(cmds);
+        return await redisAccountSync.multiAsync(cmds);
     }
 
 
@@ -45,7 +44,7 @@ class MatchReward extends RankReward {
         let rank = 0;
         let cmds = [];
         while (true) {
-            let ranks = await dbUtils.redisAccountSync.getRankLimit(`${task.redisKey}:${platform}`, rank, (rank + task.limit) - 1);
+            let ranks = await redisAccountSync.getRankLimit(`${task.redisKey}:${platform}`, rank, (rank + task.limit) - 1);
             if (0 == ranks.length) {
                 break;
             }
@@ -91,13 +90,13 @@ class MatchReward extends RankReward {
                 }
 
                 if (cmds.length >= task.limit) {
-                    await dbUtils.redisAccountSync.multiAsync(cmds);
+                    await redisAccountSync.multiAsync(cmds);
                     cmds = [];
                 }
             }
         }
 
-        await dbUtils.redisAccountSync.multiAsync(cmds);
+        await redisAccountSync.multiAsync(cmds);
     }
 
     async handle(task, month) {

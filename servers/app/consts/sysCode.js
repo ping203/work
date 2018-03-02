@@ -89,7 +89,7 @@ class SysCode{
         
         this.PLAYER_CREATE_FAILED = {
             code:353,
-            desc:'忘记创建失败'
+            desc:'玩家创建失败'
         };
 
         this.PLAYER_NOT_LOGIN = {

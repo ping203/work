@@ -62,7 +62,9 @@ class Account extends AccountCommit {
     commit(cb) {
         let fields = this.__update;
 
-        if (fields.length === 0) return;
+        if (fields.length === 0) {
+            utils.invokeCallback(cb, null);
+        };
 
         let cmds = [];
         let fields_keys = [];

@@ -8,11 +8,14 @@ const DaoCommon = require('../dao/dao_common');
 const dao_reward = require('../dao/dao_reward');
 const BuzzUtil = require('../utils/BuzzUtil');
 const buzz_online = require('./buzz_online');
-const redisSync = require('./redisSync');
+const redisAccountSync = require('../../../../utils/redisAccountSync');
 const async = require('async');
 const CstError = require('./cst/buzz_cst_error'),
     ERROR_OBJ = CstError.ERROR_OBJ;
 const redisKeys = require('../../../../database').dbConsts.REDISKEY;
+const gameConfig = require('../../../../utils/imports').GAME_CFGS;
+const common_const_cfg = gameConfig.common_const_cfg;
+const shop_shop_buy_type_cfg = gameConfig.shop_shop_buy_type_cfg;
 const logger = loggerEx(__filename);
 
 const TAG = "【buzz_chat】";
@@ -119,7 +122,7 @@ function getUserInfo(pool, dataObj, cb) {
                 "channel_account_name",
                 "tempname"
             ];
-            redisSync.getAccountById(uid, fields, function (err, res) {
+            redisAccountSync.getAccount(uid, fields, function (err, res) {
                 cb(null, res);
             });
         }, function (err, res) {
@@ -231,7 +234,7 @@ function costChat(req, dataObj, cb) {
 
     function doNextWithAccount(account, cb) {
         let item1 = [['i006', 1]];
-        let item2 = [['i002', 10]];
+        let item2 = [[shop_shop_buy_type_cfg.CHAT_COST.id, common_const_cfg.WORLD_LABA_PEARL]];
         if (dao_reward.enough(account, item1)) {
             let tmp1 = [{
                 item_id: item1[0][0],

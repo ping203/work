@@ -4,11 +4,12 @@ const versions = require('../../../../utils/imports').versions;
 
 class GamePlay {
     constructor() {
-        switch (versions.GAMEPLAY.PUB) {
+        switch (versions.PUB) {
             case versions.GAMEPLAY.VIETNAM:
                 this._cost = new VietnamCost();
                 break;
-            case versions.GAMEPLAY.CHINA:
+            case versions.GAMEPLAY.LOCAL:
+            case versions.GAMEPLAY.WANBA:
                 this._cost = new Cost();
                 break;
             default:
@@ -22,4 +23,3 @@ class GamePlay {
 }
 
 module.exports = new GamePlay();
-0

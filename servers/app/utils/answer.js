@@ -26,6 +26,7 @@ function HttpResponse(data, aes, isError = false){
     let res = {};
     if(!isError){
         if(aes){
+            res.aes = aes;
             let encrypt_data = CryptoJS.AES.encrypt(JSON.stringify(data), session.secret);
             res.data = encodeURIComponent(encrypt_data);
         }else{

@@ -1,6 +1,6 @@
 const Handler = require('../../common/hander');
 const matchingCmd = require('../../../cmd/matchingCmd');
-const matching = require('../../../logic/matching/matching');
+const matchingApp = require('../matchingApp');
 
 class MatchingHandler extends Handler {
     constructor() {
@@ -8,7 +8,7 @@ class MatchingHandler extends Handler {
     }
 
     request(route, msg, session, next) {
-        matching.request(route, msg, session, (err, result)=>{
+        matchingApp.request(route, msg, session, (err, result)=>{
             super.response(err, result, next);
         })
     }

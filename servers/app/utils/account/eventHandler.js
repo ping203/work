@@ -2,8 +2,10 @@ const ACCOUNT_EVENT_TYPE = require('../../database/consts/consts').ACCOUNT_EVENT
 const common_const_cfg = require('../../utils/imports').GAME_CFGS.common_const_cfg;
 const ACCOUNTKEY = require('../../database/consts').ACCOUNTKEY;
 const REDISKEY = require('../../database/consts').REDISKEY;
-const mission = require('./mission');
-const missionConsts = require('./missionConsts');
+const RewardModel = require('./RewardModel');
+const omelo = require('omelo');
+const rpc = require('../../logic/net/rpc');
+const fishCmd = require('../../cmd/fishCmd');
 
 class EventHandler {
     constructor() {
@@ -17,7 +19,17 @@ class EventHandler {
         this.missionKeys = new Map([
             [ACCOUNTKEY.GOLD, 1],
             [ACCOUNTKEY.PEARL, 1],
-        ])
+        ]);
+        this.accountChangeKeys = new Map([
+            [ACCOUNTKEY.GOLD,1],
+            [ACCOUNTKEY.PEARL,1],
+            [ACCOUNTKEY.WEAPON,1],
+            [ACCOUNTKEY.WEAPON_ENERGY,1],
+            [ACCOUNTKEY.WEAPON_SKIN,1],
+            [ACCOUNTKEY.SKILL,1],
+            [ACCOUNTKEY.VIP,1],
+            [ACCOUNTKEY.COMEBACK,1],
+        ]);
     }
 
     addEvent(type, account, fields) {
@@ -38,6 +50,11 @@ class EventHandler {
                     this.events[type] = this.missionFunc(account);
                 }
                 break;
+            case ACCOUNT_EVENT_TYPE.PLAYER_DATA_CHANGE_SYNC:
+                if (!this.events[type]) {
+                    this.events[type] = this.playerDataSyncFunc(account);
+                }
+                break;
             default:
                 break;
         }
@@ -45,11 +62,15 @@ class EventHandler {
 
     listenKey(keys, account) {
         keys.forEach(function (key) {
-            if (this.gainLossKeys.has(key[0])) {
+            let tk = key[0];
+            if (this.gainLossKeys.has(tk)) {
                 this.addEvent(ACCOUNT_EVENT_TYPE.GAIN_LOST, account);
             }
-            if (this.missionKeys.has(key[0])) {
+            if (this.missionKeys.has(tk)) {
                 this.addEvent(ACCOUNT_EVENT_TYPE.MISSION, account);
+            }
+            if (this.accountChangeKeys.has(tk)) {
+                this.addEvent(ACCOUNT_EVENT_TYPE.PLAYER_DATA_CHANGE_SYNC, account, tk);
             }
         }.bind(this));
     }
@@ -75,8 +96,7 @@ class EventHandler {
                 account.gain_loss = v;
                 if (account.gain_loss_limit != 0 && account.gain_loss_snapshot == 0) {
                     account.gain_loss_snapshot = account.gain_loss;
-                }
-                else if (account.gain_loss_limit == 0 && account.gain_loss_snapshot != 0) {
+                } else if (account.gain_loss_limit == 0 && account.gain_loss_snapshot != 0) {
                     account.gain_loss_snapshot = 0;
                 }
                 if (tmpV != v) {
@@ -104,13 +124,36 @@ class EventHandler {
             for (let i = 0; i < updates.length; i++) {
                 let key = updates[i][0];
                 let value = updates[i][1];
+                //统计金币变化dfc
+                let mission = new RewardModel();
+                mission.resetLoginData(account.mission_only_once, account.mission_daily_reset);
+                let mark = false;
                 if (value && 'gold' == key) {
-                    value > 0 ? mission.add(account.id, missionConsts.MissionType.GET_GOLD, 0, value)
-                        : mission.add(account.id, missionConsts.MissionType.USE_GOLD, 0, Math.abs(value));
+                    mark = true;
+                    value > 0 ? mission.addProcess(RewardModel.TaskType.GET_GOLD, value) :
+                        mission.addProcess(RewardModel.TaskType.USE_GOLD, Math.abs(value));
                 }
                 if ('pearl' == key && value < 0) {
-                    mission.add(account.id, missionConsts.MissionType.USE_DIAMOND, 0, Math.abs(value));
+                    mark = true;
+                    mission.addProcess(RewardModel.TaskType.USE_DIAMOND, Math.abs(value));
                 }
+                if (mark) {
+                    account.mission_only_once = mission.getReadyData2Send(RewardModel.Type.ACHIEVE);
+                    account.mission_daily_reset = mission.getReadyData2Send(RewardModel.Type.EVERYDAY);
+                    account.commit();
+                }
+            }
+        }
+    }
+
+    playerDataSyncFunc(account){
+        return function(){
+            let serverType = omelo.app.getServerType();
+            if(serverType !== 'game'){
+                let rpc_target = rpc.getRPCTarget(rpc.serverType.game, rpc.serverModule.game.playerRemote, fishCmd.remote.playerDataChange.route);
+                rpc.invoke(rpc_target, rpc.getSession(rpc.serverType.game, account.id), {
+                    uid: account.id,
+                });
             }
         }
     }

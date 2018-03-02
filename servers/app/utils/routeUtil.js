@@ -13,12 +13,22 @@ routeUtil.chatRoute = function(session, msg, app, cb) {
 };
 
 routeUtil.gameRoute = function (session, msg, app, cb) {
-    if(typeof session.get === 'function'){
-        cb(null, session.get('gameSid'));
+    let games = app.getServersByType('game');
+    if(!games || games.length === 0) {
+        cb(new Error('can not find game servers.'));
+        return;
     }
-    else{
-        cb(null, session.gameSid);
-    }
+
+    let res = dispatcher.dispatchEx(session.uid, games);
+    cb(null, res.id);
+
+
+    // if(typeof session.get === 'function'){
+    //     cb(null, session.get('gameSid'));
+    // }
+    // else{
+    //     cb(null, session.gameSid);
+    // }
 
 };
 
@@ -29,16 +39,5 @@ routeUtil.rankMatchRoute = function (session, msg, app, cb) {
     else{
         cb(null, session.rankMatchSid);
     }
-};
-
-routeUtil.hallRoute = function (session, msg, app, cb) {
-    let hallServers = app.getServersByType('hall');
-    if(!hallServers || hallServers.length === 0) {
-        cb(new Error('can not find game servers.'));
-        return;
-    }
-
-    let res = dispatcher.dispatchEx(session.uid, hallServers);
-    cb(null, res.id);
 };
 

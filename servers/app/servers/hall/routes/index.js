@@ -1,9 +1,5 @@
-﻿var express = require('express');
-var router = express.Router();
-
-/* GET home page. */
-router.get('/', function (req, res) {
-    res.redirect('admin/pages-signin.html');
-});
-
-module.exports = router;
+﻿module.exports = (router) => {
+    router.get('/', async (ctx) => {
+		ctx.redirect('admin/pages-signin.html');
+    });
+}

@@ -1,6 +1,7 @@
-const rank_ranklist_cfg = require('../../config/index').data_cfg.rank_ranklist_cfg;
-const rank_rankgame_cfg = require('../../config/index').data_cfg.rank_rankgame_cfg;
-const goddess_rankreward_cfg = require('../../config/index').data_cfg.goddess_rankreward_cfg;
+const GAME_CFGS = require('../../../utils/imports').GAME_CFGS
+const rank_ranklist_cfg = GAME_CFGS.rank_ranklist_cfg;
+const rank_rankgame_cfg = GAME_CFGS.rank_rankgame_cfg;
+const goddess_rankreward_cfg = GAME_CFGS.goddess_rankreward_cfg;
 
 const RANK_TYPE = {
     MATCH: 3,   //排位赛排行榜

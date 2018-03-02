@@ -6,27 +6,22 @@ module.exports = (router) => {
 	router.prefix('/account_api');
 
 	router.post('/auth', async (ctx) => {
-		let data = await httpHandler(ctx, thirdPartyAuth, 'login');
-		if(data){
-			ctx.session.uid = data.id;
-		}
+		await httpHandler(ctx, thirdPartyAuth, 'login');
 	});
 
 	router.post('/register', async (ctx) => {
-		let data = await httpHandler(ctx, innerUserAuth, 'register');
-		if(data){
-			ctx.session.uid = data.id;
-		}
+		await httpHandler(ctx, innerUserAuth, 'register');
 	});
 
 	router.post('/login', async (ctx) => {
-		let data = await httpHandler(ctx, innerUserAuth, 'login');
-		if(data){
-			ctx.session.uid = data.id;
-		}
+		await httpHandler(ctx, innerUserAuth, 'login');
 	});
 
 	router.post('/modifyPassword', async (ctx) => {
 		await httpHandler(ctx, innerUserAuth, 'modifyPassword');
 	});
+
+    router.post('/logout_account', async (ctx) => {
+        await httpHandler(ctx, innerUserAuth, 'logout');
+    });
 };

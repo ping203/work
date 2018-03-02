@@ -6,7 +6,7 @@
  * 规则：
  * 作弊判定，以下两种情况（两种情况都要判断），任意满足一种就认为作弊：
     近1000发子弹gain/cost >= 1.8  and  提现VND + 持有金币/CHANGE_CASH_4 >= 充值VND + （CHANGE_CASH_1 + 75000）/CHANGE_CASH_4 
-    近1000发子弹gain/cost >=1.3  and  历史累计gain/cost  >= 1    and  提现VND + 持有金币/CHANGE_CASH_4 >= 充值VND + （CHANGE_CASH_1 + 75000）/CHANGE_CASH_4 
+    level >=DRAW_LEVEL and 近1000发子弹gain/cost >=1.5  and  历史累计gain/cost  >= 1.25    and  提现VND + 持有金币/CHANGE_CASH_4 >= 充值VND + （CHANGE_CASH_1 + 75000）/CHANGE_CASH_4 
  */
 const REDISKEY = require('../../../../database').dbConsts.REDISKEY;
 const consts = require('../consts');
@@ -21,27 +21,34 @@ const CASH_FIELDS = [
     REDISKEY.CASH,
     REDISKEY.RECHARGE,
     REDISKEY.GOLD,
+    REDISKEY.LEVEL,
 ];
 const REGET_DT = 60; //重新获取充值参数周期，单位秒
 const LOG_DT = 30; //金币钻石日志写入周期，即每隔指定时间插入一条
 const FIRE_C = 1000; //金币收益多批次共检查炮数
 const GOLD_C = 10; //金币收益检查批次
 const CHEAT_P = 1.8; //金币作弊阈值
-const CHEAT_P2 = 1.3; //金币作弊阈值
+const CHEAT_P2 = 1.5; //金币作弊阈值
+const CHEAT_P3 = 1.25; //金币作弊阈值
 
  class FishingLog {
-    constructor(uid, ugold, upearl) {
-        this._uid = uid;
+    constructor(account) {
+        this._account = account;
+        this._uid = account.id;
         this._logs = {
             gold: {
                 funcName: 'addGoldLog',
                 sdata: {},
-                total: ugold,
+                total: account.gold,
+                timestamp: 0,
+                isReadingRedis: false
             },
             pearl: {
                 funcName: 'addPearlLog',
                 sdata: {},
-                total: upearl,
+                total: account.pearl,
+                timestamp: 0,
+                isReadingRedis: false
             }
         };
 
@@ -55,6 +62,7 @@ const CHEAT_P2 = 1.3; //金币作弊阈值
             cash: 0,
             recharge: 0,
             gold: 0,
+            level: 1,
         }
         this._regetDt = 0;
 
@@ -95,6 +103,7 @@ const CHEAT_P2 = 1.3; //金币作弊阈值
                 this._cashTempData.cash = parseInt(docs[0]) || 0;
                 this._cashTempData.recharge = parseInt(docs[1]) || 0;
                 this._cashTempData.gold = parseInt(docs[2]) || 0;
+                this._cashTempData.level = parseInt(docs[3]) || 1;
                 logger.debug('dd = ', this._cashTempData)
             }else{
                 logger.error('fishingLog:_regetCach failed.', err);
@@ -123,11 +132,14 @@ const CHEAT_P2 = 1.3; //金币作弊阈值
      * 历史累计gain/cost  >= 1
      */
     _isNotNormalWithTotal () {
-        let data = this._goldTotals;
-        if (data) {
-            let tp = data.cost ? (data.gain / data.cost) : 0;
-            logger.error('total gain = ', data.gain, ' total cost = ', data.cost);
-            return tp >= 1;
+        let DRAW_LEVEL = configReader.getValue('common_const_cfg', 'DRAW_LEVEL');
+        if (this._cashTempData.level >= DRAW_LEVEL) {
+            let data = this._goldTotals;
+            if (data) {
+                let tp = data.cost ? (data.gain / data.cost) : 0;
+                logger.debug('total gain = ', data.gain, ' total cost = ', data.cost);
+                return tp >= CHEAT_P3;
+            }
         }
         return false;
     }
@@ -160,6 +172,7 @@ const CHEAT_P2 = 1.3; //金币作弊阈值
     _exeCheat (msg, cheatCode) {
         this._saveCheatGold();
         this._cheatFunc && this._cheatFunc(msg, cheatCode);
+        this._isForbided = true;
     }
 
     _insertDefaultGold () {
@@ -266,7 +279,7 @@ const CHEAT_P2 = 1.3; //金币作弊阈值
             data.cost += -value;
             isFireCounting && (data.fire ++);
         }
-        log.total += value;
+        log.total = this._account[field];
         if (log.total < 0) {
             log.total = 0;
         }
@@ -320,6 +333,10 @@ const CHEAT_P2 = 1.3; //金币作弊阈值
      * @param {*玩家等级} uLevel 
      */
     logAll () {
+        if (this._isForbided) {
+            return;
+        }
+        
         let uid = this._uid;
         let logs = this._logs;
         for (let field in logs) {
@@ -330,21 +347,23 @@ const CHEAT_P2 = 1.3; //金币作弊阈值
                 logger.error('logAll: no such function in logBuilder = ', funcName);
                 continue;
             }
-            let total = fds.total;
-            let sdata = fds.sdata;
-            for (let flag in sdata) {
-                let data = sdata[flag];
-                let gain = data.gain;
-                let cost = data.cost;
-                if (!gain && !cost) {
-                    continue;
+            this._try2GetField(field, function (total) {
+                total = Math.max(0, total);
+                let sdata = this.sdata;
+                for (let flag in sdata) {
+                    let data = sdata[flag];
+                    let gain = data.gain;
+                    let cost = data.cost;
+                    if (!gain && !cost) {
+                        continue;
+                    }
+                    logBuilder[funcName](uid, gain, cost, total, parseInt(flag), data.level, data.fire);
+                    data.gain = 0;
+                    data.cost = 0;
+                    data.fire = 0;
+                    data.dt = 0;
                 }
-                logBuilder[funcName](uid, gain, cost, total, parseInt(flag), data.level, data.fire);
-                data.gain = 0;
-                data.cost = 0;
-                data.fire = 0;
-                data.dt = 0;
-            }
+            }.bind(fds), true);
         }
 
         this._saveCheatGold();
@@ -355,36 +374,46 @@ const CHEAT_P2 = 1.3; //金币作弊阈值
      * @param {*轮询时间差，单位秒} dt 
      */
     checkWriteNow (dt) {
+        if (this._isForbided) {
+            return;
+        }
         let uid = this._uid;
         let logs = this._logs;
         for (let field in logs) {
             let fds = logs[field];
+            if (fds.isReadingRedis) {
+                logger.error('正在读取redis，请稍候')
+                continue;
+            }
             let funcName = fds.funcName;
             let func = logBuilder[funcName];
             if (!func || typeof func !== 'function') {
                 logger.error('checkWriteNow: no such function in logBuilder = ', funcName);
                 continue;
             }
-            let total = fds.total;
-            let sdata = fds.sdata;
-            for (let flag in sdata) {
-                let data = sdata[flag];
-                let gain = data.gain;
-                let cost = data.cost;
-                if (!gain && !cost) {
-                    continue;
-                }
-                if (data.dt > 0) {
-                    data.dt -= dt;
-                    if (data.dt <= 0) {
-                        logBuilder[funcName](uid, gain, cost, total, parseInt(flag), data.level, data.fire);
-                        data.gain = 0;
-                        data.cost = 0;
-                        data.fire = 0;
-                        data.dt = 0;
+            
+            this._try2GetField(field, function (total) {
+                total = Math.max(0, total);
+                let sdata = this.sdata;
+                for (let flag in sdata) {
+                    let data = sdata[flag];
+                    let gain = data.gain;
+                    let cost = data.cost;
+                    if (!gain && !cost) {
+                        continue;
+                    }
+                    if (data.dt > 0) {
+                        data.dt -= dt;
+                        if (data.dt <= 0) {
+                            logBuilder[funcName](uid, gain, cost, total, parseInt(flag), data.level, data.fire);
+                            data.gain = 0;
+                            data.cost = 0;
+                            data.fire = 0;
+                            data.dt = 0;
+                        }
                     }
                 }
-            }
+            }.bind(fds));
         }
 
         //
@@ -392,6 +421,44 @@ const CHEAT_P2 = 1.3; //金币作弊阈值
         if (this._regetDt >= REGET_DT) {
             this._regetDt = 0;
             this._regetCach();
+        }
+    }
+
+    /**
+     * 尝试获取指定字段
+     * @param {*} field 
+     * @param {*} cb 
+     */
+    _try2GetField (field, cb, isGetNow) {
+        let log = this._logs[field];
+        isGetNow = isGetNow || false;
+        let now = new Date().getTime();
+        if (!isGetNow && log.timestamp) {
+            let pass = now - log.timestamp;
+            if (pass >= LOG_DT * 1000) {
+                isGetNow = true;
+                log.timestamp = now;   
+            }
+        }else{
+            isGetNow = true;
+            log.timestamp = now;  
+        }
+        if (isGetNow) {
+            log.isReadingRedis = true;
+            let key = 'pair:uid:' + field;
+            redisConnector.cmd.hget(key, this._uid, function (err, res) {
+                if (!err && res) {
+                    let val = parseInt(res);
+                    logger.debug(' field = ', field, ' val = ', val);
+                    log.total = Math.max(0, val);
+                    cb && cb(val);
+                }else{
+                    cb && cb(log.total);
+                }
+                log.isReadingRedis = false;
+            });
+        }else{
+            cb && cb(log.total);
         }
     }
 

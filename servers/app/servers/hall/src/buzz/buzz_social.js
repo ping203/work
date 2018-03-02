@@ -3,18 +3,18 @@ const CacheAccount = require('./cache/CacheAccount');
 const CommonUtil = require('./CommonUtil');
 const ObjUtil = require('./ObjUtil');
 const RedisUtil = require('../utils/RedisUtil');
-const DateUtil = require('../utils/DateUtil');
 const buzz_charts = require('./buzz_charts');
 const redisKeys = require('../../../../database').dbConsts.REDISKEY;
 const DaoCommon = require('../dao/dao_common');
-const account_def = require('../dao/account/account_def');
+const account_def = require('../../../../database/consts').ACCOUNTKEY;
+const getCard = require('../dao/account/update/get_card');
 const logger = loggerEx(__filename);
 
 const TAG = "【buzz_social】";
 
 // 加入的类型
 const JOIN_TYPE = {
-    /** 邀请 */
+    /** 邀请注册 */
     INVITE: 100,
     /** 分享 */
     SHARE: 101,
@@ -22,7 +22,7 @@ const JOIN_TYPE = {
     ENSHRINE: 102,
     /** 自己来的 */
     SELF: 103,
-    /** 每日邀请 */
+    /** 邀请进入游戏 */
     INVITE_DAILY: 104,
 };
 exports.JOIN_TYPE = JOIN_TYPE;
@@ -186,22 +186,18 @@ function inviteSuccess(req, dataObj, cb) {
 function inviteDaily(req, dataObj, cb) {
     const FUNC = TAG + "inviteDaily() --- ";
     if (!lPrepare(dataObj)) return;
-    //BuzzUtil.cacheLinkDataApi(dataObj, "inviteDaily");
 
-    //Redis操作
     let token = dataObj["token"];
+    let fuid = dataObj["fuid"];
     let uid = token.split("_")[0];
-
-    CacheAccount.getAccountFieldById(uid, [account_def.OtherDef.social_invite_daily_state.name], function (err, account) {
-
-        if (!account.social_invite_daily_state) {
-            account.social_invite_daily_state = 1;
-            logger.info(FUNC + "UID_SOCIAL_INVITE_DAILY:1");
-        }
+    if (!fuid) {
+        cb("error");
+        return;
+    }
+    CacheAccount.getAccountFieldById(fuid, [account_def.SOCIAL_INVITE_DAILY_STATE], function (err, account) {
+        account.social_invite_daily_state += 1;
         account.commit();
-        RedisUtil.expire('pair:uid:social_invite_daily_state', DateUtil.getNexyDayBySeconds());
-        cb(null, "sucess");
-
+        cb(null, account.social_invite_daily_state);
     });
     function lPrepare(input) {
         return _checkParams(input, ['token'], "buzz_social", cb);
@@ -259,17 +255,9 @@ function getSocialReward(req, dataObj, cb) {
     if (!lPrepare(dataObj)) return;
     BuzzUtil.cacheLinkDataApi(dataObj, "get_social_reward");
 
-    let type = dataObj["type"];
-    if(type==JOIN_TYPE.INVITE_DAILY) {
-        myDao.getInviteDailyReward(dataObj,function(err,result) {
-            cb(err, result);
-        })
-    }else{
-        // 数据库操作
-        myDao.getSocialReward(dataObj, function (err, result) {
-            cb(err, result);
-        });
-    }
+    myDao.getSocialReward(dataObj, function (err, result) {
+        cb(err, result);
+    });
 
     function lPrepare(input) {
         let commonCheck = _checkParams(input, ['token', 'type'], "buzz_social", cb);
@@ -388,4 +376,33 @@ function _checkParams(input, params, hint, cb) {
         if (!CommonUtil.isParamExist(hint, param, "接口调用请传参数" + param_name, cb)) return false;
     }
     return true;
+}
+
+function getInviteInfo(req, data, cb) {
+    if (!lPrepare(data)) return;
+
+    DaoCommon.checkAccount(req.pool, data['token'], function (err, account) {
+        cb(null, {
+            social_invite_week: account.social_invite_week,
+            social_invite_month: account.social_invite_month
+        })
+    });
+
+    function lPrepare(input) {
+        return _checkParams(input, ['token'], "buzz_social", cb);
+    }
+}
+
+function getFreeCard(req, data, cb) {
+    if (!lPrepare(data)) return;
+
+    DaoCommon.checkAccount(req.pool, data['token'], function (err, account) {
+
+
+        getCard.update(null, data, cb, account);
+    });
+
+    function lPrepare(input) {
+        return _checkParams(input, ['token'], "buzz_social", cb);
+    }
 }

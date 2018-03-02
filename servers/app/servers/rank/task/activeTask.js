@@ -1,4 +1,4 @@
-const Task = require('../../base/task/task');
+const Task = require('../../../utils/task/task')
 const async = require('async');
 const utils = require('../../../utils/utils');
 /**

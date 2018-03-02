@@ -1,7 +1,8 @@
 const async = require('async');
-const dbUtils = require('../../database/').dbUtils;
-const Task = require('../../base/task/task');
-const REDISKEY = require('../../database/consts').REDISKEY;
+const redisAccountSync = require('../../../utils/redisAccountSync');
+const mysqlAccountSync = require('../../../utils/mysqlAccountSync');
+const Task = require('../../../utils/task/task');
+const REDISKEY = require('../../../database/consts').REDISKEY;
 const utils = require('../../../utils/utils');
 
 // const deleteAllKey = require('../../tools/deleteAllKey').deleteAllKey;
@@ -29,7 +30,7 @@ class AccountSync extends Task {
         // console.time('----------------redis');
         // console.log('-------------subUids', subSyncDatas.length);
         async.mapSeries(subSyncDatas, function (syncData, cb) {
-            dbUtils.redisAccountSync.getAccount(syncData.uid, syncData.fields, function (err, account) {
+            redisAccountSync.getAccount(syncData.uid, syncData.fields, function (err, account) {
                 cb(err, account)
             });
         }, function (err, accounts) {
@@ -39,10 +40,10 @@ class AccountSync extends Task {
             // console.timeEnd('----------------redis');
             //
             // console.time('----------------mysql');
-            let account_filter = dbUtils.redisAccountSync.Util.filterInvalidAccount(accounts);
+            let account_filter = redisAccountSync.Util.filterInvalidAccount(accounts);
             if (account_filter.length > 0) {
                 // console.log('-------------account_filter', account_filter.length);
-                dbUtils.mysqlAccountSync.setAccount(account_filter, function (err, results) {
+                mysqlAccountSync.setAccount(account_filter, function (err, results) {
                     if (err) {
                         logger.error('redis数据同步到mysql存在异常，请注意检查数据', err);
                     }
@@ -77,10 +78,10 @@ class AccountSync extends Task {
 
     _syncFullData(cb) {
         let self = this;
-        dbUtils.redisAccountSync.getSetValueLimit(REDISKEY.UPDATED_UIDS, 0, this.taskConf.readLimit, (res, next) => {
+        redisAccountSync.getSetValueLimit(REDISKEY.UPDATED_UIDS, 0, this.taskConf.readLimit, (res, next) => {
             if (!!res && res.length > 0) {
-                let uids = dbUtils.redisAccountSync.Util.parseHashKey(res);
-                dbUtils.redisAccountSync.remSetValues(REDISKEY.UPDATED_UIDS, uids, function (err, results) {
+                let uids = redisAccountSync.Util.parseHashKey(res);
+                redisAccountSync.remSetValues(REDISKEY.UPDATED_UIDS, uids, function (err, results) {
                     // logger.error('--------------uids', uids.length);
 
                     self._sync(0, uids, function () {
@@ -98,10 +99,10 @@ class AccountSync extends Task {
 
     _syncDeltaData(cb) {
         let self = this;
-        dbUtils.redisAccountSync.getSetValueLimit(REDISKEY.UPDATED_DELTA_UIDS, 0, this.taskConf.readLimit, (res, next) => {
+        redisAccountSync.getSetValueLimit(REDISKEY.UPDATED_DELTA_UIDS, 0, this.taskConf.readLimit, (res, next) => {
             if (!!res && res.length > 0) {
-                let uids = dbUtils.redisAccountSync.Util.parseHashKey(res);
-                dbUtils.redisAccountSync.remSetValues(REDISKEY.UPDATED_DELTA_UIDS, uids, async function (err, results) {
+                let uids = redisAccountSync.Util.parseHashKey(res);
+                redisAccountSync.remSetValues(REDISKEY.UPDATED_DELTA_UIDS, uids, async function (err, results) {
                     // logger.error('--------------uids', uids.length);
                     let cmds = [];
                     let del_cmds = [];
@@ -110,12 +111,12 @@ class AccountSync extends Task {
                         cmds.push(["sscan", key, 0, 'COUNT', 1000]);
                         del_cmds.push(["del", key]);
                     }
-                    let result = await dbUtils.redisAccountSync.multiAsync(cmds);
+                    let result = await redisAccountSync.multiAsync(cmds);
                     for (let i = 0; i < uids.length; i++) {
                         let fields = result[i][1];
                         uids[i].fields = fields;
                     }
-                    await dbUtils.redisAccountSync.multiAsync(del_cmds);
+                    await redisAccountSync.multiAsync(del_cmds);
                     self._sync(0, uids, function () {
                         // logger.info('next -------');
                         next();

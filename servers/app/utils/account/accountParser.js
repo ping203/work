@@ -15,19 +15,13 @@ class AccountParser {
             return '';
         }
 
-        if ((null == value || undefined == value || '' == value) && isDefault) {
+        if ((null === value || undefined === value || '' === value) && isDefault) {
             value = typeInfo.def;
         }
 
         switch (typeInfo.type) {
             case 'float':
             case 'number':{
-                if(!value){
-                    logger.error('---------serializeValue-------',key, value,);
-                }
-                if(value.toString == undefined || value.toString === 'undefined'){
-                    logger.error('---------serializeValue-------',key, value,);
-                }
                 serialVal = value.toString();
             }
                 break;

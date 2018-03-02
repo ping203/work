@@ -1,7 +1,8 @@
-const Task = require('../../base/task/task');
+const Task = require('../../../utils/task/task');
 const utils = require('../../../utils/utils');
-const REDISKEY = require('../../database/consts').REDISKEY;
-const dbUtils = require('../../database').dbUtils;
+const REDISKEY = require('../../../database/consts').REDISKEY;
+const redisAccountSync = require('../../../utils/redisAccountSync');
+const mysqlAccountSync = require('../../../utils/mysqlAccountSync');
 const consts = require('../src/consts');
 
 /**
@@ -13,16 +14,16 @@ class RankBuildTask extends Task {
     }
 
     _getRank(task, platform, skip, limit) {
-        /* yxl */console.log(`_getRank()------------------------------`);
+        // /* yxl */console.log(`_getRank()------------------------------`);
         let promise = new Promise(function (resolve, reject) {
-            /* yxl */console.log(`skip:${skip}, limit:${limit}`);
+            // /* yxl */console.log(`skip:${skip}, limit:${limit}`);
             redisConnector.cmd.zrevrange(`${task.redisKey}:${platform}`, skip, limit, 'WITHSCORES', function (err, results) {
                 if (err) {
                     /* yxl */console.log('err:', err);
                     reject(err);
                     return;
                 }
-                /* yxl */console.log('resolve(results):', results);
+                // /* yxl */console.log('resolve(results):', results);
                 resolve(results);
             });
         });
@@ -32,7 +33,7 @@ class RankBuildTask extends Task {
 
     _getPlayerExInfoByMysql(task, player){
         let promise = new Promise(function (resolve, reject) {
-            dbUtils.mysqlAccountSync.getAccount(player.uid, task.ext, function (err, account) {
+            mysqlAccountSync.getAccount(player.uid, task.ext, function (err, account) {
                 if(err || !account){
                     resolve(player);
                     return;
@@ -60,7 +61,7 @@ class RankBuildTask extends Task {
 
     async _getPlayerExInfoByRedis(task, player,i){
         try {
-            let account = await dbUtils.redisAccountSync.getAccountAsync(player.uid, task.ext);
+            let account = await redisAccountSync.getAccountAsync(player.uid, task.ext);
             // /* yxl */console.log('account:', account);
             if(account){
                 player.ext = account.toJSON();
@@ -147,12 +148,12 @@ class RankBuildTask extends Task {
 
     _saveRankInfo(task, platform, rankInfo){
         let promise = new Promise(function (resolve, reject) {
-            console.log(JSON.stringify(rankInfo).length);
+            // console.log(JSON.stringify(rankInfo).length);
             redisConnector.cmd.set(`${REDISKEY.getRankDataKey(task.redisKey)}:${platform}`, JSON.stringify(rankInfo), function (err, result) {
                 if(err){
                     logger.error(`${this.taskId}执行_saveRankInfo异常`, err);
                 }
-                console.log('------_saveRankInfo ok')
+                // console.log('------_saveRankInfo ok')
                 resolve(result);
             })
         });
@@ -160,7 +161,6 @@ class RankBuildTask extends Task {
     }
 
     async _build(task) {
-        /* yxl */ console.log('_build() --- ');
         for(let platform of Object.values(REDISKEY.PLATFORM_TYPE)){
             let result =await this._getRankInfo(task, platform);
             await this._saveRankInfo(task, platform, result);

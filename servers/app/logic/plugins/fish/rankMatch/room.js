@@ -12,9 +12,6 @@ const PlayerFactory = require('../entity/playerFactory');
 const mysqlClient = require('../../../../utils/dbclients').mysqlClient;
 const redisClient = require('../../../../utils/dbclients').redisClient;
 const redisKey = require('../../../../database').dbConsts.REDISKEY;
-const mission = require('../../../../utils/account/mission');
-const MissionType = require('../../../../utils/account/missionConsts').MissionType;
-
 
 class RankMatchRoom {
     constructor(opts) {
@@ -127,7 +124,7 @@ class RankMatchRoom {
         }
         player.ready = true;
         player.gameSid = data.gameSid;
-        if (this._canStart()) {
+        if (data.isContinue || this._canStart()) {
             this._startRmatch();
         }
     }
@@ -234,8 +231,6 @@ class RankMatchRoom {
         p1.setResult(p2);
         p2.setResult(p1);
 
-        let match_info = []; //双方比赛信息，参赛者都需要收到此数据
-
         let data = {
             time: moment(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss'),
         };
@@ -243,7 +238,6 @@ class RankMatchRoom {
 
         for (let player of this._playerMap.values()) {
             let matchDetail = player.getRMatchDetail();
-            match_info.push(matchDetail);
             let recordUid = matchDetail.uid;
             data['player' + playerIdx] = matchDetail.uid;
             data['nickname' + playerIdx] = matchDetail.nickname;
@@ -264,7 +258,8 @@ class RankMatchRoom {
             data['nuclear_exploded' + playerIdx] = matchDetail.nuclear_score != -1;
             data['nuclear_fish_count' + playerIdx] = matchDetail.nuclear_fish_count;
 
-            data['score' + playerIdx] = data['bullet_score' + playerIdx] + data['nuclear_score' + playerIdx];
+            data['score' + playerIdx] = data['bullet_score' + playerIdx] + data['nuclear_score' + playerIdx] + (matchDetail.star ? matchDetail.star.score : 0);
+            data['star' + playerIdx] = matchDetail.star;
             playerIdx++;
         }
         data.result = {
@@ -283,6 +278,7 @@ class RankMatchRoom {
                 fish_account: data.fish_account1,
                 figure_url: data.figureurl1,
                 nuclear_fish_count: data.nuclear_fish_count1,
+                star: data.star1,
                 // point_change: data.point_change1,// TODO
                 // old_points: data.old_points1,// TODO
                 // new_points: data.new_points1,// TODO
@@ -305,6 +301,7 @@ class RankMatchRoom {
                 fish_account: data.fish_account2,
                 figure_url: data.figureurl2,
                 nuclear_fish_count: data.nuclear_fish_count2,
+                star: data.star2,
                 // point_change: data.point_change1,// TODO
                 // old_points: data.old_points1,// TODO
                 // new_points: data.new_points1,// TODO
@@ -316,14 +313,8 @@ class RankMatchRoom {
         };
 
         //统计排位赛胜利dfc
-        let id = data.result.winner;
-        let uid = id == 1 ? data.result.player1.uid : data.result.player2.uid;
-        if (uid > 0) {
-            mission.add(uid, MissionType.MATCH_VICTORS, 0, 1);
-        }
         for (let player of this._playerMap.values()) {
             let pd = player.getPrivateDetail();
-            pd.match_info = match_info;
             let uid = Number(pd.uid);
             if (uid > 0) {
                 if (data.player1 == uid) {
@@ -334,7 +325,6 @@ class RankMatchRoom {
                 }
             }
             // logger.error('pd = ', pd);
-            // logger.error('match_info = ', match_info);
             player.clear();
         }
         this._broadcast(rankMatchCmd.push.pkResult.route, {});
@@ -478,7 +468,7 @@ class RankMatchRoom {
             }
 
             let rpc_target = rpc.getRPCTarget(rpc.serverType.game, rpc.serverModule.game.playerRemote, fishCmd.remote.matchStart.route);
-            rpc.invoke(rpc_target, rpc.getSession(rpc.serverType.game, player.gameSid), {
+            rpc.invoke(rpc_target, rpc.getSession(rpc.serverType.game, player.account.id), {
                 uid: player.account.id,
                 nbomb_cost: player.nbomb_cost,
             });
@@ -500,7 +490,7 @@ class RankMatchRoom {
             }
 
             let rpc_target = rpc.getRPCTarget(rpc.serverType.game, rpc.serverModule.game.playerRemote, fishCmd.remote.matchFinish.route);
-            rpc.invoke(rpc_target, rpc.getSession(rpc.serverType.game, player.gameSid), {
+            rpc.invoke(rpc_target, rpc.getSession(rpc.serverType.game, player.account.id), {
                 uid: player.account.id
             });
         }

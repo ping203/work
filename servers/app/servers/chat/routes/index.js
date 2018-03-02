@@ -1,19 +1,51 @@
-module.exports = (router)=>{
-    router.prefix = '/';
+const chat = require('../controllers/chat');
+const data_feedback = require('../controllers/feedback');
+const httpHandler = require('../../common/httpHandler');
 
-    router.get('/', async (ctx)=>{
-		await ctx.render('index', {
-			title: 'Hello Koa 2!'
-		})
-    });
+module.exports = (router) => {
+	// router.prefix('/chat_api');
 
-    router.get('/string', async (ctx)=>{
-		title: 'Hello Koa 2!'
+	/**
+	 * 聊天信息获取
+	 */
+	router.post('/chat_api/get_chat_info', async (ctx) => {
+		await httpHandler(ctx, chat, 'getChat');
 	});
-	
-	router.get('/json', async (ctx) => {
-		ctx.body = {
-			title: 'koa2 json'
-		}
-	})
+
+	//----------------------------------------------------------
+	// 玩家反馈接口
+	//----------------------------------------------------------
+	/**
+	 * 接收玩家发来的一条留言
+	 * token, text
+	 */
+	router.post('/data_api/player_propose', async (ctx) => {
+		await httpHandler(ctx, data_feedback, 'playerPropose');
+	});
+
+	/**
+	 * 客户端拉取留言板内容.
+	 * token, timestamp, count, hot4
+	 */
+	router.post('/data_api/query_msgboard', async (ctx) => {
+		await httpHandler(ctx, data_feedback, 'queryMsgboard');
+	});
+
+	/**
+	 * 玩家点赞.
+	 * token, mid
+	 */
+	router.post('/data_api/like_msgboard', async (ctx) => {
+		await httpHandler(ctx, data_feedback, 'likeMsgboard');
+	});
+
+	/**
+	 * 刪除留言.
+	 * token, mid
+	 */
+	router.post('/data_api/del_msgboard', async (ctx) => {
+		await httpHandler(ctx, data_feedback, 'delMsgboard');
+	});
+
+
 };

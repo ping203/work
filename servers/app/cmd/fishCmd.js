@@ -765,6 +765,13 @@ class FishCmd extends SysCmd {
                 sceneId: 'scene_fish_1'
             }
         }
+
+        this._rpc.playerDataChange = {
+            route: 'rpc_player_data_change',
+            data: {
+                uid: 10011
+            }
+        }
     }
 }
 

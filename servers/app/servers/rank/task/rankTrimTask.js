@@ -1,8 +1,8 @@
-const Task = require('../../base/task/task');
+const Task = require('../../../utils/task/task');
 const RANK_TRIM = require('../src/consts').RANK_TRIM;
 const async = require('async');
-const dbUtils = require('../../database/').dbUtils;
-const REDISKEY = require('../../database/consts').REDISKEY;
+const redisCmdSync = require('../../../utils/redisCmdSync');
+const REDISKEY = require('../../../database/consts').REDISKEY;
 
 class RankTrimTask extends Task {
     constructor(conf) {
@@ -20,16 +20,16 @@ class RankTrimTask extends Task {
                 let position = task.position;
                 if (RANK_TRIM.BOTTOM == position) {
                     for (let platform of Object.values(REDISKEY.PLATFORM_TYPE)) {
-                        await dbUtils.redisCmdSync.zremrangebyrank(`${key}:${platform}`, limit, -1);
+                        await redisCmdSync.zremrangebyrank(`${key}:${platform}`, limit, -1);
                     }
                     cb();
                 }
                 else {
                     for (let platform of Object.values(REDISKEY.PLATFORM_TYPE)) {
-                        let count = await dbUtils.redisCmdSync.zcard(`${key}:${platform}`);
+                        let count = await redisCmdSync.zcard(`${key}:${platform}`);
                         logger.info('COUNT:', count);
                         if (count > limit) {
-                            await dbUtils.redisCmdSync.zremrangebyrank(`${key}:${platform}`, 0, count - limit - 1);
+                            await redisCmdSync.zremrangebyrank(`${key}:${platform}`, 0, count - limit - 1);
                         }
                     }
                     cb();

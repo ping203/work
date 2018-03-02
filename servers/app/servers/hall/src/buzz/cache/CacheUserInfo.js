@@ -17,7 +17,7 @@ var ObjUtil = require('../ObjUtil');
 // DAO
 //------------------------------------------------------------------------------
 var dao_feedback = require('../../dao/dao_feedback');
-const redisSync = require('../redisSync');
+const redisAccountSync = require('../../../../../utils/redisAccountSync');
 
 //==============================================================================
 // constant
@@ -131,7 +131,7 @@ function queryOrInsert(req, uid, cb) {
     }
     else {
         let fields = ["id", "nickname", "figure_url"];
-        redisSync.getAccountById(uid, fields, function (err, account) {
+        redisAccountSync.getAccount(uid, fields, function (err, account) {
             push(account.toJSON());
         });
     }

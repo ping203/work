@@ -1,5 +1,5 @@
-const REDISKEY = require('../../database/consts').REDISKEY;
-const ACCOUNTKEY = require('../../database/consts').ACCOUNTKEY;
+const REDISKEY = require('../../../database/consts').REDISKEY;
+const ACCOUNTKEY = require('../../../database/consts').ACCOUNTKEY;
 const rankScore = require('../../../utils/rankScore');
 const SUBTASK_TYPE = require('../src/consts').SUBTASK_TYPE;
 const REWARD_TYPE = require('../src/consts').REWARD_TYPE;
@@ -22,8 +22,8 @@ module.exports = {
     //按天重置
     dailyReset: {
         enable: false,
-        time: '*/10,*,*,*,*,*',
-        // time: '0,0,0,*,*,*', //每天0点执行
+        // time: '*/10,*,*,*,*,*',
+        time: '0,0,0,*,*,*', //每天0点执行
         subTask: [
             { redisKey: REDISKEY.PLATFORM_DATA.TODAY_PLATFORM_CASH, type: SUBTASK_TYPE.DEL }, //平台玩家每日兑现重置
 
@@ -60,8 +60,8 @@ module.exports = {
     //按周重置
     weekReset: {
         enable: false,
-        time: '*/10,*,*,*,*,*',
-        //time: '0,0,0,*,*,7', //每周日0点执行
+        // time: '*/10,*,*,*,*,*',
+        time: '0,0,0,*,*,7', //每周日0点执行
         subTask: [
             { redisKey: REDISKEY.SOCIAL_SHARE_STATUS_2, type: SUBTASK_TYPE.DEL }
         ]
@@ -69,8 +69,8 @@ module.exports = {
     //按月重置
     monthReset: {
         enable: false,
-        time: '*/10,*,*,*,*,*',
-        //time: '0,0,0,1,*,*', //每月1号0点执行
+        // time: '*/10,*,*,*,*,*',
+        time: '0,0,0,1,*,*', //每月1号0点执行
         subTask: [
             {
                 redisKey: REDISKEY.MONTH_SIGN, type: SUBTASK_TYPE.MODIFY, limit: 1000, value: function () {
@@ -84,11 +84,12 @@ module.exports = {
                     return ret;
                 }
             },
+            { redisKey: REDISKEY.MONTH_SIGN_EXTRA_REWARD, type: SUBTASK_TYPE.DEL },
         ]
     },
     //排行榜生成
     rankBuild: {
-        enable: true,
+        enable: false,
         time: '*/10,*,*,*,*,*',
         subTask: [
             {
@@ -159,9 +160,9 @@ module.exports = {
     },
     //排行奖励、重置
     rankReward: {
-        enable: false,
-        time: '*/10,*,*,*,*,*',
-        //time: '0,0,0,*,*,*', //每天0点执行
+        enable: true,
+        // time: '*/10,*,*,*,*,*',
+        time: '0,0,0,*,*,*', //每天0点执行
         subTask: [
             {
                 redisKey: REDISKEY.RANK.BP,

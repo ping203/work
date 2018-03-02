@@ -34,7 +34,6 @@ function _update(pool, data, cb, account) {
     let uid = account.id;
     let mySkin = account.weapon_skin;
     let own = mySkin.own;
-    let oldMoney = account[coinType];
 
     let i = own.length;
     while (i > 0 && i --) {
@@ -58,7 +57,6 @@ function _update(pool, data, cb, account) {
 
     let newSkinList = [];
     let moneyCost = 0;
-    let moneyTotal = oldMoney;
     let reqData = data.weapon_skin;
     let state = reqData.state;
     let skinId = reqData.skinId;
@@ -84,11 +82,9 @@ function _update(pool, data, cb, account) {
             if (moneyCost < 0) {
                 return failOperation('配置有误，价格不能为负数');
             }
-            if (oldMoney < moneyCost) {
+            if (account[coinType] < moneyCost) {
                 return failOperation('金钱不足以购买');
             }
-            moneyTotal -= moneyCost;
-            account[coinType] = -moneyCost;
             own.push(skinId);
             account.weapon_skin = mySkin;
             account.commit();
@@ -109,7 +105,7 @@ function _update(pool, data, cb, account) {
                         log_at: new Date(),
                         gain: 0,
                         cost: moneyCost,
-                        total: moneyTotal,
+                        total: account[coinType],
                         scene: common_log_const_cfg.SKIN_BUY,
                         nickname: 0,
                     });
@@ -123,7 +119,7 @@ function _update(pool, data, cb, account) {
                         log_at: new Date(),
                         gain: 0,
                         cost: moneyCost,
-                        total: moneyTotal,
+                        total: account[coinType],
                         scene: common_log_const_cfg.SKIN_BUY,
                         nickname: 0,
                         duration: 0,
@@ -138,7 +134,7 @@ function _update(pool, data, cb, account) {
             let ret = {
                 weapon_skin: mySkin,
             };
-            ret[coinType] = moneyTotal;
+            ret[coinType] = account[coinType];
             if (chs && chs.length == 2) {
                 let charmPoint = chs[0];
                 let charmRank = chs[1];

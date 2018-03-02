@@ -78,7 +78,6 @@ class Cost {
      *  weapon_skin:1,
      *  weapon:10
      * }
-     * TODO：多平台
      */
     fire_gold_cost(params) {
         return Math.floor(params.weapon * this._getWpSKinCfg(params.weapon_skin).power[1]);
@@ -97,6 +96,10 @@ class Cost {
         let spData = this.findGodSProperty(params.godId, params.godLevel, consts.GOD_PROPERTY_ID.lv10);
         if (spData > 0) {
             userExp *= (1 + spData); //女神特权:捕鱼获得升级经验提高x%
+        }
+        let starExp = params.starExp;
+        if (starExp > 0) {
+            userExp *= (1 + starExp)
         }
         return userExp;
 
@@ -119,6 +122,10 @@ class Cost {
         if (godSpVal > 0) {
             pp *= (1 + godSpVal); //女神特权加成激光增量
         }
+        let starLaser = params.starLaser;
+        if (starLaser > 0) {
+            pp *= (1 + starLaser);
+        } 
         old += pp;
         return old;
     }
@@ -137,7 +144,7 @@ class Cost {
         }
         let cfg = level_cfgs[next - 1];
         if (exp + gain >= cfg.exp_max) {
-            exp = -cfg.exp_max;
+            exp = -(cfg.exp_max - gain);
             level = next + 1;
         } else {
             exp = gain;
@@ -340,6 +347,7 @@ class Cost {
         let skinPct = params.skinPct;
         let gold = params.gold;
         let fishbasepct = params.fishbasepct;
+        let starLaser = params.starLaser;
 
         let basPCT = fishbasepct * fishCfg.mapct * weaponspct;
         
@@ -386,6 +394,10 @@ class Cost {
 
         gpct *= skinPct;
         log && log(TAG + '--skinPct = ', skinPct, gpct);
+
+        gpct *= starLaser;
+        log && log(TAG + '--starLaser = ', starLaser, gpct);
+
         if (Number.isNaN(gpct)) {
             throw new Error('debug test--!');
         }
@@ -438,6 +450,7 @@ class Cost {
         let comeback = account.comeback;
         let heartbeat = account.heartbeat;
         let roipctTime = account.roipct_time;
+        let starData = account.weapon_skin.star;
 
         const L_CFG = this._configReader.getValue('player_level_cfg', level);
         let yPCT = L_CFG.yPCT;
@@ -474,9 +487,15 @@ class Cost {
                     bulletBornSkillHitrate = this.getSkillGpctValue(skillIngIds);
                 }
             }
+            let star = 0;
+            starData && (star = starData[skin]);
+            let wpStarCfg = null;
+            star && (wpStarCfg = this._configReader.getWeaponStarData(skin, star));
+
             let skinReward = 1;
             let SKIN = null;
-            let skinPct = 1; //TODO:武器星级可对皮肤捕获率加成,字段pct
+            let skinPct = 1; 
+            let starLaser = 1;
             if (bulletBornSkillHitrate === 1) {
                 SKIN = this._getWpSKinCfg(skin);
                 if (!SKIN) {
@@ -484,11 +503,13 @@ class Cost {
                 }
                 const WP_POWER = SKIN.power;
                 skinPct = WP_POWER[0];
+                wpStarCfg && wpStarCfg.pct > 0 && (skinPct += wpStarCfg.pct);  //武器星级可对皮肤捕获率加成,字段pct; 命中加成，和武器命中系数power求和后再计算
                 skinReward = WP_POWER[2];
             } else {
                 bulletBornSkillHitrate *= (1 + vipSkillPct);
-                //TODO:武器星级可对激光捕获率加成,字段power//bulletBornSkillHitrate * (1 + wp.getWpStarData().power); //激光威力加成
+                wpStarCfg && wpStarCfg.power > 0 && (starLaser = 1 + wpStarCfg.power);  //武器星级可对激光捕获率加成
             }
+            
             let isPlayerPowerSkillIng = false;//玩家主动技能：核弹或激光
             let isFishPowerSkillIng = false; //鱼死亡技能：炸弹、闪电
             let fireFlag = consts.FIRE_FLAG.NORMAL;
@@ -626,6 +647,7 @@ class Cost {
                     isReal: isReal,
                     account: account,
                     fishRewad: fishRewad,
+                    starLaser: starLaser,
                 });
                 let gotData = null;
                 if (isCaught) {
@@ -635,6 +657,7 @@ class Cost {
                     });
                     gotData.fireFlag = fireFlag;
                     gotData.rmatching = td.rmatching;
+                    gotData.skin = skin;
                     fishFloor[fk] = gotData.floor;
                 }else if (skin === consts.WP_SKIN_ID.CHIYANNVSHEN) {
                     (!SKIN) && (SKIN = this._getWpSKinCfg(skin));
@@ -765,7 +788,7 @@ class Cost {
      * 计算奖金鱼奖金
      * 注意其加成方式
      */
-    calGoldenFishReward (gold, skin, star) {
+    calGoldenFishReward (gold, skin, star, wpStarCfg) {
         let reward = gold;
         if (skin === consts.WP_SKIN_ID.DIANWAN) {
             const cfg = this._getWpSKinCfg(skin);
@@ -773,7 +796,7 @@ class Cost {
                 reward *= cfg.effectvalue;
             }
         }
-        const wpStarCfg = this._configReader.getWeaponStarData(skin, star);
+        wpStarCfg = wpStarCfg || this._configReader.getWeaponStarData(skin, star);
         if (wpStarCfg && wpStarCfg.golden >= 0) {
             reward *= (1 + wpStarCfg.golden);  
         }

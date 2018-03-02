@@ -1,19 +1,15 @@
-module.exports = (router)=>{
-    router.prefix('/admin');
+// const adminHandler = require('../../common/adminHandler');
+const adminHandler = require('../../common/httpHandler');
+const ObjUtil = require('../utils/ObjUtil');
 
-    router.get('/', async (ctx)=>{
-		await ctx.render('index', {
-			title: 'Hello Koa 2!'
+module.exports = (router) => {
+	router.prefix('/admin');
+
+	function setRoute(route, menu, method) {
+		router.post(route, async (ctx) => {
+			await adminHandler(ctx, menu, method);
 		})
-    });
+	}
 
-    router.get('/string', async (ctx)=>{
-		title: 'Hello Koa 2!'
-	});
-	
-	router.post('/json', async (ctx) => {
-		ctx.body = {
-			title: 'koa2 json'
-		}
-	})
+	ObjUtil.routes(setRoute);
 };

@@ -1,12 +1,26 @@
 const omelo = require('omelo');
 const path = require('path');
+const fs = require('fs');
 const versions = require('./app/utils/imports').versions;
 const omeloHttpPlugin = require('omelo-http-plugin');
 const logger = require('omelo-logger').getLogger('default', __filename);
 require('./app/utils/globals');
 const routeUtil = require('./app/utils/routeUtil');
 const httpAesFilter = require('./app/servers/common/httpAesFilter');
-const httpSessionFilter = require('./app/servers/common/httpSessionFilter');
+const httpTokenFilter = require('./app/servers/common/httpTokenFilter');
+const sysConfig = require('./config/sysConfig');
+
+let SSL = null;
+if (sysConfig.SSL_CERT) {
+  SSL = {
+    type: 'wss',
+    key: fs.readFileSync(sysConfig.SSL_CERT.KEY, 'utf8'),
+    cert: fs.readFileSync(sysConfig.SSL_CERT.CERT, 'utf8'),
+    strictSSL: false,
+    rejectUnauthorized: false
+  };
+}
+
 
 /**
  * Init app for client.
@@ -26,6 +40,7 @@ app.set('errorHandler', function (err, msg, resp, session, next) {
 app.loadConfig('redis', require('./app/utils/imports').dbCfg.redis);
 app.loadConfig('mysql', require('./app/utils/imports').dbCfg.mysql);
 app.loadConfig('http', path.join(app.getBase(), `config/service/${versions.VERSION_KEY[versions.PUB]}/http`));
+// app.loadConfig('http', sysConfig.HTTPCFG);
 
 // configure for global
 app.configure('production|development', function () {
@@ -95,141 +110,51 @@ app.configure('production|development', function () {
   app.route('rankMatch', routeUtil.rankMatchRoute);
 });
 
-// gate configuration
+// 服务基础配置
+app.configure('production|development', 'manager|event|matching|rankMatch|r2mSync|rank|admin|resource|game|gate|hall|chat', function () {
+  global.logger = require('omelo-logger').getLogger(app.getServerId());
+});
+
+//服务http配置
+app.configure('production|development', 'admin|resource|gate|hall|chat', function () {
+  app.use(omeloHttpPlugin, {
+    http: app.get('http')
+  });
+  omeloHttpPlugin.filter(httpAesFilter);
+});
+
+// 服务器token配置
+app.configure('production|development', 'hall|chat', function () {  
+  omeloHttpPlugin.filter(httpTokenFilter);
+})
+
+// 网关配置
 app.configure('production|development', 'gate', function () {
-  global.logger = require('omelo-logger').getLogger('gate');
   app.set('connectorConfig', {
     connector: omelo.connectors.hybridconnector,
     useDict: true,
     useProtobuf: true
   });
 
-  app.gate = require('./app/logic/gate/gate');
-  app.gate.start();
-
-  app.use(omeloHttpPlugin, {
-    http: app.get('http')
-  });
-
-  omeloHttpPlugin.filter(httpAesFilter);
-
-  httpSessionFilter.addIgnoreRoute('/auth');
-  httpSessionFilter.addIgnoreRoute('/login');
-  httpSessionFilter.addIgnoreRoute('/register');
-  
-  omeloHttpPlugin.filter(httpSessionFilter);
-  // todo deprecated
-  app.beforeStopHook(function () {
-    app.gate.stop();
-  });
-})
-
-// configuration for app
-app.configure('production|development', 'resource', function () {
-  app.use(omeloHttpPlugin, {
-    http: app.get('http')
-  });
-
-  app.beforeStopHook(function () {
-    //todo add user code
-  });
+  httpTokenFilter.addIgnoreRoute('/auth');
+  httpTokenFilter.addIgnoreRoute('/login');
+  httpTokenFilter.addIgnoreRoute('/register');
+  omeloHttpPlugin.filter(httpTokenFilter);
 
 });
 
-// configuration for admin
-app.configure('production|development', 'admin', function () {
-  app.use(omeloHttpPlugin, {
-    http: app.get('http')
-  });
-
-  app.beforeStopHook(function () {
-    //todo add user code
-  });
-
-});
-
-// auth configuration
-app.configure('production|development', 'auth', function () {
-  global.logger = require('omelo-logger').getLogger('auth');
-  app.auth = require('./app/logic/auth/auth');
-  app.auth.start();
-  // todo deprecated
-  app.beforeStopHook(function () {
-    app.auth.stop();
-  });
-});
-
-// game configuration
+// 游戏服务配置
 app.configure('production|development', 'game', function () {
-  global.logger = require('omelo-logger').getLogger('game');
-  app.set('connectorConfig', {
+  let connectorConfig = {
     connector: omelo.connectors.hybridconnector,
     heartbeat: 10,
     useDict: true,
     useProtobuf: true
-  });
-  // app.set('redisClient', redisClient);
+  };
+  SSL && (connectorConfig.ssl = SSL);
+  app.set('connectorConfig', connectorConfig);
   // app.use(sync, {sync: {path: __dirname + '/app/logic/mapping', dbclient: redisClient, interval: 500}});
   app.filter(require('./app/servers/game/filter/playerFilter'));
-  app.game = require('./app/logic/game/game');
-  app.game.start();
-  app.beforeStopHook(function () {
-    app.game.stop();
-  });
-});
-
-// 负载均衡服务器配置
-app.configure('production|development', 'balance', function () {
-  global.logger = require('omelo-logger').getLogger('balance');
-
-  app.balance = require('./app/logic/balance/balance');
-  app.balance.start();
-
-  // todo deprecated
-  app.beforeStopHook(function () {
-    app.balance.stop();
-  });
-});
-
-// 负载均衡服务器配置
-app.configure('production|development', 'dataSync', function () {
-  global.logger = require('omelo-logger').getLogger('dataSync');
-
-  app.dataSync = require('./app/logic/dataSync/dataSync');
-  app.dataSync.start();
-
-  omeloHttpPlugin.filter(require('./app/servers/common/httpAesFilter'));
-
-  // todo deprecated
-  app.beforeStopHook(function () {
-    app.dataSync.stop(); 
-  });
-});
-
-// 排位赛匹配服
-app.configure('production|development', 'matching', function () {
-  global.logger = require('omelo-logger').getLogger('matching');
-
-  app.matching = require('./app/logic/matching/matching');
-  app.matching.start();
-
-  // todo deprecated
-  app.beforeStopHook(function () {
-    app.matching.stop();
-  });
-});
-
-// 排位赛服
-app.configure('production|development', 'rankMatch', function () {
-  global.logger = require('omelo-logger').getLogger('rankMatch');
-
-  app.rankMatch = require('./app/logic/rankMatch/rankMatch');
-  app.rankMatch.start();
-
-  // todo deprecated
-  app.beforeStopHook(function () {
-    app.rankMatch.stop();
-  });
 });
 
 // start app

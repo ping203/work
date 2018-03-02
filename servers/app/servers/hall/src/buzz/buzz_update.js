@@ -75,15 +75,6 @@ function updateAccount(req, data, cb) {
             myDao.updateAccount(data, account, function (err, results) {
                 cb(err, results);
             });
-            // 仅新版走以下的逻辑
-            // if (UPDATE_TYPE.GET_CARD == type) {
-            //     _updateGetCard(req, data, cb, account);
-            // }
-            // else {
-            //     myDao.updateAccount(data, account, function (err, results) {
-            //         cb(err, results);
-            //     });
-            // }
         }
     });
 }

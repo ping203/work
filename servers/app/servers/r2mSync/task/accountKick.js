@@ -1,7 +1,8 @@
-const Task = require('../../base/task/task');
+const Task = require('../../../utils/task/task');
 const async = require('async');
-const dbUtils = require('../../database/').dbUtils;
-const REDISKEY = require('../../database/consts').REDISKEY;
+const redisAccountSync = require('../../../utils/redisAccountSync');
+const mysqlAccountSync = require('../../../utils/mysqlAccountSync');
+const REDISKEY = require('../../../database/consts').REDISKEY;
 const utils = require('../../../utils/utils');
 
 /**
@@ -29,7 +30,7 @@ class AccountKick extends Task {
         let self = this;
         let next_kick = kicked + this.taskConf.writeLimit;
         async.mapSeries(subUids, function (uid, cb) {
-            dbUtils.redisAccountSync.getAccount(uid, function (err, account) {
+            redisAccountSync.getAccount(uid, function (err, account) {
                 cb(null, account)
             });
         }, function (err, accounts) {
@@ -37,15 +38,15 @@ class AccountKick extends Task {
                 console.log('获取account信息失败');
             }
 
-            let account_filter = dbUtils.redisAccountSync.Util.filterInvalidAccount(accounts);
+            let account_filter = redisAccountSync.Util.filterInvalidAccount(accounts);
             if (account_filter.length > 0) {
-                dbUtils.mysqlAccountSync.setAccount(account_filter, function (err, results) {
+                mysqlAccountSync.setAccount(account_filter, function (err, results) {
                     if (err) {
                         console.log('踢出非活跃玩家,同步玩家信息到mysql异常', err);
                         self._kickAccount(next_kick, kickUids, finish);
                     }
                     else {
-                        dbUtils.redisAccountSync.delAccount(subUids, function (err, result) {
+                        redisAccountSync.delAccount(subUids, function (err, result) {
                             if (err) {
                                 console.log('踢出非活跃玩家,清除redis缓存数据异常', err);
                                 return;
@@ -66,7 +67,7 @@ class AccountKick extends Task {
      * @private
      */
     _exeTask(cb) {
-        dbUtils.redisAccountSync.getHashValueLimit(REDISKEY.LAST_ONLINE_TIME, 0, this.taskConf.readLimit, (err, res, next) => {
+        redisAccountSync.getHashValueLimit(REDISKEY.LAST_ONLINE_TIME, 0, this.taskConf.readLimit, (err, res, next) => {
             if (!!res && res.length > 0) {
                 let kickUids = [];
                 let now = Date.now();

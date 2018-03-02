@@ -4,33 +4,35 @@ const httpCfg = omelo.app.get('http');
 const ERROR_OBJ = require('../../../consts/error').ERROR_OBJ;
 const logicResponse = require('../../common/logicResponse');
 
-function _getList(uid, enableHttps) {
+function _getList(uid, protocol) {
     const serverInfo = {};
+    let enable = protocol == 'https' ? true : false;
 
-    serverInfo.HTTPS = enableHttps;
+    serverInfo.PROTOCOL = protocol;
 
     let resource = dispatcher.dispatchEx(uid, httpCfg.resource);
     serverInfo.RESOURCE = {
-        address: enableHttps ? resource.http.host : resource.https.host,
-        port: enableHttps ? resource.http.port : resource.https.port,
+        address: enable ? resource.https.host : resource.http.host,
+        port: enable ? resource.https.port : resource.http.port,
     }
 
     let hall = dispatcher.dispatchEx(uid, httpCfg.hall);
     serverInfo.HALL = {
-        address: enableHttps ? hall.http.host : hall.https.host,
-        port: enableHttps ? hall.http.port : hall.https.port,
+        address: enable ? hall.https.host : hall.http.host,
+        port: enable ? hall.https.port : hall.http.port,
     }
 
     let chat = dispatcher.dispatchEx(uid, httpCfg.chat);
     serverInfo.CHAT = {
-        address: enableHttps ? chat.http.host : chat.https.host,
-        port: enableHttps ? chat.http.port : chat.https.port,
+        address: enable ? chat.https.host : chat.http.host,
+        port: enable ? chat.https.port : chat.http.port,
     }
 
-    let game = dispatcher.dispatchEx(uid, httpCfg.game);
+    let games = omelo.app.getServersByType('game');
+    let game = dispatcher.dispatchEx(uid, games);
     serverInfo.ROOM = {
-        address: enableHttps ? game.http.host : game.https.host,
-        port: enableHttps ? game.http.port : game.https.port,
+        address: game.clientHost,
+        port: game.clientPort,
     }
 
     return serverInfo;
@@ -38,10 +40,10 @@ function _getList(uid, enableHttps) {
 
 class QueryServices {
     async lists(data) {
-        if(!data.uid || !data.protocol){
+        if(!data.token || !data.protocol){
             throw ERROR_OBJ.PARAM_MISSING;
         }
-        let result = _getList(data.uid, data.protocol == 'https' ? true : false);
+        let result = _getList(data.uid, data.protocol);
         return logicResponse.ask(result);
     }
 }

@@ -1,22 +1,11 @@
 const omelo = require('omelo');
 
-const serverType = {
-    gate: 'gate',
-    auth: 'auth',
-    balance: 'balance',
-    dataSync: 'dataSync',
-    matching: 'matching',
-    rankMatch: 'rankMatch',
-    game: 'game'
-}
-
 class Rpc {
     constructor() {
         this._serverType = {
             gate: 'gate',
-            auth: 'auth',
-            balance: 'balance',
-            dataSync: 'dataSync',
+            manager: 'manager',
+            event: 'event',
             matching: 'matching',
             rankMatch: 'rankMatch',
             game: 'game'
@@ -24,23 +13,19 @@ class Rpc {
 
         this._serverIdKey = {
             gate: 'gateSid',
-            auth: 'authSid',
-            balance: 'balanceSid',
-            dataSync: 'dataSyncSid',
+            manager: 'managerSid',
+            event: 'eventSid',
             matching: 'matchingSid',
             rankMatch: 'rankMatchSid',
-            game: 'gameSid'
+            game: 'uid'
         };
 
         this._serverModule = {
             gate: {},
-            auth: {
-                authRemote: 'authRemote'
+            manager: {
+                managerRemote: 'managerRemote'
             },
-            balance: {
-                balanceRemote: 'balanceRemote'
-            },
-            dataSync: {},
+            event: {},
             matching: {
                 matchingRemote: 'matchingRemote'
             },

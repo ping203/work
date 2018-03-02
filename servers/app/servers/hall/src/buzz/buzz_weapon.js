@@ -7,7 +7,7 @@ const DateUtil = require('../utils/DateUtil');
 const BuzzUtil = require('../utils/BuzzUtil');
 const ArrayUtil = require('../utils/ArrayUtil');
 const RedisUtil = require('../utils/RedisUtil');
-const RandomUtil = require('../utils/RandomUtil');
+const RandomUtil = require('../../../../utils/RandomUtil');
 const DaoCommon = require('../dao/dao_common');
 const CacheWeapon = require('./cache/CacheWeapon');
 const CacheAccount = require('./cache/CacheAccount');
@@ -463,7 +463,7 @@ function _levelup(req, dataObj, cb) {
         if (!_checkLevelup2()) return;
 
         // logger.info(FUNC + "-----------------pearl old:", account.pearl);
-        CacheAccount.setPearl(account, account.pearl - weapon_unlock_cost);
+        account.pearl = -weapon_unlock_cost;
         let change = {pearl: account.pearl};
         // logger.info(FUNC + "-----------------change:", change);
         if (0 == weapon_unlock_material.length) {
@@ -587,15 +587,6 @@ function _levelup(req, dataObj, cb) {
         function didWeaponLevelUp() {
             let old_level = account.weapon;
             account.weapon = weapon_level_next;
-            let accountWeaponEnergy = account.weapon_energy;
-            let needpower = 3000;
-            if (newweapon_upgrade_cfg[weapon_level_next]
-                && newweapon_upgrade_cfg[weapon_level_next].needpower) {
-                needpower = newweapon_upgrade_cfg[weapon_level_next].needpower;
-            }
-            accountWeaponEnergy[account.weapon] = needpower;
-            // 隐患，实际weapon_energy会通过客户端进行更新
-            account.weapon_energy = accountWeaponEnergy;
             stepMissionWeaponLevel();
             addWeaponLog(account.weapon, old_level);
         }

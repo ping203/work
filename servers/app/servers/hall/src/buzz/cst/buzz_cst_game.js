@@ -3,7 +3,9 @@ const RedisUtil = require("../../utils/RedisUtil");
 const ObjUtil = require("../ObjUtil");
 const TimeQueue = ObjUtil.TimeQueue;
 const Broadcast = ObjUtil.Broadcast;
-const CacheAccount = require("../../buzz/cache/CacheAccount");
+const redisAccountSync = require('../../../../../utils/redisAccountSync');
+const cache = require('../../rankCache/cache');
+const RANK_TYPE = require('../../rankCache/cacheConf').RANK_TYPE;
 const redisKeys = require('../../../../../database').dbConsts.REDISKEY;
 const logger = loggerEx(__filename);
 
@@ -78,7 +80,7 @@ exports.addBroadcastFamousOnline = addBroadcastFamousOnline;
 exports.addBroadcastDraw = addBroadcastDraw;
 exports.addBroadcastRewardPeople = addBroadcastRewardPeople;
 exports.redisNotifyBroadcast = redisNotifyBroadcast;
-
+exports.addFamousOnlineBroadcast = addFamousOnlineBroadcast;
 //------------------------------------------------------------------------------
 // implement
 //------------------------------------------------------------------------------
@@ -99,7 +101,7 @@ function getBroadcast(dataObj, cb) {
     let cik_on = 0;
     if (token != null) {
         let uid = token.split('_')[0];
-        CacheAccount.getAccountById(uid, function (err, account) {
+        redisAccountSync.getAccount(uid, function (err, account) {
             RedisUtil.get(redisKeys.SWITCH.CIK, function(err, res) {
                 if (err) return cb && cb(err);
                 if (null == res) {
@@ -463,5 +465,39 @@ function getResData(json_data, aes) {
     }
     else {
         return json_data;
+    }
+}
+
+//万人迷上线公告
+function addFamousOnlineBroadcast(account, platform) {
+    const FUNC = TAG + "_addBroadcast() --- ";
+    logger.info(FUNC + "call:");
+    let id = account.id;
+    let nickname = account.channel_account_name;
+    if (!nickname) nickname = account.nickname;
+    if (!nickname) nickname = account.tempname;
+    let vip = account.vip;
+    let charm = account.charm_rank && parseInt(account.charm_rank) || 0;
+    let Charmaccount = cache.getChart(platform, RANK_TYPE.CHARM, 0, 1);
+    if (Charmaccount && Charmaccount.length > 0 && id == Charmaccount[0].uid) {
+        let content = {
+            txt: "",
+            times: 1,
+            type: FAMOUS_ONLINE_TYPE.CHARM,
+            params: [nickname, vip, charm],
+            platform: platform
+        };
+        addBroadcastFamousOnline(content);
+    }
+    let Matchaccount = cache.getChart(platform, RANK_TYPE.MATCH, 0, 1);
+    if (Matchaccount && Matchaccount.length > 0 && id == Matchaccount[0].uid) {
+        let content = {
+            txt: "",
+            times: 1,
+            type: FAMOUS_ONLINE_TYPE.COMPETITION,
+            params: [nickname, vip, charm],
+            platform: platform
+        };
+        addBroadcastFamousOnline(content);
     }
 }

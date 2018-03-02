@@ -303,7 +303,7 @@ function opSpeed(pool, data, account, cb) {
     account.match_box_list = new_box;
     account.match_box_timestamp = box_timestamp;
     account.match_season_box = season_box + 1;
-    account.pearl = pearl - pearlNeed >= 0 ? pearl - pearlNeed : 0;
+    account.pearl = -pearlNeed;
     account.commit();
     let ret = {
         id: box_id,
@@ -568,6 +568,7 @@ function getRankgameLog(pool, uid, account, cb) {
                 nuclear_score: p1.nuclear_score,
                 winning_rate: p1.winning_rate,
                 figureurl: p1.figureurl,
+                star: p1.star,
             },
             {
                 uid: p2.uid,
@@ -578,6 +579,7 @@ function getRankgameLog(pool, uid, account, cb) {
                 nuclear_score: p2.nuclear_score,
                 winning_rate: p2.winning_rate,
                 figureurl: p2.figureurl,
+                star: p2.star,
             }
         ];
         for (let key in result) {

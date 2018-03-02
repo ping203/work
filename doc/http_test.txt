@@ -1,0 +1,40 @@
+
+//curl 测试
+curl -l -H "Content-type: application/json" -X POST -d '{"data":{"username":"linyang11","password":"test", "device":3}}' http://127.0.0.1:3002/account_api/register
+
+//查看cpu
+cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c 
+
+查看内存
+cat /proc/meminfo 
+
+硬盘大小
+fdisk -l |grep Disk 
+
+
+//硬件信息查看
+cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c & cat /proc/meminfo |grep MemTotal & fdisk -l |grep Disk & ifconfig |grep inet
+
+//postman 测试
+
+//用户注册
+method:
+	post
+url:
+	http://127.0.0.1:3002/account_api/register
+body:
+	{"data":{"username":"linyang","password":"test", "device":3}}
+	
+//用户登录
+method:
+	post
+url:
+	http://127.0.0.1:3002/account_api/login
+body:
+	{"data":{"username":"linyang","password":"test"}}
+	
+//获取服务列表
+method:
+	get
+url:
+	http://127.0.0.1:3002/client_api/get_api_server

@@ -215,7 +215,8 @@ function getMission(req, dataObj, cb) {
             cb(error);
             return;
         }
-        await getMissionInfo(account, cb);
+        cb && cb(null, {mission_only_once: account.mission_only_once, mission_daily_reset: account.mission_daily_reset});
+        // await getMissionInfo(account, cb);
     });
 }
 

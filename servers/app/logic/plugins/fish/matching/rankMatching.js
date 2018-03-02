@@ -4,7 +4,7 @@ const MatchingRobotUser = require('./matchingRobotUser');
 const omelo = require('omelo');
 const messageService = require('../../../net/messageService');
 const matchingCmd = require('../../../../cmd/matchingCmd');
-const balanceCmd = require('../../../../cmd/balanceCmd');
+const managerCmd = require('../../../../cmd/managerCmd');
 const rankMatchCmd = require('../../../../cmd/rankMatchCmd');
 const robotBuilder = require('../robot/robotBuilder');
 const AiData = require('./AiData');
@@ -210,7 +210,7 @@ class RankMatching {
 
     _allocMatchServer() {
         return new Promise(function (resolve, reject) {
-            omelo.app.rpc.balance.balanceRemote[balanceCmd.remote.getRankMatchServer.route]({}, function (err, serverId) {
+            omelo.app.rpc.manager.managerRemote[managerCmd.remote.getRankMatchServer.route]({}, function (err, serverId) {
                 if (err) {
                     reject(err);
                 } else {
