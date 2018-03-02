@@ -1,6 +1,4 @@
-﻿var express = require('express');
-var router = express.Router();
-
+﻿const logicResponse = require('../../../common/logicResponse');
 var FileUtil = require('../../src/utils/FileUtil');
 var StringUtil = require('../../src/utils/StringUtil');
 
@@ -37,27 +35,23 @@ function _makeVar() {
     return data;
 }
 
-/* GET home page. */
-router.get('/', function (req, res) {
-    res.render("admin/pages-gm-update", _makeVar());
-    // res.render("admin/pages-gm-update", {});
-});
+let exp = module.exports;
+exp.get = async function (data) {
+    return logicResponse.askEjs('admin/pages-gm-update', _makeVar());
+};
 
-/* POST */
-router.post('/', function (req, res) {
-    buzz_admin_utils.checkTokenPost(req, function (err, user_auth) {
-        if (err) {
-            var errMsg = JSON.stringify(err);
-            console.log(errMsg);
-            res.json({ rc: 10000, error: errMsg });
-        } else {
-            var params = _makeVar(req);
+exp.post = async function (data) {
+    return new Promise(function (resolve, reject) {
+        buzz_admin_utils.checkTokenPost({
+            body: data
+        }, function (err, user_auth) {
+            if (err) {
+                logger.error('pages-gm-update err:', err);
+                reject(err);
+            }
+            var params = _makeVar();
             params = _.extend(params, { user_auth: user_auth });
-            // var params = { user_auth: user_auth };
-            
-            res.render("admin/pages-gm-update", params);
-        }
+            resolve(logicResponse.askEjs("admin/pages-gm-update", params));
+        });
     });
-});
-
-module.exports = router;
+};

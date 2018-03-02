@@ -1,11 +1,10 @@
-﻿var express = require('express');
-var router = express.Router();
+﻿const logicResponse = require('../../../common/logicResponse');
 var buzz_admin_utils = require('../../src/buzz/buzz_admin_utils');
 var buzz_cst_admin = require('../../src/buzz/cst/buzz_cst_admin');
 var buzz_cst_am_auth = require('../../src/buzz/cst/buzz_cst_am_auth');
 var _ = require('underscore');
 
-function _makeVar(req) {
+function _makeVar() {
     var TXT_EN = buzz_cst_admin.TXT_SIDEBAR_EN;
     TXT_EN = _.extend(TXT_EN, buzz_cst_am_auth.TXT_CONTENT_EN);
     
@@ -19,8 +18,8 @@ function _makeVar(req) {
     return data;
 }
 
-function _getAuthList(req, cb) {
-    myDao.getAuthList({}, function (err, rows) {
+function _getAuthList(cb) {
+    myDao.getAuthList({pool:global.mysqlPool}, function (err, rows) {
         if (err) {
             //res.success({ type: 1, msg: '更新玩家金币数据失败', err: '' + err });
         } else {
@@ -30,38 +29,33 @@ function _getAuthList(req, cb) {
     });
 }
 
-/* GET */
-router.get('/', function (req, res) {
-    
-    buzz_admin_utils.checkToken(req, function () {
-        var params = _makeVar(req);
-        
-        _getAuthList(req, function (rows) {
+let exp = module.exports;
+exp.get = async function (data) {
+    return new Promise(function (resolve, reject) {
+        var params = _makeVar();
+        _getAuthList(function (rows) {
             params = _.extend(params, { auth_list: rows });
-            res.render("admin/pages-am-auth", params);
+            resolve(logicResponse.askEjs('admin/pages-am-auth', params))
         });
     });
-
-});
-
-/* POST */
-router.post('/', function (req, res) {
-    buzz_admin_utils.checkTokenPost(req, function (err, user_auth) {
-        if (err) {
-            var errMsg = JSON.stringify(err);
-            console.log(errMsg);
-            res.json({ rc: 10000, error: errMsg });
-        } else {
-            console.log('----------user_auth: ', user_auth);
-            var params = _makeVar(req);
+};
+/* POST: 需要验证token, 决定用户的访问权限. */
+exp.post = async function (data) {
+    return new Promise(function (resolve, reject) {
+        buzz_admin_utils.checkTokenPost({
+            body: data
+        }, function (err, user_auth) {
+            if (err) {
+                logger.error('pages-am-auth err:', err);
+                reject(err);
+            }
+            var params = _makeVar();
             params = _.extend(params, { user_auth: user_auth });
-            
-            _getAuthList(req, function (rows) {
+            _getAuthList(function (rows) {
                 params = _.extend(params, { auth_list: rows });
-                res.render("admin/pages-am-auth", params);
+                resolve(logicResponse.askEjs("admin/pages-am-auth", params));
             });
-        }
-    });
-});
 
-module.exports = router;
+        });
+    });
+};

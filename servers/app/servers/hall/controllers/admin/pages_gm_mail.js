@@ -1,5 +1,4 @@
-﻿var express = require('express');
-var router = express.Router();
+﻿const logicResponse = require('../../../common/logicResponse');
 
 var buzz_admin_utils = require('../../src/buzz/buzz_admin_utils');
 var buzz_cst_admin = require('../../src/buzz/cst/buzz_cst_admin');
@@ -20,25 +19,23 @@ function _makeVar() {
     return data;
 }
 
-/* GET home page. */
-router.get('/', function (req, res) {
-    res.render("admin/pages-gm-mail", _makeVar());
-});
+let exp = module.exports;
+exp.get = async function (data) {
+    return logicResponse.askEjs('admin/pages-gm-mail', _makeVar());
+};
 
-/* POST */
-router.post('/', function (req, res) {
-    buzz_admin_utils.checkTokenPost(req, function (err, user_auth) {
-        if (err) {
-            var errMsg = JSON.stringify(err);
-            console.log(errMsg);
-            res.json({ rc: 10000, error: errMsg });
-        } else {
-            var params = _makeVar(req);
+exp.post = async function (data) {
+    return new Promise(function (resolve, reject) {
+        buzz_admin_utils.checkTokenPost({
+            body: data
+        }, function (err, user_auth) {
+            if (err) {
+                logger.error('pages-gm-mail err:', err);
+                reject(err);
+            }
+            var params = _makeVar();
             params = _.extend(params, { user_auth: user_auth });
-            
-            res.render("admin/pages-gm-mail", params);
-        }
+            resolve(logicResponse.askEjs("admin/pages-gm-mail", params));
+        });
     });
-});
-
-module.exports = router;
+};

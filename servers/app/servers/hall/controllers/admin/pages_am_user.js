@@ -1,5 +1,4 @@
-﻿var express = require('express');
-var router = express.Router();
+﻿const logicResponse = require('../../../common/logicResponse');
 var buzz_admin_utils = require('../../src/buzz/buzz_admin_utils');
 var buzz_cst_admin = require('../../src/buzz/cst/buzz_cst_admin');
 var buzz_cst_am_user = require('../../src/buzz/cst/buzz_cst_am_user');
@@ -18,8 +17,8 @@ function _makeVar() {
     return data;
 }
 
-function _getUserList(req, cb) {
-    myDao.getUserList({}, function (err, rows) {
+function _getUserList(cb) {
+    myDao.getUserList({pool:global.mysqlPool}, function (err, rows) {
         if (err) {
             //res.success({ type: 1, msg: '更新玩家金币数据失败', err: '' + err });
         } else {
@@ -29,36 +28,34 @@ function _getUserList(req, cb) {
     });
 }
 
-/* GET home page. */
-router.get('/', function (req, res) {
-    buzz_admin_utils.checkToken(req, function () {
-        var params = _makeVar(req);
-        
+let exp = module.exports;
+exp.get = async function (data) {
+    return new Promise(function(resolve, reject){
+        var params = _makeVar();
         _getUserList(req, function (rows) {
             params = _.extend(params, { user_list: rows });
-            res.render("admin/pages-am-user", params);
+            resolve(logicResponse.askEjs('admin/pages-am-user', params))
         });
     });
-});
+};
 
-/* POST */
-router.post('/', function (req, res) {
-    buzz_admin_utils.checkTokenPost(req, function (err, user_auth) {
-        if (err) {
-            var errMsg = JSON.stringify(err);
-            console.log(errMsg);
-            res.json({ rc: 10000, error: errMsg });
-        } else {
-            console.log('----------user_auth: ', user_auth);
-            var params = _makeVar(req);
+exp.post = async function (data) {
+    return new Promise(function (resolve, reject) {
+        buzz_admin_utils.checkTokenPost({
+            body: data
+        }, function (err, user_auth) {
+            if (err) {
+                logger.error('pages-am-user err:', err);
+                reject(err);
+            }
+
+            var params = _makeVar();
             params = _.extend(params, { user_auth: user_auth });
-            
-            _getUserList(req, function (rows) {
-                params = _.extend(params, { user_list: rows });
-                res.render("admin/pages-am-user", params);
-            });
-        }
-    });
-});
 
-module.exports = router;
+            _getUserList(function (rows) {
+                params = _.extend(params, { user_list: rows });
+                resolve(logicResponse.askEjs("admin/pages-am-user", params));
+            });
+        });
+    });
+};

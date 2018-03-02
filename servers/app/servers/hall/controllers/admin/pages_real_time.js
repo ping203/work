@@ -1,10 +1,8 @@
-﻿var express = require('express');
-var router = express.Router();
-
-var buzz_admin_utils = require('../../src/buzz/buzz_admin_utils');
+﻿var buzz_admin_utils = require('../../src/buzz/buzz_admin_utils');
 var buzz_cst_admin = require('../../src/buzz/cst/buzz_cst_admin');
 var buzz_cst_admin_realtime = require('../../src/buzz/cst/buzz_cst_admin_realtime');
 var _ = require('underscore');
+const logicResponse = require('../../../common/logicResponse');
 
 function _makeVar() {
     var TXT_EN = buzz_cst_admin.TXT_SIDEBAR_EN;
@@ -19,24 +17,23 @@ function _makeVar() {
     return data;
 }
 
-/* GET home page. */
-router.get('/', function (req, res) {
-    res.render("admin/pages-realtime", _makeVar());
-});
-
-/* POST */
-router.post('/', function (req, res) {
-    buzz_admin_utils.checkTokenPost(req, function (err, user_auth) {
-        if (err) {
-            var errMsg = JSON.stringify(err);
-            console.log(errMsg);
-            res.json({ rc: 10000, error: errMsg });
-        } else {
+let exp = module.exports;
+exp.get = async function (data) {
+    return logicResponse.askEjs('admin/pages-realtime', _makeVar());
+};
+/* POST: 需要验证token, 决定用户的访问权限. */
+exp.post = async function (data) {
+    return new Promise(function (resolve, reject) {
+        buzz_admin_utils.checkTokenPost({
+            body: data
+        }, function (err, user_auth) {
+            if (err) {
+                logger.error('实时数据 err:', err);
+                reject(err);
+            }
             var data = _makeVar();
             data = _.extend(data, { user_auth: user_auth });
-            res.render("admin/pages-realtime", data);
-        }
+            resolve(logicResponse.askEjs("admin/pages-realtime", data));
+        });
     });
-});
-
-module.exports = router;
+};

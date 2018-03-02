@@ -1,5 +1,4 @@
-﻿var express = require('express');
-var router = express.Router();
+﻿const logicResponse = require('../../../common/logicResponse');
 var buzz_admin_utils = require('../../src/buzz/buzz_admin_utils');
 var buzz_cst_admin = require('../../src/buzz/cst/buzz_cst_admin');
 var buzz_cst_gm_data = require('../../src/buzz/cst/buzz_cst_am_backdoor');
@@ -18,25 +17,23 @@ function _makeVar() {
     return data;
 }
 
-/* GET */
-router.get('/', function (req, res) {
-    res.render("admin/pages-am-backdoor", _makeVar());
-});
-
-/* POST */
-router.post('/', function (req, res) {
-    buzz_admin_utils.checkTokenPost(req, function (err, user_auth) {
-        if (err) {
-            var errMsg = JSON.stringify(err);
-            console.log(errMsg);
-            res.json({ rc: 10000, error: errMsg });
-        } else {
+let exp = module.exports;
+exp.get = async function (data) {
+    return logicResponse.askEjs('admin/pages-am-backdoor', _makeVar());
+};
+/* POST: 需要验证token, 决定用户的访问权限. */
+exp.post = async function (data) {
+    return new Promise(function (resolve, reject) {
+        buzz_admin_utils.checkTokenPost({
+            body: data
+        }, function (err, user_auth) {
+            if (err) {
+                logger.error('pages-am-backdoor err:', err);
+                reject(err);
+            }
             var params = _makeVar(req);
             params = _.extend(params, { user_auth: user_auth });
-            
-            res.render("admin/pages-am-backdoor", params);
-        }
+            resolve(logicResponse.askEjs("admin/pages-am-backdoor", params));
+        });
     });
-});
-
-module.exports = router;
+};

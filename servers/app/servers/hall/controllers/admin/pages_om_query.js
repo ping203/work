@@ -1,5 +1,4 @@
-﻿var express = require('express');
-var router = express.Router();
+﻿const logicResponse = require('../../../common/logicResponse');
 var buzz_admin_utils = require('../../src/buzz/buzz_admin_utils');
 var buzz_cst_admin = require('../../src/buzz/cst/buzz_cst_admin');
 var buzz_cst_om_query = require('../../src/buzz/cst/buzz_cst_om_query');
@@ -18,20 +17,20 @@ function _makeVar() {
     return data;
 }
 
-/* POST */
-router.post('/', function (req, res) {
-    buzz_admin_utils.checkTokenPost(req, function (err, user_auth) {
-        if (err) {
-            var errMsg = JSON.stringify(err);
-            console.log(errMsg);
-            res.json({ rc: 10000, error: errMsg });
-        } else {
-            console.log('----------user_auth: ', user_auth);
+let exp = module.exports;
+
+exp.post = async function (data) {
+    return new Promise(function (resolve, reject) {
+        buzz_admin_utils.checkTokenPost({
+            body: data
+        }, function (err, user_auth) {
+            if (err) {
+                logger.error('pages-om-query err:', err);
+                reject(err);
+            }
             var params = _makeVar();
             params = _.extend(params, { user_auth: user_auth });
-            res.render("admin/pages-om-query", params);
-        }
+            resolve(logicResponse.askEjs("admin/pages-om-query", params));
+        });
     });
-});
-
-module.exports = router;
+};

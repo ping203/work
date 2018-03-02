@@ -1,6 +1,4 @@
-﻿var express = require('express');
-var router = express.Router();
-
+﻿const logicResponse = require('../../../common/logicResponse');
 var buzz_admin_utils = require('../../src/buzz/buzz_admin_utils');
 var buzz_cst_admin = require('../../src/buzz/cst/buzz_cst_admin');
 var buzz_cst_admin_register = require('../../src/buzz/cst/buzz_cst_admin_register');
@@ -19,59 +17,25 @@ function _makeVar() {
     return data;
 }
 
-/* GET. */
-router.get('/', function (req, res) {
-    console.log("req.headers: ", req.headers);
-    console.log("req.body: ", req.body);
-
+let exp = module.exports;
+exp.get = async function (data) {
     var data = _makeVar();
     data = _.extend(data, { user_auth: {} });
-
-    res.render("admin/pages-register", data);
-});
-
-/* POST */
-router.post('/', function (req, res) {
-    buzz_admin_utils.checkTokenPost(req, function (err, user_auth) {
-        if (err) {
-            var errMsg = JSON.stringify(err);
-            console.log(errMsg);
-            res.json({ rc: 10000, error: errMsg });
-        } else {
-            var data = _makeVar();
-            data = _.extend(data, { user_auth: user_auth });
-            res.render("admin/pages-register", data);
-        }
+    return logicResponse.askEjs('admin/pages-register', data);
+};
+/* POST: 需要验证token, 决定用户的访问权限. */
+exp.post = async function (data) {
+    return new Promise(function (resolve, reject) {
+        buzz_admin_utils.checkTokenPost({
+            body: data
+        }, function (err, user_auth) {
+            if (err) {
+                logger.error('pages-register err:', err);
+                reject(err);
+            }
+            var params = _makeVar();
+            params = _.extend(params, { user_auth: user_auth });
+            resolve(logicResponse.askEjs("admin/pages-register", params));
+        });
     });
-});
-
-///* POST. */
-//router.post('/', function (req, res) {
-
-//    buzz_admin_utils.checkTokenPost(req, function (err, rows) {
-//        if (err) {
-//            console.log(JSON.stringify(err));
-//            cb(err);
-//        } else {
-//            console.log('----------rows: ', rows);
-//            var user_auth = {};
-//            for (var i = 0; i < rows.length; i++) {
-//                user_auth[rows[i]] = 1;
-//            }
-//            // 处理页面权限
-//            var data = _makeVar();
-//            data = _.extend(data, { user_auth: user_auth });
-//            res.render("admin/pages-register", data);
-//        }
-//    });
-
-//    //console.log("req.headers: ", req.headers);
-//    //console.log("req.body: ", req.body);
-    
-//    //var data = _makeVar();
-//    //data = _.extend(data, { user_auth: {} });
-    
-//    //res.render("admin/pages-register", data);
-//});
-
-module.exports = router;
+};
