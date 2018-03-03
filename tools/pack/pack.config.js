@@ -5,27 +5,19 @@ module.exports = {
             '!../../servers/config/**/*',
             '!../../servers/shared/**/*',
         ],
-        plugins:[
-            '../../config*/**/*',
-            
-        ]
-        cfg1:'../../config*/**/*',
-        cfg2:'../../servers/config*/**/*',
-        cfg3:'../../servers/config*/**/*',
+        plugins: [
+            ['../../servers/config*/**/*', './dist/servers'],
+            ['../../servers/shared*/**/*', './dist/servers'],
+            ['../../servers/*.json', './dist/servers']
+
+        ],
         zip: './dist/**/*.*',
-        cfgs: '../../../cfgs/data_table_js-越南版/服务器导出/**/*',
     },
     output: {
         dist: './dist',
         origin: 'origin',
         sourcemap: 'map',
-        cfg
         zip: './',
-        cfgs: ['./dist/cfgs/',
-            // './dist/chat_server/cfgs/',
-            './dist/data_server/cfgs/',
-            // './dist/resource_server/public/cfgs'
-        ]
     },
     scp: {
         host: '119.28.176.122',

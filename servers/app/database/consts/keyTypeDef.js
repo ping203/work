@@ -3,7 +3,7 @@
  * TODO: 表过于臃肿，待拆分:女神数据，凡是单个字段
  */
 const base = require('./keytypeDef.base');
-const version = require('../../../../config/versions');
+const version = require('../../../config/versions');
 
 let AccountDef = {};
 let OtherDef = {};

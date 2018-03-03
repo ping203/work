@@ -1,6 +1,4 @@
-﻿var admin_common = require('../../routes/api/admin_common');
-
-exports.checkToken = _checkToken;
+﻿exports.checkToken = _checkToken;
 exports.checkTokenPost = _checkTokenPost;
 
 /**

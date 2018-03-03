@@ -23,6 +23,7 @@ const exclude = new Set(['node_modules', 'dist']);
 const DEST_DIR = 'dist/';
 const ORIGIN_DIR = 'origin/';
 const SRC_MAP = 'src-map';
+const SRC_DIR = '';
 
 let pkgName = '';
 
@@ -37,7 +38,8 @@ gulp.task('checkout', ['commit'], function () {
 gulp.task('prod', function (cb) {
   // runSequence('clean', 'eslint', ['mix', 'copy'], 'zip', 'scp', cb);
   // runSequence('clean', ['mix', 'copy'], 'zip', cb);
-  runSequence('clean', ['copy'], 'zip', cb);
+  runSequence('clean', ['mix'],'copy', 'zip',cb);
+  // runSequence('zip',cb);
   // runSequence('clean', ['mix', 'copy'],'copyCfg', 'zip','scp', cb);
   // runSequence('copy', cb);
   // runSequence('copy', ['zip'], cb);
@@ -73,7 +75,7 @@ gulp.task('file_scp', function () {
         .on('error', function (err) {
           console.log(err);
         });
-    })
+    });
 
   });
 
@@ -94,8 +96,14 @@ gulp.task('copyCfg', function () {
 });
 
 gulp.task('copy', function () {
-  return gulp.src(config.input.plugins)
-    .pipe(gulp.dest(config.output.plugins));
+  let task = null;
+  console.error('---------------config.input.plugins', config.input.plugins);
+  config.input.plugins.forEach(function (item) {
+    console.error('---------------item', item);
+    task =  gulp.src(item[0])
+      .pipe(gulp.dest(item[1]));
+  });
+  return task;
 });
 
 gulp.task('commit', function () {

@@ -3,7 +3,7 @@
  * TODO: 表过于臃肿，待拆分:女神数据，凡是单个字段
  */
 
-const player_users_cfg = require('../../../../config/data').GAME_CFGS.player_users_cfg;
+const player_users_cfg = require('../../../config/data').GAME_CFGS.player_users_cfg;
 
 module.exports.AccountDef = {
     "id": {

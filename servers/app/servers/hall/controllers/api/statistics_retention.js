@@ -1,5 +1,4 @@
-﻿var admin_common = require('./admin_common');
-const logicResponse = require('../../../common/logicResponse');
+﻿const logicResponse = require('../../../common/logicResponse');
 
 exports.get_retention_data = _get_retention_data;
 

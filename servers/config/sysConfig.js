@@ -1,5 +1,5 @@
 const fs = require('fs');
-const versions = require('../../config/versions');
+const versions = require('./versions');
 
 module.exports = {
     GAME_TYPE: 'fish',

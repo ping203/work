@@ -12,7 +12,7 @@
         // "no-unreachable": 2,//不能有无法执行的代码
         // "no-unused-expressions": 2,//禁止无用的表达式
         "strict": 2, //使用严格模式
-        "no-undef": 1,//不能有未定义的变量
+        "no-undef": 2,//不能有未定义的变量
         "no-undef-init": 2,//变量初始化时不能直接给它赋值为undefined
         // "no-undefined": 2,//不能使用undefined
         "no-unused-vars": [0, {"vars": "all", "args": "after-used"}],//不能有声明后未被使用的变量或参数
@@ -32,7 +32,7 @@
         "use-isnan": 2,//禁止比较时使用NaN，只能用isNaN()
         "no-var": 0,//禁用var，用let和const代替
         "init-declarations": 0,//声明时必须赋初值
-        "max-depth": [0, 4]//嵌套块深度
+        "max-depth": [2, 4]//嵌套块深度
     },
     "parserOptions": {
         "ecmaVersion": 8,
