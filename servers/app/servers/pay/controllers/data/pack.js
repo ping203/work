@@ -4,9 +4,7 @@
 const data_util = require('./data_util');
 const DaoCommon = require('../../src/dao/dao_common');
 const DaoReward = require('../../src/dao/dao_reward');
-
 const GameLog = require('../../src/log/GameLog');
-
 const gameConfig = require('../../../../utils/imports').GAME_CFGS;
 const common_log_const_cfg = gameConfig.common_log_const_cfg;
 const string_strings_cfg = gameConfig.string_strings_cfg;

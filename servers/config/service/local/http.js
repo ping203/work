@@ -2,7 +2,6 @@ const omelo = require('omelo');
 const dbCfg = require('../../../app/utils/imports').dbCfg;
 const versions = require('../../../app/utils/imports').versions;
 const serversCfg = require('./servers.json')[omelo.app.env];
-
 const sysConfig = require('../../sysConfig');
 const SSL_CERT = sysConfig.SSL_CERT || {};
 

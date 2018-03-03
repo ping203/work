@@ -5,12 +5,13 @@ module.exports = {
             '!../../servers/config/**/*',
             '!../../servers/shared/**/*',
         ],
-        plugins: [
-            '../../database*/**/*.json',
-            '../../database*/**/*.sql',
-            '../../*.json',
-            '../../admin*/**/*',
-        ],
+        plugins:[
+            '../../config*/**/*',
+            
+        ]
+        cfg1:'../../config*/**/*',
+        cfg2:'../../servers/config*/**/*',
+        cfg3:'../../servers/config*/**/*',
         zip: './dist/**/*.*',
         cfgs: '../../../cfgs/data_table_js-越南版/服务器导出/**/*',
     },
@@ -18,7 +19,7 @@ module.exports = {
         dist: './dist',
         origin: 'origin',
         sourcemap: 'map',
-        plugins: './dist',
+        cfg
         zip: './',
         cfgs: ['./dist/cfgs/',
             // './dist/chat_server/cfgs/',
@@ -76,4 +77,4 @@ module.exports = {
         localPath: '../../../fishjoy_server/data_server/src/buzz/sdk/payConfig.js',
         remotePath: '/home/fishjoy_test/server/data_server/src/buzz/sdk/'
     }, ]
-}
+};

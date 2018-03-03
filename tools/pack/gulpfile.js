@@ -36,7 +36,8 @@ gulp.task('checkout', ['commit'], function () {
 
 gulp.task('prod', function (cb) {
   // runSequence('clean', 'eslint', ['mix', 'copy'], 'zip', 'scp', cb);
-  // runSequence('clean', ['mix', 'copy'], 'zip', 'scp', cb);
+  // runSequence('clean', ['mix', 'copy'], 'zip', cb);
+  runSequence('clean', ['copy'], 'zip', cb);
   // runSequence('clean', ['mix', 'copy'],'copyCfg', 'zip','scp', cb);
   // runSequence('copy', cb);
   // runSequence('copy', ['zip'], cb);
