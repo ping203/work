@@ -94,9 +94,9 @@ class LogBackupTask extends Task{
      */
     _exportBakData(tname, cb){
         let path = `./data/${tname}_${Date.now()}.txt`;
-        let sql = `SELECT * FROM ${tname} INTO OUTFILE \'${path}\' lines terminated by '\\r\\n'`;
+        let sql = `SELECT * FROM ${tname} INTO OUTFILE ${path} lines terminated by '\\r\\n'`;
         logger.info('-----_exportBakData:', path, '       ', sql);
-        mysqlConnector.query(sql, function (err, result) {
+        mysqlConnector.query(sql, function (err) {
             if(err){
                 // console.gameLogSync('-----_exportBakData:', err);
             }
@@ -141,7 +141,7 @@ class LogBackupTask extends Task{
     _backupData(task, tname, cb){
         this._moveData(task, tname, 0, task.bak, function (err, skip, affectedRows, callback) {
             if(affectedRows < task.bak){
-                mysqlConnector.query(`DELETE FROM ${task.table} WHERE id >= ${task.begin_id} AND id <= ${task.end_id}`, function (err, result) {
+                mysqlConnector.query(`DELETE FROM ${task.table} WHERE id >= ${task.begin_id} AND id <= ${task.end_id}`, function () {
                     utils.invokeCallback(cb, null);
                 });
                 return;

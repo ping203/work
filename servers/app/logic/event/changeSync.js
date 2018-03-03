@@ -3,8 +3,6 @@ const redisClient = require('../../utils/dbclients').redisClient;
 const redisKey = require('../../database').dbConsts.REDISKEY;
 const EventEmitter = require('events').EventEmitter;
 const eventType = require('../../consts/eventType');
-const omelo = require('omelo');
-
 class ChangeSync extends EventEmitter{
     constructor(){
         super();

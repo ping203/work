@@ -1,56 +1,24 @@
 {
     "extends": ["eslint:recommended"],
     "env": {
-        "browser": true,
         "node": true
-    },
-    "rules": {
-        "camel_case": 0,
-        "quotes": 0,
-        "semi": 2,
-        "no-unreachable": 2,//不能有无法执行的代码
-        "strict": 2, //使用严格模式
-        "no-undef": 2,//不能有未定义的变量
-        "no-undef-init": 2,//变量初始化时不能直接给它赋值为undefined
-        "no-unused-vars": [0, {"vars": "all", "args": "after-used"}],//不能有声明后未被使用的变量或参数
-        "no-dupe-args": 2, //函数参数不能重复
-        "no-duplicate-case": 2, //switch中的case标签不能重复
-        "no-eval": 1, //禁止使用eval
-        "space-after-keywords": [0, "always"], //关键字后面是否要空一格
-        "space-before-blocks": [0, "always"], //不以新行开始的块{前面要不要有空格
-        "space-before-function-paren": [0, "always"], //函数定义时括号前面要不要有空格
-        "space-in-parens": [0, "never"], //小括号里面要不要有空格
-        "use-isnan": 2,//禁止比较时使用NaN，只能用isNaN()
-        "no-var": 0,//禁用var，用let和const代替
-        "init-declarations": 0,//声明时必须赋初值
-        "max-depth": [2, 4]//嵌套块深度
     },
     "parserOptions": {
         "ecmaVersion": 8,
         "sourceType": "module"
     },
+    "rules":{
+        "semi": [2, "always"],
+        "no-unused-vars": [0, {"vars": "all", "args": "after-used"}]
+    },
     "globals": {
-        "console": true,
-        "module": true,
-        "require": true,
-        "process": true,
         "logger": true,
-        "Map": true,
-        "Set": true,
         "utils": true,
         "CONSTS":true,
-        "setInterval": true,
-        "clearInterval": true,
-        "global": true,
-        "Buffer": true,
-        "setTimeout": true,
-        "clearTimeout": true,
-        "__filename": true,
         "redisConnector": true,
         "Promise": true,
         "mysqlConnector": true,
         "mysqlPool": true,
-        "Symbol": true,
         "cache": true,
         "answer": true,
         "redisClient": true,

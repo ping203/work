@@ -162,7 +162,7 @@ function _didPutGoddess(req, data, cb) {
 
             // 数据验证及操作.
             if (aquarium.goddess['' + id] == null) {
-                if (ERROR) logger.error(FUNC + "放置的女神没有解锁");
+                if (ERROR) console.error(FUNC + "放置的女神没有解锁");
                 cb(ERROR_OBJ.GODDESS_LOCKED);
                 return;
             }
@@ -171,7 +171,7 @@ function _didPutGoddess(req, data, cb) {
                 var goddess = aquarium.goddess['' + id];
                 if (DEBUG) logger.info(FUNC + "goddess:", goddess);
                 if (GODDESS_STATE.PLACED == goddess.state) {
-                    if (ERROR) logger.error(FUNC + "女神已经处于放置状态，请勿重复放置");
+                    if (ERROR) console.error(FUNC + "女神已经处于放置状态，请勿重复放置");
                     cb(ERROR_OBJ.GODDESS_PLACED);
                     return;
                 }
@@ -188,8 +188,8 @@ function _didPutGoddess(req, data, cb) {
                     cb(null, _currentAquarium(account));// 返回当前水族馆的所有数据
                     return;
                 }
-                if (ERROR) logger.error(FUNC + "女神处于未知状态:" + goddess.state);
-                if (ERROR) logger.error(FUNC + "goddess:", goddess);
+                if (ERROR) console.error(FUNC + "女神处于未知状态:" + goddess.state);
+                if (ERROR) console.error(FUNC + "goddess:", goddess);
                 cb(ERROR_OBJ.GODDESS_STATE_ERR);
                 return;
             }
@@ -217,7 +217,7 @@ function _didRewardPetfish(req, data, cb, account) {
         var petfish = aquarium.petfish['' + id];
 
         if (!_fishPlaced(petfish)) {
-            if (ERROR) logger.error(FUNC + "宠物鱼未放养，无法收取");
+            if (ERROR) console.error(FUNC + "宠物鱼未放养，无法收取");
             cb(ERROR_OBJ.PETFISH_REWARD_ERR_NOTPLACED);
             return;
         }
@@ -231,7 +231,7 @@ function _didRewardPetfish(req, data, cb, account) {
         }
         else {
             if (!_PetfishCanReward(petfish,aquarium)) {
-                if (ERROR) logger.error(FUNC + "宠物鱼没有到时间");
+                if (ERROR) console.error(FUNC + "宠物鱼没有到时间");
                 cb(ERROR_OBJ.PETFISH_REWARD_ERR_TIME_NOT_UP);
                 return;
             }
@@ -326,7 +326,7 @@ function _checkFish(account, id, cb) {
         if (DEBUG) logger.info(FUNC + "用户放养的鱼在水族馆中");
         var petfish = aquarium.petfish['' + fish_id];
         if (_fishPlaced(petfish)) {
-            if (ERROR) logger.error(FUNC + "用户放养的鱼已经处于放养状态，请勿重复放养");
+            if (ERROR) console.error(FUNC + "用户放养的鱼已经处于放养状态，请勿重复放养");
             cb(ERROR_OBJ.PETFISH_PLACED);
             return;
         }
@@ -338,11 +338,11 @@ function _checkFish(account, id, cb) {
             continue;
         }
         else if (petfish.state == PET_STATE.ALREADY_REWARD) {
-            if (ERROR) logger.error(FUNC + "宠物鱼今日已放养并领取奖励");
+            if (ERROR) console.error(FUNC + "宠物鱼今日已放养并领取奖励");
             continue;
         }
 
-        if (ERROR) logger.error(FUNC + "宠物鱼处于未知状态:" + petfish.state);
+        if (ERROR) console.error(FUNC + "宠物鱼处于未知状态:" + petfish.state);
         cb(ERROR_OBJ.PETFISH_STATE_ERR);
         return;
     }
@@ -365,7 +365,7 @@ function _fishUnlocked(aquarium, id, cb) {
     const FUNC = TAG + "_fishUnlocked() --- ";
 
     if (aquarium.petfish['' + id] == null) {
-        if (ERROR) logger.error(FUNC + "用户放养的鱼并没有在水族馆中");
+        if (ERROR) console.error(FUNC + "用户放养的鱼并没有在水族馆中");
         if (cb) cb(ERROR_OBJ.PETFISH_LOCKED);
         return false;
     }
@@ -482,7 +482,7 @@ function _didUpgradePetfish(req, data, cb) {
                 var ownCoin = account[coinType];
                 if (DEBUG) logger.info(FUNC + "ownCoin:", ownCoin);
                 if (ownCoin < needCoin) {
-                    if (ERROR) logger.error("金币不足:", ERROR_OBJ.GOLD_NOT_ENOUGH);
+                    if (ERROR) console.error("金币不足:", ERROR_OBJ.GOLD_NOT_ENOUGH);
                     cb(ERROR_OBJ.GOLD_NOT_ENOUGH);
                     return false;
                 }
@@ -512,14 +512,14 @@ function _isChipEnough(account, fish_id, need_chip, cb) {
     if (DEBUG) logger.info(FUNC + "chip_id:", chip_id);
     if (chip) {
         if (chip[chip_id] == null || chip[chip_id] < need_chip) {
-            if (ERROR) logger.error(FUNC + "碎片不足:", ERROR_OBJ.CHIP_NOT_ENOUGH);
+            if (ERROR) console.error(FUNC + "碎片不足:", ERROR_OBJ.CHIP_NOT_ENOUGH);
             cb(ERROR_OBJ.CHIP_NOT_ENOUGH);
             return false;
         }
         return true;
     }
     else {
-        if (ERROR) logger.error(FUNC + "碎片不足:", ERROR_OBJ.CHIP_NOT_ENOUGH);
+        if (ERROR) console.error(FUNC + "碎片不足:", ERROR_OBJ.CHIP_NOT_ENOUGH);
         cb(ERROR_OBJ.CHIP_NOT_ENOUGH);
         return false;
     }
@@ -612,7 +612,7 @@ function _getChipFromId(id) {
         return fishInfo.chip;
     }
     else {
-        logger.error(FUNC + "获取鱼的信息失败, 鱼的id:", id);
+        console.error(FUNC + "获取鱼的信息失败, 鱼的id:", id);
         return null;
     }
     // return _petfishInfo(id).chip;

@@ -1,8 +1,5 @@
-const fs = require('fs');
-const downloader = require('../controllers/downloader');
-const logger = require('omelo-logger').getLogger('gate', __filename);
-const path = require('path');
 
+const downloader = require('../controllers/downloader');
 
 module.exports = (router) => {
 	router.prefix = '/';
