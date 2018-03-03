@@ -27,14 +27,6 @@ const SRC_DIR = '';
 
 let pkgName = '';
 
-//gulp checkout --tag v1.0.0
-gulp.task('checkout', ['commit'], function () {
-  let gitTag = argv.tag || config.gitTag;
-  git.checkout(gitTag, function (err) {
-    if (err) throw err;
-  });
-});
-
 //清理、不混肴压缩发布、打包、上传
 gulp.task('default', function (cb) {
   runSequence('clean', ['unmix', 'copy'], 'zip', 'scp', cb);
@@ -46,7 +38,7 @@ gulp.task('prod', function (cb) {
 });
 
 
-
+//gulp 功能业务配置
 gulp.task('clean', function () {
   return del([
     //删除
@@ -54,42 +46,6 @@ gulp.task('clean', function () {
     //保留
     '!dist/**/*.json'
   ]);
-});
-
-gulp.task('file_scp', function () {
-  let uploads = config.upload;
-  let t = null;
-  uploads.forEach(function (item) {
-    let paths = item.paths;
-    paths.forEach(function (target) {
-      t = gulp.src(target.localPath)
-        .pipe(scp({
-          host: item.host,
-          username: item.username,
-          password: item.password,
-          dest: target.remotePath
-        }))
-        .on('error', function (err) {
-          console.log(err);
-        });
-    });
-
-  });
-
-  return t;
-});
-
-
-gulp.task('copyCfg', function () {
-
-  let output_cfgs = config.output.cfgs;
-  let t = null;
-  output_cfgs.forEach(function (cfg) {
-    t = gulp.src(config.input.cfgs)
-      .pipe(gulp.dest(cfg));
-  });
-
-  return t;
 });
 
 gulp.task('copy', function () {
@@ -101,12 +57,6 @@ gulp.task('copy', function () {
       .pipe(gulp.dest(item[1]));
   });
   return task;
-});
-
-gulp.task('commit', function () {
-  return gulp.src(SRC_DIR)
-    .pipe(git.add())
-    .pipe(git.commit());
 });
 
 // 监视文件变化，自动执行任务
@@ -146,26 +96,6 @@ gulp.task('eslint', function () {
       gulp.emit('end');
     });
 });
-
-gulp.task('map', function () {
-  return gulp.src(config.input.js)
-    .pipe(sourcemaps.init())
-    .pipe(babel({
-      presets: ['es2015', 'es2016', 'es2017'],
-      plugins: [
-        ["transform-runtime", {
-          "polyfill": false,
-          "regenerator": true
-        }]
-      ]
-    }))
-    .pipe(sourcemaps.write(config.output.sourcemap))
-    .on('error', function (err) {
-      console.log('eslint error:', err.stack);
-      gulp.emit('end');
-    });
-});
-
 
 gulp.task('mix', function () {
   return gulp.src(config.input.js)
@@ -208,4 +138,74 @@ gulp.task('unmix', function () {
       console.log(err.stack);
       gulp.emit('end');
     });
+});
+
+
+gulp.task('file_scp', function () {
+  let uploads = config.upload;
+  let t = null;
+  uploads.forEach(function (item) {
+    let paths = item.paths;
+    paths.forEach(function (target) {
+      t = gulp.src(target.localPath)
+        .pipe(scp({
+          host: item.host,
+          username: item.username,
+          password: item.password,
+          dest: target.remotePath
+        }))
+        .on('error', function (err) {
+          console.log(err);
+        });
+    });
+
+  });
+
+  return t;
+});
+
+
+gulp.task('copyCfg', function () {
+
+  let output_cfgs = config.output.cfgs;
+  let t = null;
+  output_cfgs.forEach(function (cfg) {
+    t = gulp.src(config.input.cfgs)
+      .pipe(gulp.dest(cfg));
+  });
+
+  return t;
+});
+
+gulp.task('map', function () {
+  return gulp.src(config.input.js)
+    .pipe(sourcemaps.init())
+    .pipe(babel({
+      presets: ['es2015', 'es2016', 'es2017'],
+      plugins: [
+        ["transform-runtime", {
+          "polyfill": false,
+          "regenerator": true
+        }]
+      ]
+    }))
+    .pipe(sourcemaps.write(config.output.sourcemap))
+    .on('error', function (err) {
+      console.log('eslint error:', err.stack);
+      gulp.emit('end');
+    });
+});
+
+gulp.task('commit', function () {
+  return gulp.src(SRC_DIR)
+    .pipe(git.add())
+    .pipe(git.commit());
+});
+
+//gulp checkout --tag v1.0.0
+gulp.task('checkout', ['commit'], function () {
+  let gitTag = argv.tag || config.gitTag;
+  git.checkout(gitTag, function (err) {
+    if (err) throw err;
+  });
 });
