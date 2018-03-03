@@ -262,7 +262,7 @@ function getSocialReward(req, dataObj, cb) {
     if(type==JOIN_TYPE.INVITE_DAILY) {
         myDao.getInviteDailyReward(dataObj,function(err,result) {
             cb(err, result);
-        })
+        });
     }else{
         // 数据库操作
         myDao.getSocialReward(dataObj, function (err, result) {
@@ -375,7 +375,7 @@ function _getFriendsCharts(req, data, cb) {
                 if (err) return cb && cb(err);
                 cb && cb(null, charts);
             });
-        })
+        });
     }
 }
 

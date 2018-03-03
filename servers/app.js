@@ -126,7 +126,7 @@ app.configure('production|development', 'admin|resource|gate|hall|chat', functio
 // 服务器token配置
 app.configure('production|development', 'hall|chat', function () {  
   omeloHttpPlugin.filter(httpTokenFilter);
-})
+});
 
 // 网关配置
 app.configure('production|development', 'gate', function () {

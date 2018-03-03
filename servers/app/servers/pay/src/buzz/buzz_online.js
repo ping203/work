@@ -12,5 +12,5 @@ function isOnline(id,cb) {
         let now = new Date().getTime();
         let last_online_time = parseInt(result);
         cb(null,now - last_online_time < 120000);
-    })
+    });
 }

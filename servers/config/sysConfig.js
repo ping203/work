@@ -1,5 +1,5 @@
 const fs = require('fs');
-const versions = require('../../config/versions')
+const versions = require('../../config/versions');
 
 module.exports = {
     GAME_TYPE: 'fish',
@@ -33,6 +33,6 @@ if(versions.SSL){
     module.exports.SSL_CERT = {
         KEY:`shared/cert/${versions.VERSION_KEY[versions.PUB]}/server.key`,
         CERT:`shared/cert/${versions.VERSION_KEY[versions.PUB]}/server.crt`,
-    }
+    };
 }
 

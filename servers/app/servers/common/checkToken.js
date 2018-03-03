@@ -12,4 +12,4 @@ module.exports = async function (uid, token) {
     else if (account.token != token) {
         throw ERROR_OBJ.TOKEN_INVALID;
     } 
-}
+};

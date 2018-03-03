@@ -146,11 +146,11 @@ class FishPlayer extends Player {
     }
 
     set gameInfo(info) {
-        this._gameInfo = info
+        this._gameInfo = info;
     }
 
     get gameInfo() {
-        return this._gameInfo
+        return this._gameInfo;
     }
 
     set account(value) {
@@ -158,7 +158,7 @@ class FishPlayer extends Player {
     }
 
     get account() {
-        return this._account
+        return this._account;
     }
 
     save() {
@@ -224,7 +224,7 @@ class FishPlayer extends Player {
             }
             if (!account) {
                 logger.error('err = ', err, ' code = ', CONSTS.SYS_CODE.PLAYER_NOT_EXIST.code);
-                return
+                return;
             }
 
             this.account = account;
@@ -784,7 +784,7 @@ class FishPlayer extends Player {
             saveData.skillUsed = {
                 id: skillId,
                 ct: ret.skillC,
-            }
+            };
             this._mission.addProcess(RewardModel.TaskType.USE_SKILL, 1, skillId);//使用x技能y次，如果x为0则为任意技能
         }
         let costVal = 0;
@@ -941,7 +941,7 @@ class FishPlayer extends Player {
         let call = {
             fish_key: fishKey,
             fish_path: fishPath,
-        }
+        };
         utils.invokeCallback(cb, null);
 
         this.emit(fishCmd.push.use_skill.route, {
@@ -1065,7 +1065,7 @@ class FishPlayer extends Player {
                             }, GAMECFG.common_log_const_cfg.MINI_GAME);
                             ret = {
                                 gold: this.account.gold,
-                            }
+                            };
                         }
                         this._miniTimestamp = null;
                     }
@@ -1430,7 +1430,7 @@ class FishPlayer extends Player {
      * 返回玩家重连时需要继续的关键数据
      */
     getContinueData() {
-        let data = {}
+        let data = {};
         let mBIdx = this._lastFireIdx;
         mBIdx > 0 && (data.mBIdx = mBIdx);
         return data;
@@ -1520,7 +1520,7 @@ class FishPlayer extends Player {
                             skin: curSkin,
                             score : wpStarCfg.score,    //--比赛分数提高
                             rank : wpStarCfg.rank,    //--比赛胜点提高
-                        }
+                        };
                     }
                 }
                 this.rpcRankMatchCall(rankMatchCmd.remote.fightInfo.route, data);

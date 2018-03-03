@@ -35,7 +35,7 @@ class Rpc {
             game: {
                 playerRemote: 'playerRemote'
             }
-        }
+        };
     }
 
     get serverType() {

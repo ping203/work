@@ -103,7 +103,7 @@ module.exports = (router) => {
         await httpHandler(ctx, first_recharge, 'reward');
     });
 
-}
+};
 
 // // =========================================================
 // // routes

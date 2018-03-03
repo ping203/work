@@ -201,7 +201,7 @@ class GoddessFishModel extends FishModel {
     _emitGodEvent (evtName, evtData) {
         this._emitEvent(evtName, {
             goddess: evtData
-        })
+        });
     }
 
 }

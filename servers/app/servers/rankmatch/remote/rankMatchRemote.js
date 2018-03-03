@@ -1,4 +1,4 @@
-const rankMatchCmd = require('../../../cmd/rankMatchCmd')
+const rankMatchCmd = require('../../../cmd/rankMatchCmd');
 const RemoteHandler = require('../../common/remoteHandler');
 const rankMatchApp = require('../rankMatchApp');
 

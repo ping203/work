@@ -215,7 +215,7 @@ function _getCommonData(data) {
         appid: buzz_cst_sdk.WANBA_PARAMS.APP_ID,
         pf: GLOBAL_PF,
         format: "json",
-    }
+    };
 }
 
 function _callTencentApi(params, req_client, cb) {

@@ -33,7 +33,7 @@ class MonthTask extends Task {
         logger.info('按月任务重置开始');
         let tasks = this.taskConf.subTask;
         async.mapSeries(tasks, this._reset.bind(this), function (err, results) {
-            logger.info('按月任务重置完成')
+            logger.info('按月任务重置完成');
             utils.invokeCallback(cb, null);
         });
     }

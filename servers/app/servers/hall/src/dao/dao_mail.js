@@ -285,7 +285,7 @@ function updateMailBox(pool, cb) {
         err && logger.error(FUNC + "err: ", err);
         rows && logger.info(FUNC + "rows: ", rows);
         if (cb != null) cb(err, rows);
-    })
+    });
 }
 
 /**
@@ -714,7 +714,7 @@ function _getMailsDetail(mids, cb){
         }
 
         cb(err, objs);
-    })
+    });
 
 }
 

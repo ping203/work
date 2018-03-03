@@ -198,7 +198,7 @@ class RankMatchRobotPlayer extends RankMatchPlayer {
         }
         let temp = {
             wp_skin: wpSkin,
-        }
+        };
         this._operation(consts.RMATCH_ROBOT_OPT.WEAPON_CHANGE, temp);
         this._resetWpSkin(wpSkin);
     }

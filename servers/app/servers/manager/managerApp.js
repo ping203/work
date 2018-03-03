@@ -41,7 +41,7 @@ class ManagerApp {
     remoteRpc(method, data, cb) {
         if (!plugins[GAME_TYPE]) {
             utils.invokeCallback(cb, CONSTS.SYS_CODE.NOT_SUPPORT_GAMETYPE);
-            return
+            return;
         }
 
         if (!this[method]) {

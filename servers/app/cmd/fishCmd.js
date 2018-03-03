@@ -1,9 +1,9 @@
 const SysCmd = require('./sysCmd');
 class FishCmd extends SysCmd {
     constructor() {
-        super()
-        this.initReq()
-        this.initPush()
+        super();
+        this.initReq();
+        this.initPush();
         this.initRemote();
     }
 
@@ -614,7 +614,7 @@ class FishCmd extends SysCmd {
                 }
             },
             res: {}
-        }
+        };
 
         /**
          * 多人房广播刷鱼
@@ -630,7 +630,7 @@ class FishCmd extends SysCmd {
                 }
             },
             res: {}
-        }
+        };
 
         /**
          * 多人房广播战斗行为通知
@@ -647,7 +647,7 @@ class FishCmd extends SysCmd {
                 }
             },
             res: {}
-        }
+        };
 
         this._push.player_notify = {
             route: 's_player_notify',
@@ -724,7 +724,7 @@ class FishCmd extends SysCmd {
                 scene: 'scene_fish_1',
                 sid: 'connector-server-1'
             }
-        }
+        };
 
         this._rpc.leaveGame = {
             route: 'rpc_leave_game',
@@ -733,7 +733,7 @@ class FishCmd extends SysCmd {
                 scene: 'scene_fish_1',
                 sid: 'connector-server-1'
             }
-        }
+        };
 
         //玩家连接状态
         this._rpc.playerConnectState = {
@@ -744,7 +744,7 @@ class FishCmd extends SysCmd {
                 sid: 'connector-server-1',
                 scene: 'scene_fish_1'
             }
-        }
+        };
 
         //比赛正式开始
         this._rpc.matchStart = {
@@ -754,7 +754,7 @@ class FishCmd extends SysCmd {
                 roomId: '111111',
                 sceneId: 'scene_fish_1'
             }
-        }
+        };
 
         //比赛正常结束：开炮都结束或时间到
         this._rpc.matchFinish = {
@@ -764,14 +764,14 @@ class FishCmd extends SysCmd {
                 roomId: '111111',
                 sceneId: 'scene_fish_1'
             }
-        }
+        };
 
         this._rpc.playerDataChange = {
             route: 'rpc_player_data_change',
             data: {
                 uid: 10011
             }
-        }
+        };
     }
 }
 

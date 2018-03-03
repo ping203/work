@@ -480,5 +480,5 @@ exports.withDbPool = function () {
         },
 
 
-    }
+    };
 };

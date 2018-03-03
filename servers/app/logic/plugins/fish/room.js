@@ -1,4 +1,4 @@
-const omelo = require('omelo')
+const omelo = require('omelo');
 const fishCmd = require('../../../cmd/fishCmd');
 const consts = require('./consts');
 const Cost = require('./gamePlay/cost');
@@ -185,7 +185,7 @@ class Room {
 
     //获取房间配置
     get config() {
-        return this._config
+        return this._config;
     }
 
     //获取房间模式
@@ -323,10 +323,10 @@ class Room {
     }
 
     c_query_players(data, cb) {
-        logger.debug(data, cb)
+        logger.debug(data, cb);
         let players = [];
         for (let v of this.playerMap.values()) {
-            players.push(this._genPlayerProcolInfo(v))
+            players.push(this._genPlayerProcolInfo(v));
         }
         utils.invokeCallback(cb, null, players);
     }
@@ -341,7 +341,7 @@ class Room {
             data = {
                 gold: player.account.gold,
                 pearl: player.account.pearl,
-            }
+            };
             player.clear();
             this._clearPlayerResource(player);
             this.playerMap.delete(uid);
@@ -528,7 +528,7 @@ class Room {
             this._bcash[route] = {
                 data: [],
                 name: name,
-            }
+            };
         }
         this._bcash[route].name = name;
         this._bcash[route].data.push(data);

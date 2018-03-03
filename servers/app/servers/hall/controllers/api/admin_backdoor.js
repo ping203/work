@@ -104,7 +104,7 @@ async function generateCycleReward(data) {
     if (err) {
         throw err;
     }
-    return logicResponse.ask("success:" + data.type, "生成排行奖励")
+    return logicResponse.ask("success:" + data.type, "生成排行奖励");
 }
 
 async function kickUser(data) {

@@ -188,7 +188,7 @@ class InnerUser extends User {
 
                 resolve(false);
             });
-        })
+        });
     }
 
     getUID(username) {
@@ -214,13 +214,13 @@ class InnerUser extends User {
                             } else {
                                 resolve(result.id);
                             }
-                        })
+                        });
                     }
                 } else {
                     resolve(uid);
                 }
             });
-        })
+        });
     }
 
 

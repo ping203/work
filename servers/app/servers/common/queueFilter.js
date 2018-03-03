@@ -1,17 +1,17 @@
 class QueueFilter {
   constructor() {
     this.requestQueue = [];
-    this.apiFilterWaitCount = 0
-    this.msgTotalInCount = 0
-    this.msgTotalOutCount = 0
-    this.apiFilterWaitCountHighLimit = 100
-    this.apiFilterWaitCountLowLimit = 30
+    this.apiFilterWaitCount = 0;
+    this.msgTotalInCount = 0;
+    this.msgTotalOutCount = 0;
+    this.apiFilterWaitCountHighLimit = 100;
+    this.apiFilterWaitCountLowLimit = 30;
 
     this.routeMap = new Map();
 
     setInterval(function(){
       this._printf();
-    }.bind(this), 10000)
+    }.bind(this), 10000);
   }
 
   _printf(){
@@ -22,21 +22,21 @@ class QueueFilter {
   }
 
   handlerQueue() {
-    let handlerQueueCount = this.apiFilterWaitCountLowLimit - this.apiFilterWaitCount
-    logger.info('[doHandlerQueue]lowLimit : %s,waitCount : %s,queueCount : %s', this.apiFilterWaitCountLowLimit, this.apiFilterWaitCount, handlerQueueCount)
+    let handlerQueueCount = this.apiFilterWaitCountLowLimit - this.apiFilterWaitCount;
+    logger.info('[doHandlerQueue]lowLimit : %s,waitCount : %s,queueCount : %s', this.apiFilterWaitCountLowLimit, this.apiFilterWaitCount, handlerQueueCount);
     for (let i = 0; i < handlerQueueCount && i < this.requestQueue.length; i++) {
-      let handlerNextItem = this.requestQueue.shift()
+      let handlerNextItem = this.requestQueue.shift();
       logger.info('[queue]pop : %s', this.requestQueue.length);
       this.apiFilterWaitCount++;
       logger.info('[queue]this.apiFilterWaitCount++ : %s', this.apiFilterWaitCount);
       process.nextTick(function () {
-        handlerNextItem.next()
-      })
+        handlerNextItem.next();
+      });
     }
   }
 
   requestQueuePush(queueItem) {
-    this.requestQueue.push(queueItem)
+    this.requestQueue.push(queueItem);
     logger.info('[queue]push : %s', this.requestQueue.length);
   }
 
@@ -47,7 +47,7 @@ class QueueFilter {
         inMsg:0,
         outMsg:0,
         beginTime:Date.now()
-      }
+      };
       this.routeMap.set(msg.__route__, obj);
     }
     obj.inMsg++;
@@ -57,25 +57,25 @@ class QueueFilter {
       //push to queue
       this.requestQueuePush({
         next: next
-      })
+      });
     } else {
       if (this.apiFilterWaitCount < this.apiFilterWaitCountHighLimit) {
         //push to api
         this.apiFilterWaitCount++;
         logger.info('[direct]this.apiFilterWaitCount++ : %s', this.apiFilterWaitCount);
-        next()
-        return
+        next();
+        return;
       } else {
         //push to queue
         this.requestQueuePush({
           next: next
-        })
+        });
       }
     }
 
     if (this.apiFilterWaitCount < this.apiFilterWaitCountLowLimit) {
-      logger.info('[BeforeCallQueue]')
-      this.handlerQueue()
+      logger.info('[BeforeCallQueue]');
+      this.handlerQueue();
     }
   }
 
@@ -87,8 +87,8 @@ class QueueFilter {
     logger.info('this.apiFilterWaitCount-- : %s', this.apiFilterWaitCount);
     logger.info('this.msgTotalOutCount=%s', this.msgTotalOutCount++);
     if (this.apiFilterWaitCount < this.apiFilterWaitCountLowLimit) {
-      logger.info('[AfterCallQueue]')
-      this.handlerQueue()
+      logger.info('[AfterCallQueue]');
+      this.handlerQueue();
     }
     next(err, msg);
   }

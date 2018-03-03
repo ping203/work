@@ -12,14 +12,14 @@ class pp{
 function test(age,name, other) {
     let p = new pp();
     let func = p['say'];
-    func.apply(this, Array.prototype.slice.call(arguments, 2))
+    func.apply(this, Array.prototype.slice.call(arguments, 2));
 }
 
 
 // test();
 
 
-const moment = require('moment')
+const moment = require('moment');
 
 
 function _genNow() {
@@ -37,7 +37,7 @@ event.on(100, function(value){
     let a = 100.01;
     let b = 23.32;
     console.log(100, value, 'a+b', a+b);
-})
+});
 
 setInterval(function(){
     event.emit(100, 'helllo');

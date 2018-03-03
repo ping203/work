@@ -1047,7 +1047,7 @@ function addSpecifyMail(mail_obj, player_list) {
             account.mail_box = account.mail_box;
             account.commit();
         });
-    })
+    });
 }
 
 /**
@@ -1245,7 +1245,7 @@ function setNeedInsert(uid) {
 function push(data) {
     redisAccountSync.setAccount(data.id, data, function (err, result) {
         if (err) {
-            logger.error('插入玩家数据失败')
+            logger.error('插入玩家数据失败');
         }
     });
 }
@@ -1281,7 +1281,7 @@ function getAccountById(id, cb) {
             }
         }
         utils.invokeCallback(cb, err, account);
-    })
+    });
 
 }
 
@@ -1290,7 +1290,7 @@ function getAccountFieldById(id, fields, cb) {
     fields = fields || ['platform'];
     redisAccountSync.getAccount(id, fields, function (err, account) {
         utils.invokeCallback(cb, err, account);
-    })
+    });
 }
 
 
@@ -1390,7 +1390,7 @@ function getActualCostTimes(uid, type, times, cb) {
 function updateActiveCharge(account, price) {
     const FUNC = TAG + "updateActiveCharge() --- ";
 
-    logger.info(FUNC + "id:", account.id)
+    logger.info(FUNC + "id:", account.id);
 
     if (account) {
         let new_charge = {

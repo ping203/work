@@ -479,7 +479,7 @@ class RankMatchRoom {
      * 比赛结束
      */
     _matchFinish() {
-        const FUNC = '\n_matchFinish() --- '
+        const FUNC = '\n_matchFinish() --- ';
         for (let player of this._playerMap.values()) {
             if (player.kindId == consts.ENTITY_TYPE.ROBOT) {
                 continue;

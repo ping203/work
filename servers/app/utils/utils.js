@@ -9,7 +9,7 @@ utils.timestamp = function timestamp() {
     var time = Date.parse(date); // 1970到现在过去的毫秒数
     time = time / 1000;
     return time;
-}
+};
 
 // 时间戳是秒，Date是毫秒
 utils.timestamp2date = function timestamp2date(time) {
@@ -17,14 +17,14 @@ utils.timestamp2date = function timestamp2date(time) {
     date.setTime(time * 1000); //
 
     return [date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()];
-}
+};
 
 // "2017-06-28 18:00:00"
 utils.date2timestamp = function date2timestamp(strtime) {
     var date = new Date(strtime.replace(/-/g, '/'));
     var time = Date.parse(date);
     return (time / 1000);
-}
+};
 
 // 今天00:00:00的时间戳
 utils.timestamp_today = function timestamp_today() {
@@ -36,36 +36,36 @@ utils.timestamp_today = function timestamp_today() {
     var time = Date.parse(date); // 1970到现在过去的毫秒数
     time = time / 1000;
     return time;
-}
+};
 
 utils.timestamp_yesterday = function timestamp_yesterday() {
     var time = utils.timestamp_today();
-    return (time - 24 * 60 * 60)
-}
+    return (time - 24 * 60 * 60);
+};
 
 utils.base64_encode = function base64_encode(content) {
     var buf = new Buffer(content);
     var base64 = buf.toString("base64");
 
     return base64;
-}
+};
 
 utils.base64_decode = function base64_decode(base64_str) {
     var buf = new Buffer(base64_str, "base64");
     return buf;
-}
+};
 
 utils.md5 = function md5(data) {
     var md5 = crypto.createHash("md5");
     md5.update(data);
     return md5.digest('hex');
-}
+};
 
 utils.sha1 = function sha1(data) {
     var sha1 = crypto.createHash("sha1");
     sha1.update(data);
     return sha1.digest('hex');
-}
+};
 
 // control variable of func "myPrint"
 var isPrintFlag = false;
@@ -341,5 +341,5 @@ Date.calcWeeksFromDays = function (day) {
 Date.getTimeFromTimestamp = function (timestamp) {
     let date = new Date(timestamp);
     return date.format("yyyy-MM-dd hh:mm:ss");
-}
+};
 

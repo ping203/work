@@ -34,7 +34,7 @@ exp.get = async function (data) {
         var params = _makeVar();
         _getUserList(req, function (rows) {
             params = _.extend(params, { user_list: rows });
-            resolve(logicResponse.askEjs('admin/pages-am-user', params))
+            resolve(logicResponse.askEjs('admin/pages-am-user', params));
         });
     });
 };

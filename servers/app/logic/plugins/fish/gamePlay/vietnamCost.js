@@ -5,7 +5,7 @@
 // ATTENTION：引用外部参数不可在该内中修改
 // //--]]
 
-const Cost = require('./cost')
+const Cost = require('./cost');
 const cacheReader = require('../../../../cache/cacheReader');
 const consts = require('../consts');
 const GAME_CFGS = require('../../../../utils/imports').GAME_CFGS;
@@ -57,7 +57,7 @@ class VietnamCost extends Cost {
         let basPCT = fishbasepct * fishCfg.mapct * weaponspct;
         
         let log = params.isReal && this.log || null;
-        log && log(TAG + '------------fish---start----------------------------1')
+        log && log(TAG + '------------fish---start----------------------------1');
         log && log(TAG + '--fishbasepct = ', fishbasepct);
         log && log(TAG + '--mapct = ', fishCfg.mapct, fireFlag);
 

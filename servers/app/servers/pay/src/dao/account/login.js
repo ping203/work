@@ -68,7 +68,7 @@ let _generateAccount = function (id, data, cb) {
         }], function (err, res) {
             cb && cb(err, [{ id: id, tempname: "fj_" + id }]);
         }
-        )
+        );
     }
 };
 
@@ -117,7 +117,7 @@ let _isCardValid = function (buyDate) {
         return offDate < 30;
     }
     return true;
-}
+};
 
 /**
  * 登录后相关数据操作

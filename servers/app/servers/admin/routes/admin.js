@@ -8,7 +8,7 @@ module.exports = (router) => {
 	function setRoute(route, menu, method) {
 		router.post(route, async (ctx) => {
 			await adminHandler(ctx, menu, method);
-		})
+		});
 	}
 
 	ObjUtil.routes(setRoute);

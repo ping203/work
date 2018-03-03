@@ -151,7 +151,7 @@ function incr(key, cb) {
         client.incr(key, function (err, res) {
             if (!handleErr(FUNC, err, cb)) return;
             cb && cb(null, res);
-        })
+        });
     }
 
 }
@@ -162,7 +162,7 @@ function hkeys(key, cb) {
         client.hkeys(key, function (err, res) {
             if (!handleErr(FUNC, err, cb)) return;
             cb && cb(null, res);
-        })
+        });
     }
 }
 

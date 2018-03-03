@@ -36,7 +36,7 @@ function getGoddessFromId(id, level) {
             return goddess;
         }
     }
-    return 
+    return; 
 }
 
 function _updateGoddess(pool, data, cb, account) {

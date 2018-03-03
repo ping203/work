@@ -497,7 +497,7 @@ function getInviteDailyReward(pool, dataObj, cb) {
         } else {
             cb(ERROR_OBJ.ACTIVE_DISSATISFY);
         }
-    })
+    });
 }
 
 /**
@@ -1073,7 +1073,7 @@ function _afterReward(pool, type, uid, invitor_social, share_id, cb) {
             break;
 
         case JOIN_TYPE.SHARE:
-            _updateTableSocialWithShare(pool, uid, invitor_social, share_id, SHARE_STATUS.GOTTEN, cb)
+            _updateTableSocialWithShare(pool, uid, invitor_social, share_id, SHARE_STATUS.GOTTEN, cb);
             break;
 
         case JOIN_TYPE.ENSHRINE:

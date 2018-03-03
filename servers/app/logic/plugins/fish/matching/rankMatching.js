@@ -216,8 +216,8 @@ class RankMatching {
                 } else {
                     resolve(serverId);
                 }
-            })
-        })
+            });
+        });
     }
 
     //加入比赛房间

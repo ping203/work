@@ -23,7 +23,7 @@ class DownloadRes {
                     }
                 });
                 res.on('end', function () {
-                    resolve(null, [bufCache, res.headers])
+                    resolve(null, [bufCache, res.headers]);
                 });
             });
 
@@ -66,4 +66,4 @@ class DownloadRes {
 
 }
 
-module.exports = new DownloadRes
+module.exports = new DownloadRes;

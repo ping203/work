@@ -496,12 +496,12 @@ function _getDayExtraReward(req, dataObj, cb) {
                     item_list: item
                 };
                 cb(null, ret);
-            })
+            });
         } else {
             cb("已经领取过了");
         }
 
-    })
+    });
 }
 
 function _checkGetDayReward(account, day, today, cb) {
@@ -1251,7 +1251,7 @@ function _onekeyReward(req, dataObj, cb) {
                 }
 
                 cb(err, objs);
-            })
+            });
 
         }
     }
@@ -1300,7 +1300,7 @@ function resetReward(req, token, redis_key, hash, account, cb) {
                                     return;
                                 }
                                 cb(null, ret);
-                            })
+                            });
                         });
 
                         for (let i = 0; i < item_list.length; i++) {
@@ -1350,7 +1350,7 @@ function resetReward(req, token, redis_key, hash, account, cb) {
                                 });
                             }
                         }
-                    })
+                    });
                 }
                 else {
                     // console.log("*****************3*******************");
@@ -1362,13 +1362,13 @@ function resetReward(req, token, redis_key, hash, account, cb) {
                         cb();
                     });
                 }
-            })
+            });
         }
         else {
             RedisUtil.expire(hash, uid, 5);
             cb();
         }
-    })
+    });
 }
 
 function getRewardInfo(account, redis_key, cb) {
@@ -1383,6 +1383,6 @@ function getRewardInfo(account, redis_key, cb) {
             res = JSON.parse(res);
         }
         cb(null, res);
-    })
+    });
 
 }

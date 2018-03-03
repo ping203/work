@@ -135,7 +135,7 @@ class SysCode{
         this.PLAYER_REWARD_NOT_EXIST ={
             code:362,
             desc:'玩家奖励信息不存在'
-        }
+        };
 
         this.PLAYER_REWARD_RECEIVED ={
             code:363,

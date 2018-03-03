@@ -9,7 +9,7 @@ module.exports = {
         return {
             data: data,
             type: type
-        }
+        };
     },
 
     askEjs: function (template, data) {
@@ -19,6 +19,6 @@ module.exports = {
                 template: template,
             },
             type: 1
-        }
+        };
     }
-}
+};

@@ -2,7 +2,7 @@ const logger = require('omelo-logger').getLogger(__filename);
 
 module.exports = function (opts) {
     return new Module(opts);
-}
+};
 
 module.exports.moduleId = 'matchInfo';
 

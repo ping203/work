@@ -62,8 +62,8 @@ async function get_day_extra_reward(data){
                 reject(err);
             }
             resolve(logicResponse.ask(result));
-        })
-    })
+        });
+    });
 }
 
 /**

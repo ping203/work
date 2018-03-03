@@ -74,7 +74,7 @@ function logBanUser(admin_uid, nickname, uid_list, comment) {
         else {
             logger.info(FUNC + "Redis设置成功, res:", res);
         }
-    })
+    });
 }
 
 function _removeRank(uids) {
@@ -174,7 +174,7 @@ function check(req, data, cb) {
 
     _checkDb(req, token, function (err, account) {
         cb(err, account);
-    })
+    });
 
 }
 

@@ -420,4 +420,4 @@ module.exports = (router) => {
         await httpHandler(ctx, admin_user, 'edit');
     });
 
-}
+};

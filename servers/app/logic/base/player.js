@@ -28,7 +28,7 @@ class Player extends Entity{
     }
 
     get activeTime(){
-        return this._activeTime
+        return this._activeTime;
     }
 
     updateActiveTime(){

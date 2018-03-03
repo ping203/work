@@ -198,7 +198,7 @@ function _vote(req, dataObj, cb) {
                 data.push(['sadd', redisKesy.SKIN_VOTE_UID, uid]);
                 RedisUtil.multi(data, function (err, res) {
                     cb(null, res);
-                })
+                });
             }
                 , function step3(result, cb) {
                 weapon_skin.vote = clientVote;
@@ -501,7 +501,7 @@ function _levelup(req, dataObj, cb) {
                 change = {pearl: account.pearl};
                 let change = ObjUtil.merge(change, change_m);
                 _handleReturn(change, cb);
-            })
+            });
         }
 
         function _handleReturn(change, cb) {

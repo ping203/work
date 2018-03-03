@@ -146,4 +146,4 @@ module.exports = {
     "GAIN_LOSS_LIMIT": "gain_loss_limit",
     "GAIN_LOSS_SNAPSHOT":"gain_loss_snapshot",
     "BP": "bp",
-}
+};

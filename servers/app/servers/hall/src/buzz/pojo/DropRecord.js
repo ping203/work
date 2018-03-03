@@ -167,12 +167,12 @@ function DropRecord(drop_key, time_idx, platform, limit_type, limit_count) {
 
     this.getCurrentValue = function() {
         return this.current_value;
-    }
+    };
 
     /**
      * 每次都向数据库查询一次并重置当前值
      */
     this.reset = function(current_value) {
         this.current_value = current_value;
-    }
+    };
 }

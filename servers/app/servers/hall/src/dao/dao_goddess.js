@@ -148,7 +148,7 @@ function _putWeekRewardData(pool, platform, start, stop, cb) {
         let paramEntitys = mysqlHelper.buildGeneralSqlParams(sqlTemplate, datas);
         mysqlHelper.execTrans(pool, paramEntitys, function (err, result) {
             cb&&cb(err, result);
-        })
+        });
 
     });
 }
@@ -158,10 +158,10 @@ function _putWeekRewardByPlatform(pool, platform, cb) {
             if(err){
                 console.log('发放周排行奖励失败 err:',err, '平台:', platform);
                 cb && cb(err);
-                return
+                return;
             }
             console.log('发放周排行奖励成功 err:',err, '平台:', platform);
             cb && cb(null);
-    })
+    });
 
 }

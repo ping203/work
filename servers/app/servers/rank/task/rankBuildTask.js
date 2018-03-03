@@ -155,7 +155,7 @@ class RankBuildTask extends Task {
                 }
                 // console.log('------_saveRankInfo ok')
                 resolve(result);
-            })
+            });
         });
         return promise;
     }

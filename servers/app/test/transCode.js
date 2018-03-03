@@ -22,7 +22,7 @@ class A {
     static sBaseField() {
         return [
             1,2,3
-        ]
+        ];
     }
 
     getBaseField () {

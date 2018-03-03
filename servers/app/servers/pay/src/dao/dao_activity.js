@@ -236,7 +236,7 @@ function getReward(pool, data, cb) {
                     _rewardEnd(pool, type, uid, quest_id, cb);
                 });
             }
-        })
+        });
     }
 }
 
@@ -268,7 +268,7 @@ function _didExchange(pool, reward, type, quest_id, account, cb) {
                 logger.info(FUNC + "skill:", account.skill);
                 try {
                     DaoReward.cost(pool, account, needitem, function (err_cost, results_cost) {
-                        addActiveGoldLog(pool, account, type, reward, needitem)
+                        addActiveGoldLog(pool, account, type, reward, needitem);
                         _rewardEnd(pool, type, uid, quest_id, cb);
                     });
                 }
@@ -739,8 +739,8 @@ function _multiFunc(cmds) {
                 return;
             }
             resolve(res);
-        })
-    })
+        });
+    });
 }
 
 /**

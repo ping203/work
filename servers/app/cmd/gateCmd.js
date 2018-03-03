@@ -5,7 +5,7 @@ const SysCmd = require('./sysCmd');
  */
 class GateCmd extends SysCmd{
     constructor(){
-        super()
+        super();
         this.initReq();
         this.initPush();
     }
@@ -31,7 +31,7 @@ class GateCmd extends SysCmd{
     }
 
     initPush(){
-        super.initPush()
+        super.initPush();
     }
 }
 

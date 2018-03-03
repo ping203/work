@@ -364,7 +364,7 @@ function _getFriendsCharts(req, data, cb) {
                 if (err) return cb && cb(err);
                 cb && cb(null, charts);
             });
-        })
+        });
     }
 }
 
@@ -385,7 +385,7 @@ function getInviteInfo(req, data, cb) {
         cb(null, {
             social_invite_week: account.social_invite_week,
             social_invite_month: account.social_invite_month
-        })
+        });
     });
 
     function lPrepare(input) {

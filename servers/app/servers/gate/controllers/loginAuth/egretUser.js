@@ -18,7 +18,7 @@ class EgretUser {
             openkey: data.openkey,
             appId: data.appId,
             pf: data.pf
-        }
+        };
 
         let uri = this._sdkConfig.uri.is_login;
         let sig = this._sig(filterData, uri);
@@ -61,7 +61,7 @@ class EgretUser {
             openkey: data.openkey,
             appId: data.appId,
             pf: data.pf
-        }
+        };
         let uri = this._sdkConfig.uri.get_info;
         let sig = this._sig(filterData, uri);
 
@@ -111,7 +111,7 @@ class EgretUser {
             openkey: data.openkey,
             appId: data.appId,
             pf: data.pf
-        }
+        };
 
         let uri = this._sdkConfig.uri.get_app_friends;
         let sig = this._sig(filterData, uri);
@@ -170,7 +170,7 @@ class EgretUser {
         params = encodeURIComponent(params);
 
         let signing_data = `GET&${uri}&${params}`;
-        let signed_key = this._sdkConfig.appSecret + '&'
+        let signed_key = this._sdkConfig.appSecret + '&';
         let signed_data = CryptoJS.HmacSHA1(signing_data, signed_key);
         return encodeURIComponent(this._base64(signed_data.toString()));
     }

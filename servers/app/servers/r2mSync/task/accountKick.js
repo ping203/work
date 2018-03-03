@@ -31,7 +31,7 @@ class AccountKick extends Task {
         let next_kick = kicked + this.taskConf.writeLimit;
         async.mapSeries(subUids, function (uid, cb) {
             redisAccountSync.getAccount(uid, function (err, account) {
-                cb(null, account)
+                cb(null, account);
             });
         }, function (err, accounts) {
             if (err) {

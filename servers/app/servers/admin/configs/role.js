@@ -24,4 +24,4 @@ module.exports =
 		auth : [100,201,301],    //--权限
 		sidebar : 'index.superadmin.ejs'
 	},
-}
+};

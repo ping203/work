@@ -6,56 +6,56 @@ class PhoneVerification {
             verifyCode: 1233,
             validTime: 6000000,
             timestamp: Date.now()
-        })
+        });
 
         this._codeMap.set('11111111112', {
             verifyCode: 1233,
             validTime: 6000000,
             timestamp: Date.now()
-        })
+        });
 
         this._codeMap.set('11111111113', {
             verifyCode: 1233,
             validTime: 6000000,
             timestamp: Date.now()
-        })
+        });
 
         this._codeMap.set('11111111114', {
             verifyCode: 1233,
             validTime: 6000000,
             timestamp: Date.now()
-        })
+        });
 
 
         this._codeMap.set('11111111115', {
             verifyCode: 1233,
             validTime: 6000000,
             timestamp: Date.now()
-        })
+        });
 
         this._codeMap.set('11111111116', {
             verifyCode: 1233,
             validTime: 6000000,
             timestamp: Date.now()
-        })
+        });
 
         this._codeMap.set('222222222222', {
             verifyCode: 1233,
             validTime: 6000000,
             timestamp: Date.now()
-        })
+        });
 
         this._codeMap.set('12222222223', {
             verifyCode: 1233,
             validTime: 6000000,
             timestamp: Date.now()
-        })
+        });
 
         this._codeMap.set('322222222222', {
             verifyCode: 1233,
             validTime: 6000000,
             timestamp: Date.now()
-        })
+        });
     }
 
     //获取手机验证码
@@ -64,7 +64,7 @@ class PhoneVerification {
         let code = this._codeMap.get(data.phone);
         return {
             validTime: code.validTime / 1000
-        }
+        };
     }
 
     async getPhoneCode(phone) {
@@ -83,13 +83,13 @@ class PhoneVerification {
             let code = self._codeMap.get(data.phone);
             if (!code || Date.now() - code.timestamp >= code.validTime) {
                 console.log('验证码过期');
-                reject(ERROR_OBJ.PHONE_CODE_EXPIRE.msg)
+                reject(ERROR_OBJ.PHONE_CODE_EXPIRE.msg);
             }
             
             console.log('--------checkPhoneCodeValid:', data);
             if (data.verifyCode != code.verifyCode) {
                 console.log('验证码不正确');
-                reject(ERROR_OBJ.PHONE_CODE_ERROR.msg)
+                reject(ERROR_OBJ.PHONE_CODE_ERROR.msg);
             }
 
             return resolve(null);

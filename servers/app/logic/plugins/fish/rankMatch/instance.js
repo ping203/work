@@ -16,7 +16,7 @@ class RankMatchInstance {
     getLoadStatistics() {
         return {
             roomCount: this._rankHall.roomCount
-        }
+        };
     }
 
     remoteRpc(method, data, cb) {

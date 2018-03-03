@@ -63,7 +63,7 @@ const CHEAT_P3 = 1.25; //金币作弊阈值
             recharge: 0,
             gold: 0,
             level: 1,
-        }
+        };
         this._regetDt = 0;
 
         let cmds = [];
@@ -104,7 +104,7 @@ const CHEAT_P3 = 1.25; //金币作弊阈值
                 this._cashTempData.recharge = parseInt(docs[1]) || 0;
                 this._cashTempData.gold = parseInt(docs[2]) || 0;
                 this._cashTempData.level = parseInt(docs[3]) || 1;
-                logger.debug('dd = ', this._cashTempData)
+                logger.debug('dd = ', this._cashTempData);
             }else{
                 logger.error('fishingLog:_regetCach failed.', err);
             }
@@ -382,7 +382,7 @@ const CHEAT_P3 = 1.25; //金币作弊阈值
         for (let field in logs) {
             let fds = logs[field];
             if (fds.isReadingRedis) {
-                logger.error('正在读取redis，请稍候')
+                logger.error('正在读取redis，请稍候');
                 continue;
             }
             let funcName = fds.funcName;

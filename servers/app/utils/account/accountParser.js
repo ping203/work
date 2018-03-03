@@ -11,7 +11,7 @@ class AccountParser {
         let serialVal = null;
         let typeInfo = accountConf.getFieldDef(key);
         if (!typeInfo) {
-            console.log('非法字段，请检查字段名是否正确', __filename, key)
+            console.log('非法字段，请检查字段名是否正确', __filename, key);
             return '';
         }
 
@@ -62,7 +62,7 @@ class AccountParser {
         let serialVal = null;
         let typeInfo = accountConf.getFieldDef(key);
         if (!typeInfo) {
-            console.log('解析redis数据失败，非法字段，请检查字段名是否正确', __filename, key)
+            console.log('解析redis数据失败，非法字段，请检查字段名是否正确', __filename, key);
             return null;
         }
 

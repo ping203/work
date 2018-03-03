@@ -43,7 +43,7 @@ class Connector {
                     resolve(true);
                 }
             }.bind(this));
-        }.bind(this))
+        }.bind(this));
     }
 
     stop() {
@@ -62,7 +62,7 @@ class Connector {
             sqlParams.push({
                 sql: sql,
                 params: datas[i]
-            })
+            });
         }
 
         return sqlParams;
@@ -101,7 +101,7 @@ class Connector {
                             } else {
                                 cb(null);
                             }
-                        })
+                        });
                     };
                     funcAry.push(temp);
                 });
@@ -127,9 +127,9 @@ class Connector {
                                 callback(null, info);
                                 return;
                             }
-                        })
+                        });
                     }
-                })
+                });
             });
         });
     }

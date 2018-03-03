@@ -560,7 +560,7 @@ function _unlock(req, dataObj, cb) {
         let goddess_list = account.goddess;
         let goddess_info = BuzzUtil.getGoddessById(goddess_id);
         if (!_checkUnlock1()) return;
-        let goddess = _getGoddessById(goddess_list, goddess_id)
+        let goddess = _getGoddessById(goddess_list, goddess_id);
         let goddess_unlock = goddess.unlock;
         let needitem = goddess_info.needitem[idx];
         let needitem_id = needitem[0];
@@ -602,7 +602,7 @@ function _unlock(req, dataObj, cb) {
                 account.commit();
                 cb(null, ret);
             }
-        })
+        });
 
         // 校验方法
         function _checkUnlock1() {
@@ -727,7 +727,7 @@ function _levelup(req, dataObj, cb) {
                 cb(null, ret);    
             });
             DEBUG = 0;
-        })
+        });
 
         // 校验方法
         function _checkLevelup1() {
@@ -801,7 +801,7 @@ function _weekReward(req, dataObj, cb) {
             };
             cb &&cb(null, ret);
         }
-    })
+    });
 
     return;
 

@@ -250,7 +250,7 @@ function getTokenByUid(uid, cb) {
             });
         }
 
-    })
+    });
 }
 
 function _queryAccount(pool, sql, sql_data, cb) {
@@ -271,7 +271,7 @@ function _queryAccount(pool, sql, sql_data, cb) {
             let account = results[0];
             cb(null, account);
         } else {
-            cb('账号未注册')
+            cb('账号未注册');
         }
     });
 }

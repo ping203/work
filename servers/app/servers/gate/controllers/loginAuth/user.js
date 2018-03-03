@@ -46,7 +46,7 @@ class User {
                                 } else {
                                     resolve(result.id);
                                 }
-                            })
+                            });
                         } else {
                             resolve(null);
                         }
@@ -128,10 +128,10 @@ class User {
         newAccount.city = data.city;
 
         if (data.saltPassword) {
-            newAccount.password = data.saltPassword
+            newAccount.password = data.saltPassword;
         }
         if (data.phone) {
-            newAccount.phone = data.phone
+            newAccount.phone = data.phone;
         }
 
         return new Promise(function (resolve, reject) {
@@ -149,7 +149,7 @@ class User {
                 account.nickname = account.nickname;
                 account.commit();
                 resolve(err, account.id);
-            })
+            });
 
         });
     };

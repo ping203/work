@@ -11,11 +11,11 @@ var allFields = [];
 var TAG = "【redisSync】";
 
 for (let key in account_def.AccountDef) {
-    allFields.push(key)
+    allFields.push(key);
 }
 
 for (let key in account_def.OtherDef) {
-    allFields.push(key)
+    allFields.push(key);
 }
 
 class RedisSync {
@@ -34,7 +34,7 @@ class RedisSync {
         let serialVal = null;
         let typeInfo = account_def.getField(key);
         if (!typeInfo) {
-            logger.error('parseValue,非法字段，请检查字段名是否正确', __filename, key)
+            logger.error('parseValue,非法字段，请检查字段名是否正确', __filename, key);
             return null;
         }
 
@@ -98,7 +98,7 @@ class RedisSync {
         let serialVal = null;
         let typeInfo = account_def.getField(key);
         if (!typeInfo) {
-            logger.error('buildValue,非法字段，请检查字段名是否正确', __filename, key)
+            logger.error('buildValue,非法字段，请检查字段名是否正确', __filename, key);
             return '';
         }
         switch (typeInfo.type) {
@@ -157,10 +157,10 @@ class RedisSync {
         let cmd = 'HSET';
         if (typeInfo.inc === true) {
             if (typeInfo.type == 'float') {
-                cmd = 'HINCRBYFLOAT'
+                cmd = 'HINCRBYFLOAT';
             }
             else {
-                cmd = 'HINCRBY'
+                cmd = 'HINCRBY';
             }
         }
         return cmd;
@@ -1408,7 +1408,7 @@ function setAccountById(id, data, cb) {
 
         fields.forEach(function (item) {
             for (let key in item) {
-                cmds.push(['hset', `pair:uid:${key}`, id, RedisSync.buildValue(key, item[key])])
+                cmds.push(['hset', `pair:uid:${key}`, id, RedisSync.buildValue(key, item[key])]);
             }
         });
 
@@ -1473,7 +1473,7 @@ function getAccountById(id, fields, cb) {
                 _fileds = fields;
             }
             _fileds.forEach(function (item) {
-                cmds.push(['hget', `pair:uid:${item}`, id])
+                cmds.push(['hget', `pair:uid:${item}`, id]);
             });
 
             RedisUtil.multi(cmds, function (err, docs) {
@@ -1521,13 +1521,13 @@ function getUIDs(cb) {
     //todo 不用hkeys这个方法
     RedisUtil.hkeys(`pair:uid:${account_def.AccountDef.platform.name}`, function (err, docs) {
         utils.invokeCallback(cb, err, docs);
-    })
+    });
 }
 
 function delAccount(uid, cb) {
     let cmds = [];
     allFields.forEach(function (item) {
-        cmds.push(['hdel', `pair:uid:${item}`, uid])
+        cmds.push(['hdel', `pair:uid:${item}`, uid]);
     });
 
     RedisUtil.multi(cmds, function (err, docs) {

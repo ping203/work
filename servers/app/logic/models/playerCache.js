@@ -7,7 +7,7 @@ class PlayerCache{
             if(err){
                 logger.error(err);
             }
-        })
+        });
     }
 
     static getData(uid, cb){
@@ -22,7 +22,7 @@ class PlayerCache{
             console.log(data);
             console.log(data.info);
             utils.invokeCallback(cb, null, data);
-        })
+        });
     }
 }
 

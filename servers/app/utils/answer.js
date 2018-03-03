@@ -20,7 +20,7 @@ function ResponseData(data,enc) {
 
 ResponseData.prototype.toString = function () {
     return JSON.stringify(this);
-}
+};
 
 function HttpResponse(data, aes, isError = false){
     let res = {};

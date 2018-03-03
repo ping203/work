@@ -186,7 +186,7 @@ class FishModel {
     }
 
     getActorData ( nameKey ){
-        return this._actorData[nameKey]
+        return this._actorData[nameKey];
     }
 
     getActorTotal ( ) {
@@ -256,7 +256,7 @@ class FishModel {
         this._tideDt = 0;//randomInt(this._sceneCfg.tide_circle);   //鱼潮时间检测: 第一个鱼潮时间起点随机
         this._isWarningEscapeNow = false; //鱼潮已经预警标记,即逃跑开始标记
         this._tideCfg = [];
-        this._curTideCfg = null
+        this._curTideCfg = null;
         this._guideFishes = {};
     }
 
@@ -447,7 +447,7 @@ class FishModel {
         this._rewardData[nameKey] = {
             floor: 1,
             goldVal: fish.goldVal
-        }
+        };
         return fish;
     }
 
@@ -498,7 +498,7 @@ class FishModel {
         delete this._rewardData[nameKey];
 
         this._setDead2History(nameKey, goldVal);
-        DEBUG && logger.error('roomId = ', this._roomId, ' del = nameKey = ', nameKey, this.getActorTotal())
+        DEBUG && logger.error('roomId = ', this._roomId, ' del = nameKey = ', nameKey, this.getActorTotal());
     }
 
     //标记已死亡的鱼 0无 >0 则为死亡时该鱼的分值
@@ -518,7 +518,7 @@ class FishModel {
     findDeadHistory (fishKey, isCleanNow) {
         let val = 0;
         if (this._deadHistory[fishKey]) {
-            val = this._deadHistory[fishKey].flag
+            val = this._deadHistory[fishKey].flag;
             isCleanNow && (delete this._deadHistory[fishKey]);
         }
         return val;
@@ -714,7 +714,7 @@ class FishModel {
         if (!waveName) {
             waveName = groupFishKey.replace('_json', '.json');
         }
-        let subFishKeys = {}
+        let subFishKeys = {};
         let data = _getPathCfg(waveName);
         let fishes = data.fishes;
         let pathName = this._selectPath(cfg, pName);
@@ -758,7 +758,7 @@ class FishModel {
         //鱼潮鱼阵音效配置
         this._newFishEvent(groupFish, FishModel.EventType.EVENT_NEW_GROUP_FISH);
         if (func) {
-            func(dt, subKeys)
+            func(dt, subKeys);
         }
 
         return groupFish;
@@ -832,7 +832,7 @@ class FishModel {
         let cfg = this._getFishCfg(fishKey);
         let fish = this._generateFishData(fishKey, cfg);
         //fish.attribute = clone(FishAttribute);
-        let pd = PATH_CFGS[pathKey]
+        let pd = PATH_CFGS[pathKey];
         let pName = pd && pd.name_list || pathKey;
         let pathData = _getPathCfg(pName);
         let dt = genDtBySpeed(pathData, cfg.move_speed);
@@ -889,7 +889,7 @@ class FishModel {
             value.push({
                 fk: fk,
                 gold: fish.goldVal
-            })
+            });
         }
         value.sort(function (a, b) {
             return a.gold > b.gold ? -1 : 1;

@@ -118,7 +118,7 @@ class Instance {
         let scene = this.scenes.get(data.sceneId);
         if (!scene) {
             scene = new Scene(data.sceneId);
-            let err = scene.start()
+            let err = scene.start();
             if (err) {
                 utils.invokeCallback(cb, err);
                 return;
@@ -132,7 +132,7 @@ class Instance {
                 let [err, roomId] = scene. joinGame(data.roomType, player);
                 if (err) {
                     utils.invokeCallback(cb, err);   
-                    return
+                    return;
                 }
                 this.uids.set(data.uid, scene);
                 utils.invokeCallback(cb, null, roomId);
@@ -150,14 +150,14 @@ class Instance {
      * @param {*} cb 
      */
     leaveScene(data, cb) {
-        let scene = this.scenes.get(data.sceneId)
+        let scene = this.scenes.get(data.sceneId);
         if (!scene) {
-            utils.invokeCallback(cb, null)
-            return
+            utils.invokeCallback(cb, null);
+            return;
         }
         scene.leaveGame(data.uid);
         this.uids.delete(data.uid);
-        utils.invokeCallback(cb, null)
+        utils.invokeCallback(cb, null);
     }
 
     /**
@@ -172,10 +172,10 @@ class Instance {
         }
         let scene = this.scenes.get(data.sceneId);
         if (!scene) {
-            utils.invokeCallback(cb, CONSTS.SYS_CODE.PALYER_GAME_ROOM_DISMISS)
-            return
+            utils.invokeCallback(cb, CONSTS.SYS_CODE.PALYER_GAME_ROOM_DISMISS);
+            return;
         }
-        let room = scene.getSceneRoom(data.uid)
+        let room = scene.getSceneRoom(data.uid);
         if (!!room && room.setPlayerState(data.uid, data.state, data.sid)) {
             utils.invokeCallback(cb, null, room.roomId);
         } else {
@@ -193,8 +193,8 @@ class Instance {
         logger.error('#########################333: rpc_match_start ');
         if (!scene) {
             logger.error('setPlayerState data - ', data);
-            utils.invokeCallback(cb, CONSTS.SYS_CODE.PALYER_GAME_ROOM_DISMISS)
-            return
+            utils.invokeCallback(cb, CONSTS.SYS_CODE.PALYER_GAME_ROOM_DISMISS);
+            return;
         }
 
         let room = scene.getSceneRoom(data.uid);
@@ -215,8 +215,8 @@ class Instance {
         logger.error('#########################333: rpc_match_finish ');
         if (!scene) {
             logger.error('setPlayerState data - ', data);
-            utils.invokeCallback(cb, CONSTS.SYS_CODE.PALYER_GAME_ROOM_DISMISS)
-            return
+            utils.invokeCallback(cb, CONSTS.SYS_CODE.PALYER_GAME_ROOM_DISMISS);
+            return;
         }
 
         let room = scene.getSceneRoom(data.uid);
@@ -236,8 +236,8 @@ class Instance {
         let scene = this.uids.get(data.uid);
         if (!scene) {
             logger.info('玩家不在游戏中', data.uid);
-            utils.invokeCallback(cb, CONSTS.SYS_CODE.PALYER_GAME_ROOM_DISMISS)
-            return
+            utils.invokeCallback(cb, CONSTS.SYS_CODE.PALYER_GAME_ROOM_DISMISS);
+            return;
         }
 
         let room = scene.getSceneRoom(data.uid);

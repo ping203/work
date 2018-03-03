@@ -24,7 +24,7 @@ class Pay {
         payApp.stop();
         redisClient.stop();
         mysqlClient.stop();
-        logger.info('支付服务关闭')
+        logger.info('支付服务关闭');
     }
 }
 

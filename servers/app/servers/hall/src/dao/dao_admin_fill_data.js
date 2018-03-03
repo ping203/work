@@ -142,7 +142,7 @@ function _getDayData(pool, data, cb) {
                             
                             cb(null, results);
                         });
-                    })
+                    });
                 });
             });
         });

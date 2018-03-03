@@ -1,4 +1,4 @@
-const Task = require('../../../utils/task/task')
+const Task = require('../../../utils/task/task');
 const async = require('async');
 const utils = require('../../../utils/utils');
 
@@ -16,10 +16,10 @@ class ActiveResetTask extends Task {
         utils.invokeCallback(cb, null);
     }
     _exeTask(cb) {
-        logger.info('活动重置开始')
+        logger.info('活动重置开始');
         let tasks = this.taskConf.subTask;
         async.mapSeries(tasks, this._build.bind(this), function (err, results) {
-            logger.info('活动重置完成')
+            logger.info('活动重置完成');
             utils.invokeCallback(cb, null);
         });
     }
@@ -53,7 +53,7 @@ function resetDB(myPool) {
     let cmds = [];
 
     field_def.forEach(function (item) {
-        cmds.push(['hkeys', `pair:uid:${item}`])
+        cmds.push(['hkeys', `pair:uid:${item}`]);
         // cmds.push(['hvals', `pair:uid:${item}`])
         // cmds.push(['hset', `pair:uid:${item}`, item, 1000])
     });

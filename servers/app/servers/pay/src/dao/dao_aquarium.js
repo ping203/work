@@ -97,7 +97,7 @@ function _didUpdateAquarium(pool, petfish_list, old_aquariun) {
 
     if (DEBUG) console.log(FUNC + "CALL...");
 
-    var temp_level = 0
+    var temp_level = 0;
     for (var idx in petfish_list) {
         temp_level += petfish_list[idx].level;
     }

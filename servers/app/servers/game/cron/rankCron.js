@@ -10,4 +10,4 @@ class Cron{
 
 module.exports = function (app) {
     return new Cron(app);
-}
+};

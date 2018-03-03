@@ -1,8 +1,8 @@
-const SysCode = require('../../../consts/sysCode')
+const SysCode = require('../../../consts/sysCode');
 
 class FishCode extends SysCode{
     constructor(){
-        super()
+        super();
         this.GOLD_NOT_ENOUTH = {
             code:'3000',
             desc:'金币不足'

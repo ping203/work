@@ -7,7 +7,7 @@ const ACCOUNTKEY = import_def.ACCOUNTKEY;
 const REDISKEY = import_def.REDISKEY;
 const GAMECFG = require('../../../../utils/imports').GAME_CFGS;
 const RewardModel = require('../../../../utils/account/RewardModel');
-const config = require('../config')
+const config = require('../config');
 
 class RankMatchPlayer extends Player {
     /**
@@ -406,7 +406,7 @@ class RankMatchPlayer extends Player {
                 skin: star.skin,
                 winPoint: star.rank,
                 score: star.score,
-            }
+            };
         }
         return null;
     }

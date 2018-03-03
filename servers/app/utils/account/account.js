@@ -50,9 +50,9 @@ class Account extends AccountCommit {
         let cmd = 'HSET';
         if (typeInfo.inc === true) {
             if (typeInfo.type == 'float') {
-                cmd = 'HINCRBYFLOAT'
+                cmd = 'HINCRBYFLOAT';
             } else {
-                cmd = 'HINCRBY'
+                cmd = 'HINCRBY';
             }
 
         }

@@ -30,7 +30,7 @@ class MatchingApp {
         taskPool.removeTask();
         redisClient.stop();
         mysqlClient.stop();
-        logger.info('REDIS数据同步服关闭')
+        logger.info('REDIS数据同步服关闭');
     }
 
     request(route, msg, session, cb) {

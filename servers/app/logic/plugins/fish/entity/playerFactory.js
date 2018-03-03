@@ -21,7 +21,7 @@ class PlayerFactory{
                 if(!account){
                     logger.error('2212312  account data.uid= ', data.uid, baseField);
                     reject(CONSTS.SYS_CODE.PLAYER_NOT_EXIST);
-                    return
+                    return;
                 }
 
                 //logger.error('account = ', account);
@@ -65,7 +65,7 @@ class PlayerFactory{
             break;
 
             default:
-            break
+            break;
         }
         return null;
     }

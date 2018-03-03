@@ -16,7 +16,7 @@ class CatchRevise extends EventEmitter {
         this._sql = {
             cash: 'SELECT SUM(cost) AS cash FROM tbl_change_log WHERE status=2 AND created_at > ?',
             recharge: 'SELECT SUM(money) AS recharge FROM tbl_order WHERE status=2 AND created_at > ?'
-        }
+        };
         this._catch_revise = 1; //全服捕获修正默认值
         this._base = 90000; //门槛
         this._cash_recharege_percet = 0.45; //提现比例系数
@@ -36,7 +36,7 @@ class CatchRevise extends EventEmitter {
             if (!this._timer) {
                 this._timer = setInterval(this.sync.bind(this), 10000);
             }
-        }.bind(this))
+        }.bind(this));
 
     }
 
@@ -48,7 +48,7 @@ class CatchRevise extends EventEmitter {
     }
 
     cash_recharege_percet(percet) {
-        logger.error('------------提现比例系数变化通知:', percet)
+        logger.error('------------提现比例系数变化通知:', percet);
         if (Number.isNaN(percet.value) || (percet.value > 1 || percet.value < 0)) {
             logger.error('收到异常提现比例系数', percet.value);
         } else {
@@ -104,9 +104,9 @@ class CatchRevise extends EventEmitter {
             // logger.info('------------cash:', cash)
             if(Number.isNaN(recharge) || Number.isNaN(cash)){
                 logger.error('充值或者提现参数异常:', recharge, cash);
-                return
+                return;
             }
-            logger.info('------------_cash_recharege_percet:', this._cash_recharege_percet)
+            logger.info('------------_cash_recharege_percet:', this._cash_recharege_percet);
 
             let revise_value = Math.min(Math.max(1 + this._cash_recharege_percet - cash / recharge, 0.7), 1); //信用额度
             if (Number.isNaN(revise_value)) {
@@ -120,7 +120,7 @@ class CatchRevise extends EventEmitter {
             logger.error('定时计算全服捕获修正系数异常', err);
         } finally {
             redisClient.cmd.set(redisKey.PLATFORM_DATA.PLATFORM_CATCH_REVISE, this._catch_revise);
-            logger.info('------------revise_value:', this._catch_revise)
+            logger.info('------------revise_value:', this._catch_revise);
             this.pub_value(redisKey.PLATFORM_DATA.PLATFORM_CATCH_REVISE, this._catch_revise);
         }
     }

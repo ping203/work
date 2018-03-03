@@ -203,8 +203,8 @@ function multiFunc(cmds) {
                 return;
             }
             resolve(res);
-        })
-    })
+        });
+    });
 }
 
 function getMission(req, dataObj, cb) {

@@ -437,7 +437,7 @@ function getInviteDailyReward(pool, dataObj, cb) {
         } else {
             cb(ERROR_OBJ.ACTIVE_DISSATISFY);
         }
-    })
+    });
 }
 
 /**

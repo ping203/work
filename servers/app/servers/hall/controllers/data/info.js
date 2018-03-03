@@ -21,7 +21,7 @@ const logicResponse = require('../../../common/logicResponse');
 // 配置表
 //------------------------------------------------------------------------------
 var api_map = require('../api_map');
-const ERROR_OBJ = require('../../../../consts/error').ERROR_OBJ
+const ERROR_OBJ = require('../../../../consts/error').ERROR_OBJ;
 
 
 //==============================================================================

@@ -1,4 +1,4 @@
-const Task = require('../../../utils/task/task')
+const Task = require('../../../utils/task/task');
 const REDISKEY = require('../../../database/consts').REDISKEY;
 const redisAccountSync = require('../../../utils/redisAccountSync');
 const redisClient = require('../../../utils/database').redisClient;
@@ -46,10 +46,10 @@ class DailyTask extends Task {
                             }
                             redisClient.cmd.multi(sub_cmds).exec(cb);
                         }
-                    })
+                    });
                 }
                 else if (REDISKEY.GODDESS_CROSSOVER == task.redisKey) {
-                    redisClient.cmd.multi(cmds).exec(cb)
+                    redisClient.cmd.multi(cmds).exec(cb);
                 }
             }], function (err, result) {
                 next();
@@ -75,10 +75,10 @@ class DailyTask extends Task {
     }
 
     _exeTask(cb) {
-        logger.info('按天任务重置开始')
+        logger.info('按天任务重置开始');
         let tasks = this.taskConf.subTask;
         async.mapSeries(tasks, this._reset.bind(this), function (err, results) {
-            logger.info('按天任务重置完成')
+            logger.info('按天任务重置完成');
             utils.invokeCallback(cb, null);
         });
     }

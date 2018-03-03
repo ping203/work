@@ -25,7 +25,7 @@ function packMsg(data, enc) {
     }
     // console.log(msg.data.length);
     // console.timeEnd('packMsg');
-    return msg
+    return msg;
 }
 
 module.exports = packMsg;

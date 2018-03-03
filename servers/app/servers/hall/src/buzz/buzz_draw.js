@@ -61,8 +61,8 @@ function getDrawCurrent(account, cb) {
     let ret = {
         free_draw: account.free_draw,
         total_draw: account.total_draw
-    }
-    _utils.invokeCallback(cb, null, ret)
+    };
+    _utils.invokeCallback(cb, null, ret);
 }
 
 /**

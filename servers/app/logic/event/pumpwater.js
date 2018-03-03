@@ -38,7 +38,7 @@ class Pumpwater extends EventEmitter {
             pumpWater: this._pumpWater,
             start_time: this.period_start_time,
             duration: this.period_duration
-        }
+        };
 
         logger.error('------------------pumpWater', perioid_info);
 

@@ -10,7 +10,7 @@ class HttpAesFilter {
         let body = ctx.request.body;
         if (body && body.data) {
             logger.error('body:', body);
-            let data = body.data//decodeURIComponent(body.data);
+            let data = body.data;//decodeURIComponent(body.data);
             if (body.aes == 'false' || !body.aes) {
 
             }

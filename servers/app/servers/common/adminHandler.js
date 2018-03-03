@@ -44,4 +44,4 @@ module.exports = async function handler(ctx, target, method) {
         logger.error(`处理http请求${ctx.request.url}发生异常`, err);
         ctx.body = answer.httpResponse(err, ctx.request.body.aes, true);
     }
-}
+};

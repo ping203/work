@@ -43,7 +43,7 @@ class AiData {
         sql += "COALESCE(COUNT(`nuclear_exploded1`), 0) AS game_count, ";
         sql += "rank1 AS rank ";
         sql += "FROM `tbl_rankgame_log` ";
-        sql += "WHERE `player2`<0 "
+        sql += "WHERE `player2`<0 ";
         sql += "GROUP BY rank1";
 
         mysqlConnector.query(sql, function (err, results) {

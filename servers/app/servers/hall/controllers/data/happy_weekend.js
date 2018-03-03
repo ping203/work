@@ -211,7 +211,7 @@ class HappyWeekend {
                                 item_list.push({
                                     item_id: tt[0],
                                     item_num: tt[1],
-                                })
+                                });
                             }
                             BuzzUtil.putIntoPack(req, account, item_list, function (reward_info) {
                                 let change = BuzzUtil.getChange(account, reward_info);

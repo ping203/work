@@ -194,4 +194,4 @@ module.exports = (router) => {
     }).post('/pages-am-backdoor.html', async (ctx) => {
         await httpHandler(ctx, pages_am_backdoor, 'post');
     });
-}
+};

@@ -13,4 +13,4 @@ for(let k of Object.keys(remote)){
 
 module.exports = function (app) {
     return new PlayerRemote(app);
-}
+};

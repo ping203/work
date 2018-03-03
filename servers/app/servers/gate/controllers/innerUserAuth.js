@@ -86,7 +86,7 @@ class InnerUserAuth {
         }
 
         try {
-            await sdkApi.bindPhone(data)
+            await sdkApi.bindPhone(data);
         } catch (err) {
             logger.error('用户手机号绑定失败', err);
             throw ERROR_OBJ.OLD_PASSWORD_ERROR;

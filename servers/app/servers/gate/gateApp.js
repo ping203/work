@@ -35,7 +35,7 @@ class GateApp {
                 utils.invokeCallback(cb, null, answer.respNoData(err));
                 return;
             }
-            utils.invokeCallback(cb, null, serverInfo)
+            utils.invokeCallback(cb, null, serverInfo);
         });
     }
 }

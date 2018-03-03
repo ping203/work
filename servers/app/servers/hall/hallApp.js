@@ -40,7 +40,7 @@ class HallApp {
     stop() {
         redisClient.stop();
         mysqlClient.stop();
-        logger.info('大厅服务关闭')
+        logger.info('大厅服务关闭');
     }
 
     _loadInitData() {

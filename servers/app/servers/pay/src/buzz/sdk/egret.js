@@ -139,7 +139,7 @@ function callHttp(data, cb) {
 
         res.on("end", function(){
             console.log(FUNC + "html:\n", html);
-            cb(null, html)
+            cb(null, html);
         });
     }).on('error', function(e) {
         console.log(FUNC + "Got error: " + e.message);

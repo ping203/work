@@ -57,7 +57,7 @@ class Util {
                     resolve(count);
                 }
             });
-        })
+        });
     };
 };
 
@@ -116,7 +116,7 @@ function _setAccount(id, data, cb) {
     fields.forEach(function (item) {
         for (let key in item) {
             fieldKeys.push(key);
-            cmds.push([Account.getCmd(key), REDISKEY.getKey(key), id, accountParser.serializeValue(key, item[key])])
+            cmds.push([Account.getCmd(key), REDISKEY.getKey(key), id, accountParser.serializeValue(key, item[key])]);
         }
     });
 
@@ -142,7 +142,7 @@ function _setAccountAsync(id, data) {
             } else {
                 resolve(result);
             }
-        })
+        });
     });
 }
 
@@ -185,7 +185,7 @@ function _getAccount(uid, fields, cb) {
             }
 
             _fileds.forEach(function (item) {
-                cmds.push(['hget', REDISKEY.getKey(item), uid])
+                cmds.push(['hget', REDISKEY.getKey(item), uid]);
             });
 
             redisConnector.cmd.multi(cmds).exec(function (err, docs) {
@@ -227,7 +227,7 @@ function _getAccountAsync(uid, fields) {
             } else {
                 resolve(account);
             }
-        })
+        });
     });
 }
 
@@ -278,7 +278,7 @@ function _getSetValueLimit(redisKey, skip, limit, op, finish) {
 function _remSetValues(redisKey, members, cb) {
     let cmds = [];
     members.forEach(function (member) {
-        cmds.push(['srem', redisKey, member.uid])
+        cmds.push(['srem', redisKey, member.uid]);
     });
 
     let promise = new Promise(function (resolve, reject) {
@@ -307,7 +307,7 @@ function _delAccount(uids, cb) {
     let cmds = [];
     uids.forEach(function (uid) {
         accountConf.cacheFields.forEach(function (item) {
-            cmds.push(['hdel', REDISKEY.getKey(item), uid])
+            cmds.push(['hdel', REDISKEY.getKey(item), uid]);
         });
     });
 

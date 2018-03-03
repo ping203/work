@@ -3,14 +3,14 @@ const crypto = require('crypto');
 const util = require('util');
 
 
-const PARTNER_CODE = "xbom1"
+const PARTNER_CODE = "xbom1";
 const SERVICE_CODE = "cardtelco";
 const PARTNER_KEY = "8a7e933170658b3e369fb61d104d5303";
 const SERVICE_URL = "http://27.118.16.46:1581/VPGService.asmx?wsdl";
 
 const PAY_COMMAND_CODE = {
     USECARD: 'usecard',
-}
+};
 
 const ERROR = {
     SUCCESS: {
@@ -65,7 +65,7 @@ const ERROR = {
         code: -49,
         desc: '账号充值被锁定'
     },
-}
+};
 
 class PayCard {
     constructor(cardCode, cardSerial, cardType, accountName, appCode, refCode) {
@@ -134,7 +134,7 @@ class UCLoudPayCard {
             commandCode: PAY_COMMAND_CODE.USECARD,
             requestContent: data.toString(),
             signature: signature
-        }
+        };
         return req_ata;
     }
 

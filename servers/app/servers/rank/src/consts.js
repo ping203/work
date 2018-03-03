@@ -1,4 +1,4 @@
-const GAME_CFGS = require('../../../utils/imports').GAME_CFGS
+const GAME_CFGS = require('../../../utils/imports').GAME_CFGS;
 const rank_ranklist_cfg = GAME_CFGS.rank_ranklist_cfg;
 const rank_rankgame_cfg = GAME_CFGS.rank_rankgame_cfg;
 const goddess_rankreward_cfg = GAME_CFGS.goddess_rankreward_cfg;
@@ -21,7 +21,7 @@ rank_ranklist_cfg.forEach(function (item) {
     rank_award_config[item.type].push({
         interval: item.interval,    //--排名区间
         reward: item.reward,    //--奖励
-    })
+    });
 
 });
 
@@ -36,7 +36,7 @@ goddess_rankreward_cfg.forEach(function (item) {
         interval: item.interval,    //--排名区间
         reward: item.weekreward,    //--奖励
         limit: item.limit,    //--波数限制
-    })
+    });
 });
 
 let rank_monthaward_config = {};
@@ -47,7 +47,7 @@ rank_rankgame_cfg.forEach(function (item) {
     rank_monthaward_config[RANK_TYPE.MATCH].push({
         rank: item.id,    //--排名区间
         reward: item.seasonreward,    //--奖励
-    })
+    });
 });
 
 //----------------------------------------------------------------------

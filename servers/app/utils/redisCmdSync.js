@@ -10,8 +10,8 @@ exports.zremrangebyrank = (key, start, stop) => {
                 resolve(result);
             }
         });
-    })
-}
+    });
+};
 
 exports.zcard = (key) => {
     return new Promise(function (resolve, reject) {
@@ -23,5 +23,5 @@ exports.zcard = (key) => {
                 resolve(result);
             }
         });
-    })
-}
+    });
+};

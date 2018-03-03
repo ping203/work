@@ -754,7 +754,7 @@ function _updateCardData(pool, data, account, cfg_list, cb) {
     }
     else {
         // TODO: 不支持的月卡类型，错误提示
-        let err_msg = '[ERROR] dao_shop._updateCardData(): 不支持的月卡类型'
+        let err_msg = '[ERROR] dao_shop._updateCardData(): 不支持的月卡类型';
         logger.error(err_msg);
         cb(err_msg);
     }

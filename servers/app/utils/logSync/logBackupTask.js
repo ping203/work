@@ -44,8 +44,8 @@ class LogBackupTask extends Task{
                         console.log('--------task.end_id:', result[0].id);
                         task.end_id = result[0].id;
                         utils.invokeCallback(cb, null, needBak);
-                    })
-                })
+                    });
+                });
 
             }
         });
@@ -64,7 +64,7 @@ class LogBackupTask extends Task{
                 return;
             }
             utils.invokeCallback(cb, null, result % task.max_bak_file);
-        })
+        });
 
     }
 
@@ -102,8 +102,8 @@ class LogBackupTask extends Task{
             }
             mysqlConnector.query(`TRUNCATE ${tname}`, function (err, result) {
                 console.log('-----_exportBakData truncate result:', result);
-                utils.invokeCallback(cb, null, tname)
-            })
+                utils.invokeCallback(cb, null, tname);
+            });
         });
     }
 
@@ -121,14 +121,14 @@ class LogBackupTask extends Task{
         let sql = `INSERT INTO ${tname} SELECT * FROM ${task.table} WHERE id >= ${task.begin_id} AND id <= ${task.end_id} LIMIT ${skip}, ${limit}`;
         mysqlConnector.query(sql, function (err, result) {
             if(err){
-                console.log('-------------------_moveData', err)
+                console.log('-------------------_moveData', err);
                 utils.invokeCallback(cb, err);
             }
 
-            console.log('-------------------_moveData', result.affectedRows)
+            console.log('-------------------_moveData', result.affectedRows);
             let affectedRows = !!result && result.affectedRows ? result.affectedRows:0;
-            utils.invokeCallback(cb, err, skip, affectedRows, cb)
-        })
+            utils.invokeCallback(cb, err, skip, affectedRows, cb);
+        });
     }
 
     /**
@@ -168,10 +168,10 @@ class LogBackupTask extends Task{
                 }
                 self._getBakIndex(task, cb);
             },function (index, cb) {
-                self._createBakTable(task, index, cb)
+                self._createBakTable(task, index, cb);
             },function(tname,cb)
             {
-                self._exportBakData(tname, cb)
+                self._exportBakData(tname, cb);
             },function (tname, cb) {
                 self._backupData(task, tname, cb);
             }], function (err) {

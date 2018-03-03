@@ -34,7 +34,7 @@ exports.verifyTokenTrue = function (req, res, next) {
             next();
         }
     });
-}
+};
 
 // 需要验证token错误时调用
 exports.verifyTokenFalse = function verifyToken(req, res, next) {
@@ -61,4 +61,4 @@ exports.verifyTokenFalse = function verifyToken(req, res, next) {
             res.redirect('/sdk4sp/index.html');
         }
     });
-}
+};

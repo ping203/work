@@ -75,7 +75,7 @@ function Propose(mid, uid, text) {
             like_count: this.like_count,
             success: like_success,
         };
-    }
+    };
 }
 
 /**

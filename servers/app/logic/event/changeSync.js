@@ -30,7 +30,7 @@ class ChangeSync extends EventEmitter{
     }
 
     cash_recharege_percet(percet) {
-        logger.debug('------------????????????:', percet)
+        logger.debug('------------????????????:', percet);
        if (Number.isNaN(percet.value) || (percet.value > 1 || percet.value < 0)) {
            logger.warn('????????????', percet.value);
        } else {

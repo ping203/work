@@ -35,7 +35,7 @@ exp.get = async function (data) {
         var params = _makeVar();
         _getAuthList(function (rows) {
             params = _.extend(params, { auth_list: rows });
-            resolve(logicResponse.askEjs('admin/pages-am-auth', params))
+            resolve(logicResponse.askEjs('admin/pages-am-auth', params));
         });
     });
 };

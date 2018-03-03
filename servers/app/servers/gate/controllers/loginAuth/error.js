@@ -7,4 +7,4 @@ module.exports = {
         code:-2,
         desc:'token无效'
     },
-}
+};

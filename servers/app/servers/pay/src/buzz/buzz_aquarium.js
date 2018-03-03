@@ -562,7 +562,7 @@ function _getCost(level) {
             return {
                 chip: petup.chip,
                 gold: petup.needgold,
-            }
+            };
         }
     }
     throw new Error("没有查找到对应的宠物鱼等级");

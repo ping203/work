@@ -10,7 +10,7 @@ class GateHandler extends Handler{
     request(route, msg, session, next) {
         gateApp.request(route, msg, session, (err, result)=>{
             super.response(err, result, next);
-        })
+        });
     }
 }
 

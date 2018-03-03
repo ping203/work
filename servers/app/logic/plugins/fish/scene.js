@@ -1,10 +1,10 @@
 const GAMECFG = require('../../../utils/imports').GAME_CFGS;
-const omelo = require('omelo')
+const omelo = require('omelo');
 const FishCode = require('./fishCode');
 const Room = require('./room');
 const GoddessRoom = require('./goddess/goddessRoom');
 
-const consts = require('./consts')
+const consts = require('./consts');
 const fishCmd = require('../../../cmd/fishCmd');
 const event = require('../../base/event');
 
@@ -14,7 +14,7 @@ class Scene {
     constructor(sceneId) {
         this.app = omelo.app;
         this.sceneId = sceneId;
-        this._config = null
+        this._config = null;
         this.entities = new Map();
         this.roomMap = new Map();
         this.roomId_incr = 1;
@@ -29,7 +29,7 @@ class Scene {
         this._config = GAMECFG.scene_scenes_cfg[this.sceneId];
 
         if (!this._config) {
-            return FishCode.NOT_SUPPORT_SCENETYPE
+            return FishCode.NOT_SUPPORT_SCENETYPE;
         }
     }
 
@@ -68,7 +68,7 @@ class Scene {
                 this.roomMap.delete(room.roomId);
             }
         }
-        this.entities.delete(uid)
+        this.entities.delete(uid);
 
         return data;
     }
@@ -96,16 +96,16 @@ class Scene {
     }
 
     _getRoom(uid) {
-        let roomId = this.entities.get(uid)
+        let roomId = this.entities.get(uid);
         if (!roomId) {
-            return
+            return;
         }
 
         return this.roomMap.get(roomId);
     }
 
     _getPlayer(uid) {
-        let roomId = this.entities.get(uid)
+        let roomId = this.entities.get(uid);
         if (!roomId) {
             return null;
         }
@@ -153,7 +153,7 @@ class Scene {
                 break;
             default:
             err = FishCode.NOT_SUPPORT_ROOMMODE;
-                break
+                break;
         }
         return [err, !!room ? room.roomId : null];
     }

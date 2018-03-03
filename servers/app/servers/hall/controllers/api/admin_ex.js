@@ -13,7 +13,7 @@ exp.getOnlineStatus = async function(data) {
             resolve(logicResponse.ask(rows));
         });
     });
-}
+};
 
 exp.getRealtimeData = async function(data) {
     return new Promise(function(resolve, reject){
@@ -25,7 +25,7 @@ exp.getRealtimeData = async function(data) {
             resolve(logicResponse.ask(rows));
         });
     });
-}
+};
 
 exp.getRegisterData = async function(data) {
     return new Promise(function(resolve, reject){
@@ -37,7 +37,7 @@ exp.getRegisterData = async function(data) {
             resolve(logicResponse.ask(rows));
         });
     });
-}
+};
 
 exp.getActiveData = async function(data) {
     return new Promise(function(resolve, reject){
@@ -49,7 +49,7 @@ exp.getActiveData = async function(data) {
             resolve(logicResponse.ask(rows));
         });
     });
-}
+};
 
 exp.getDailyStatistics = async function(data) {
     return new Promise(function(resolve, reject){
@@ -61,4 +61,4 @@ exp.getDailyStatistics = async function(data) {
             resolve(logicResponse.ask(rows));
         });
     });
-}
+};

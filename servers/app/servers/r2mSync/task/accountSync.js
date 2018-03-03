@@ -31,7 +31,7 @@ class AccountSync extends Task {
         // console.log('-------------subUids', subSyncDatas.length);
         async.mapSeries(subSyncDatas, function (syncData, cb) {
             redisAccountSync.getAccount(syncData.uid, syncData.fields, function (err, account) {
-                cb(err, account)
+                cb(err, account);
             });
         }, function (err, accounts) {
             if (err) {

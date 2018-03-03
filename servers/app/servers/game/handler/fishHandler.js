@@ -10,7 +10,7 @@ class FishHandler extends Handler{
     request(route, msg, session, next) {
         gameApp.request(route, msg, session, (err, result)=>{
             super.response(err, result, next);
-        })
+        });
     }
 }
 

@@ -108,7 +108,7 @@ class RobotPlayer extends Player {
         if (this._robotLastFire >= B_MAX) {
             this._robotLastFire = 0;
         }
-        let tk = ''
+        let tk = '';
         for (; i < B_MAX; i++) {
             let nameKey = name + "_" + i;
             skillId && (nameKey += '_' + skillId);

@@ -47,7 +47,7 @@ function insertMsg(uid, text) {
                 return;
             }
             resole(rows.insertId);
-        })
+        });
     });
 }
 
@@ -93,7 +93,7 @@ function loadAll() {
                 return;
             }
             resole(res);
-        })
+        });
     });
 }
 

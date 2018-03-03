@@ -54,6 +54,6 @@ function hgetFromRedis(key, id) {
                 return;
             }
             resolve(res);
-        })
-    })
+        });
+    });
 }

@@ -4,7 +4,7 @@
         "camel_case": 0, //0 - turn rule off,1 - rule generates warnings
         // "comma-dangle": 2,
         "quotes": 0,
-        // "semi": [2, "always"], //语句强制分号结尾
+        "semi": [2, "always"], //语句强制分号结尾
         "semi-spacing": [0, {
             "before": false,
             "after": true

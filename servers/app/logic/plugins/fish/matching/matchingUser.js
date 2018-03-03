@@ -31,7 +31,7 @@ class MatchingUser {
 
     //浮动战力范围
     _calcFloatSword() {
-        this._float_sword = 100 + this.account.match_points * Math.min((Date.now() - this._sigupTime) / 1000 / 120, 0.5)
+        this._float_sword = 100 + this.account.match_points * Math.min((Date.now() - this._sigupTime) / 1000 / 120, 0.5);
     }
 
     //匹配条件
@@ -93,7 +93,7 @@ class MatchingUser {
                 }
                 if (!account) {
                     reject(CONSTS.SYS_CODE.PLAYER_NOT_EXIST);
-                    return
+                    return;
                 }
                 let user = new MatchingUser({
                     ext: data,

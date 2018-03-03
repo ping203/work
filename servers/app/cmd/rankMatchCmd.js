@@ -87,7 +87,7 @@ class RankMatchCmd extends SysCmd {
                     point: 1212,
                 },
             }
-        }
+        };
 
         //取消核弹
         this._push.cancelNbomb = {
@@ -96,7 +96,7 @@ class RankMatchCmd extends SysCmd {
                 uid:10001,
                 roomId: '100202',
             }
-        }
+        };
 
         /**
          * pk结算
@@ -133,7 +133,7 @@ class RankMatchCmd extends SysCmd {
             route:'rpc_join',
             data:[] //玩家基础信息
 
-        }
+        };
 
         //发送准备状态
         this._rpc.ready = {
@@ -143,14 +143,14 @@ class RankMatchCmd extends SysCmd {
                 roomId: '100202',
                 gameSid:'game-server-1' //游戏服务ID
             }
-        }
+        };
 
         this._rpc.query_playerInfo = {
             route:'rpc_query_playerInfo',
             data:{
                 roomId: '100202'
             }
-        }
+        };
 
         //武器皮肤切换
         this._rpc.weaponChange = {
@@ -159,7 +159,7 @@ class RankMatchCmd extends SysCmd {
                 uid: 1001,
                 wp_skin: 1,
             }
-        }
+        };
 
         //普通开炮信息
         this._rpc.fightInfo = {
@@ -180,7 +180,7 @@ class RankMatchCmd extends SysCmd {
                     },
                 } //最近打死鱼信息
             }
-        }
+        };
 
         //使用核弹
         this._rpc.useNbomb = {
@@ -194,7 +194,7 @@ class RankMatchCmd extends SysCmd {
                     point: 1212,
                 },
             }
-        }
+        };
 
         //取消核弹
         this._rpc.cancelNbomb = {
@@ -203,7 +203,7 @@ class RankMatchCmd extends SysCmd {
                 uid:10001,
                 roomId: '100202',
             }
-        }
+        };
 
         //取消核弹
         this._rpc.cancelNbomb = {
@@ -212,7 +212,7 @@ class RankMatchCmd extends SysCmd {
                 uid:10001,
                 roomId: '100202',
             }
-        }
+        };
 
         //排位赛聊天
         this._rpc.rmatchChat = {
@@ -224,7 +224,7 @@ class RankMatchCmd extends SysCmd {
                 data: null, //对应类型的自定义内容,
                 matchFlag: 0, //0战斗同房间广播, 非0只在具体比赛选择中广播
             }
-        }
+        };
         
     }
 }

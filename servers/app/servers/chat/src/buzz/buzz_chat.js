@@ -110,7 +110,7 @@ function getPrivateMessage(dataObj, cb) {
         }
         // logger.info(FUNC + "result:", result);
         cb(null, result);
-    })
+    });
 }
 
 

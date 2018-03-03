@@ -155,7 +155,7 @@ function _getAdReward(req, data, cb) {
                 item_list: item_list,
                 change: change,
                 adv_reward_times: advRewardTimes,
-            }
+            };
             cb(null, ret);
             RedisUtil.hset(redisKeys.ADV_REWARD_TIMES, uid, JSON.stringify(advRewardTimes));
         });
@@ -291,7 +291,7 @@ function getAdvGift(req, data, cb) {
 
             });
         }
-    })
+    });
 }
 
 

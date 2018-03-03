@@ -98,7 +98,7 @@ function checkAccount(pool, token, cb) {
                 utils.invokeCallback(cb, err, null);
             }
             else if(!checkTest(account.test, account.token, account.id) || !checkToken(account.token, token)){
-                utils.invokeCallback(cb, '账号被锁')
+                utils.invokeCallback(cb, '账号被锁');
             }
             else{
                 utils.invokeCallback(cb,null, account);

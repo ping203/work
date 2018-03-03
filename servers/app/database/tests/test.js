@@ -15,7 +15,7 @@ for(let i = 0; i< data.length; i++){
 
 fs.appendFileSync('test_ids_4.json', JSON.stringify(ids));
 
-console.log('写入完成')
+console.log('写入完成');
 
 // const moment = require('moment')
 //

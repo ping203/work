@@ -80,7 +80,7 @@ class MysqlLogInsert {
                     field = `'${field}'`;
                 }
                 row += field;
-                row += ','
+                row += ',';
             }
             values += `(${row.slice(0,-1)}),`;
         }

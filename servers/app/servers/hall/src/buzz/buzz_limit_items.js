@@ -297,7 +297,7 @@ function clearLimitItem (uid, itemId, gotAt, clearCount, doneFunc) {
                         logger.info("----剔除done!");
                     }
                     doneFunc && doneFunc();
-                })
+                });
             }else{
                 RedisUtil.hdel(pk, uid, function (err, ret) {
                     if (err) {

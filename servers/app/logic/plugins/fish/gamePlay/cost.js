@@ -99,7 +99,7 @@ class Cost {
         }
         let starExp = params.starExp;
         if (starExp > 0) {
-            userExp *= (1 + starExp)
+            userExp *= (1 + starExp);
         }
         return userExp;
 
@@ -302,7 +302,7 @@ class Cost {
         floor = Math.max(0, floor);
         let data = {
             floor: floor,
-        }
+        };
         return data;
     }
 
@@ -352,7 +352,7 @@ class Cost {
         let basPCT = fishbasepct * fishCfg.mapct * weaponspct;
         
         let log = params.isReal && this.log || null;
-        log && log(TAG + '------------fish---start----------------------------1')
+        log && log(TAG + '------------fish---start----------------------------1');
         log && log(TAG + '--fishbasepct = ', fishbasepct);
         log && log(TAG + '--mapct = ', fishCfg.mapct, fireFlag);
 
@@ -701,7 +701,7 @@ class Cost {
         } else {
             notEnough = 2;
         }
-        return notEnough
+        return notEnough;
     }
 
     skillCostWithMoney (account, cost) {
@@ -739,7 +739,7 @@ class Cost {
             ret.skillC = ownC;
         }
         ret.notEnough = notEnough;
-        return ret
+        return ret;
     }
 
     /**
@@ -755,7 +755,7 @@ class Cost {
         ret.costGold = costVal;
         ret.skillC = ownC;
         ret.notEnough = notEnough;
-        return ret
+        return ret;
     }
 
     /**

@@ -10,7 +10,7 @@ class MatchingHandler extends Handler {
     request(route, msg, session, next) {
         matchingApp.request(route, msg, session, (err, result)=>{
             super.response(err, result, next);
-        })
+        });
     }
 }
 

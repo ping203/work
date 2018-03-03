@@ -1,4 +1,4 @@
-const moment = require('moment')
+const moment = require('moment');
 const taskPool = require('../task').taskPool;
 const task_conf = require('./config');
 const LogInsertTask = require('./logInsertTask');

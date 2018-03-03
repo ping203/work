@@ -282,7 +282,7 @@ function _didAddUser(pool, data, cb) {
                 } else {
                     cb(null, result2);
                 }
-            })
+            });
         }
     });
 }

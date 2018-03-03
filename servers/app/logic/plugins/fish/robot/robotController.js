@@ -89,7 +89,7 @@ class RobotController {
 
         uids.forEach(function (uid) {
             this._robotPlayerMap.delete(uid);
-        }.bind(this))
+        }.bind(this));
     }
 
     _addPlayerEvent(player) {

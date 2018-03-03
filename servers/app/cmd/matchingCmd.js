@@ -90,7 +90,7 @@ class MatchingCmd extends SysCmd {
             route:'rpc_cancle_sigup',
             data:{uid:1000} //取消报名
 
-        }
+        };
     }
 }
 

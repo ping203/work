@@ -11,7 +11,7 @@ class TimeSync extends EventEmitter {
         this.cmds = [
             ['GET', redisKey.PLATFORM_DATA.BONUS_POOL],
             ['GET', redisKey.PLATFORM_DATA.PLATFORM_CATCHRATE]
-        ]
+        ];
     }
 
     start() {

@@ -64,7 +64,7 @@ class LogSource{
      */
     _checkLogType(type){
         if(!!logTableDef.TYPE[type]){
-            return true
+            return true;
         }
         return false;
     }

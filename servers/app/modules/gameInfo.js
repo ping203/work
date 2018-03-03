@@ -5,7 +5,7 @@ const logger = require('omelo-logger').getLogger(__filename);
 
 module.exports = function (opts) {
     return new GameInfoModule(opts);
-}
+};
 module.exports.moduleId = 'gameInfo';
 class GameInfoModule {
     constructor(opts) {

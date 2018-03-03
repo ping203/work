@@ -387,7 +387,7 @@ function forbid_player_world(req, dataObj, cb) {
             logger.info("禁言成功", data);
             cb(err, forbiddenId);
         }
-    )
+    );
 }
 
 function unforbid_player_world(req, dataObj, cb) {
@@ -418,7 +418,7 @@ function unforbid_player_world(req, dataObj, cb) {
             }
             cb(err, data);
         }
-    )
+    );
 }
 
 exports.userInfo = userInfo;

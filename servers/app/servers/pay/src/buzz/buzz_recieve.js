@@ -958,7 +958,7 @@ function _didCancelCik(req, dataObj, cb) {
                                 change: change,
                             };
                             cb(null, ret);
-                        })
+                        });
                     });
                 }
                 else {

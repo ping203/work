@@ -98,13 +98,13 @@ class GameApp {
         let sessionService = omelo.app.get('sessionService');
         async.waterfall([
             function (cb) {
-                self._getUidByToken(token, cb)
+                self._getUidByToken(token, cb);
             },
             function (uid, cb) {
                 _uid = uid;
                 sessionService.kick(_uid, function (err) {
                     if (err) {
-                        cb(CONSTS.SYS_CODE.SYSTEM_ERROR)
+                        cb(CONSTS.SYS_CODE.SYSTEM_ERROR);
                     } else {
                         cb();
                     }
@@ -113,7 +113,7 @@ class GameApp {
             function (cb) {
                 session.bind(_uid, function (err) {
                     if (err) {
-                        cb(CONSTS.SYS_CODE.SYSTEM_ERROR)
+                        cb(CONSTS.SYS_CODE.SYSTEM_ERROR);
                     } else {
                         session.on('closed', self._socketClose.bind(self));
                         cb();
@@ -255,7 +255,7 @@ class GameApp {
             if (err) {
                 logger.error('onPlayerConnectState error', err);
                 utils.invokeCallback(cb, err);
-                return
+                return;
             }
             utils.invokeCallback(cb, err, roomId);
         });

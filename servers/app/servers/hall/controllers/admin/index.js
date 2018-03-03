@@ -43,4 +43,4 @@ exp.post = async function (data) {
             resolve(logicResponse.askEjs("admin/index", data));
         });
     });
-}
+};

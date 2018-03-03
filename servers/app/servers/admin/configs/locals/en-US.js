@@ -553,4 +553,4 @@ module.exports = {
 	t1552 : 'cancel',
 	t1553 : 'Historical Data Inquire',
 	t1554 : 'Select Time',
-}
+};

@@ -317,7 +317,7 @@ function _getUserRank(req, dataObj, cb) {
                 }
             }
             cb(null, ret);
-        })
+        });
 
     }
 }
@@ -341,7 +341,7 @@ function _getChartReward(req, dataObj, cb) {
         let obj_key = _getRewardKey(type);
         buzz_reward.resetReward(req, token, obj_key.redis_key, obj_key.hash, account, function (err, res) {
             cb(err, res);
-        })
+        });
     }
 }
 
@@ -489,5 +489,5 @@ function _getRewardKey(type) {
     return {
         redis_key: redis_key,
         hash: hash
-    }
+    };
 }

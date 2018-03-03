@@ -369,5 +369,5 @@ exports.withDbPool = function () {
         },
 
 
-    }
+    };
 };

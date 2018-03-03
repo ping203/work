@@ -145,7 +145,7 @@ class RmatchHelper {
                         this._fHistoryNB = {
                             num: 0,
                             point: 0,
-                        }
+                        };
                     }
                     this._fHistoryNB.num ++;
                     this._fHistoryNB.point += gold;
@@ -198,7 +198,7 @@ class RmatchHelper {
                     name: k,
                     num: td.num,
                     point: td.point,
-                })
+                });
             }
             temp = {
                 score: this._curScore,

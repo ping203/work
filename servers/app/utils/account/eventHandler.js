@@ -105,7 +105,7 @@ class EventHandler {
                     account.commit();
                 }
             }
-        }
+        };
     }
 
     genSyncFunc(account, fields) {
@@ -114,7 +114,7 @@ class EventHandler {
             let id = account.id;
             redisConnector.cmd.sadd(REDISKEY.UPDATED_DELTA_UIDS, id);
             redisConnector.cmd.sadd(`${REDISKEY.UPDATED_DELTA_FIELDS}:${id}`, fields);
-        }
+        };
     }
 
     missionFunc(account) {
@@ -143,7 +143,7 @@ class EventHandler {
                     account.commit();
                 }
             }
-        }
+        };
     }
 
     playerDataSyncFunc(account){
@@ -155,7 +155,7 @@ class EventHandler {
                     uid: account.id,
                 });
             }
-        }
+        };
     }
 
     exec() {

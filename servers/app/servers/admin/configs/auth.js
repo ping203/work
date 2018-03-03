@@ -182,4 +182,4 @@ module.exports =
 		address : "www.baidu26.com",    //--网页
 		description : "后台用户管理说明",    //--说明
 	},
-}
+};

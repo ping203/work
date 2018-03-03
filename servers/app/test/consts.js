@@ -42,7 +42,7 @@ let GoodsId = [
     GoodType.Rectangle2,
     GoodType.Rectangle3,
 
-]
+];
 
 //中奖类型
 let WinType = {
@@ -61,15 +61,15 @@ let WinType = {
     CrownXN: 10 //皇冠x2以上
 };
 
-let WinTypeMapping ={}
-WinTypeMapping[GoodType.Cherry] = WinType.Cherry
-WinTypeMapping[GoodType.Orange] = WinType.Orange
-WinTypeMapping[GoodType.Pineapple] = WinType.Pineapple
-WinTypeMapping[GoodType.Watermelon] = WinType.Watermelon
-WinTypeMapping[GoodType.Starfish] = WinType.Starfish
-WinTypeMapping[GoodType.CoffeeChip] = WinType.CoffeeChip
-WinTypeMapping[GoodType.RedChip] = WinType.RedChip
-WinTypeMapping[GoodType.BlueChip] = WinType.BlueChip
+let WinTypeMapping ={};
+WinTypeMapping[GoodType.Cherry] = WinType.Cherry;
+WinTypeMapping[GoodType.Orange] = WinType.Orange;
+WinTypeMapping[GoodType.Pineapple] = WinType.Pineapple;
+WinTypeMapping[GoodType.Watermelon] = WinType.Watermelon;
+WinTypeMapping[GoodType.Starfish] = WinType.Starfish;
+WinTypeMapping[GoodType.CoffeeChip] = WinType.CoffeeChip;
+WinTypeMapping[GoodType.RedChip] = WinType.RedChip;
+WinTypeMapping[GoodType.BlueChip] = WinType.BlueChip;
 
 
 //中奖赔率定义
@@ -127,9 +127,9 @@ let ChipType = {
     PurpleChip: 2
 };
 
-let CoinMapping = {}
-CoinMapping[ChipType.YellowChip] = 'card'
-CoinMapping[ChipType.PurpleChip] = 'coin'
+let CoinMapping = {};
+CoinMapping[ChipType.YellowChip] = 'card';
+CoinMapping[ChipType.PurpleChip] = 'coin';
 
 module.exports.GoodType = GoodType;
 module.exports.Props = Props;
@@ -138,8 +138,8 @@ module.exports.Rate = Rate;
 module.exports.RollSpeed = RollSpeed;
 module.exports.RollParam = RollParam;
 module.exports.ChipType = ChipType;
-module.exports.CoinMapping = CoinMapping
-module.exports.LinesCode9 = LinesCode9
-module.exports.GoodsId = GoodsId
-module.exports.WinTypeMapping = WinTypeMapping
+module.exports.CoinMapping = CoinMapping;
+module.exports.LinesCode9 = LinesCode9;
+module.exports.GoodsId = GoodsId;
+module.exports.WinTypeMapping = WinTypeMapping;
 

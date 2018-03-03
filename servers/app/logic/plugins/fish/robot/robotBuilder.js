@@ -32,7 +32,7 @@ class RobotBuilder {
 
         let levels = Array.from(this._weaponLevels);
         levels.sort(function (a, b) {
-            return a - b
+            return a - b;
         });
 
         let newLevel = level;

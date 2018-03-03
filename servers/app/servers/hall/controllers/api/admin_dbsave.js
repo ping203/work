@@ -11,7 +11,7 @@ async function countAccount(data) {
         _checkAdmin(function () {
             let ret = {
                 account_count: CacheAccount.length(),
-            }
+            };
             resolve(logicResponse.ask(ret));
         });
     });
@@ -22,7 +22,7 @@ async function listAccount(data) {
         _checkAdmin(function () {
             let ret = {
                 account_list: CacheAccount.uid_list(),
-            }
+            };
             resolve(logicResponse.ask(ret));
         });
     });

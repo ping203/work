@@ -30,4 +30,4 @@ class SysCmd {
     }
 }
 
-module.exports = SysCmd
+module.exports = SysCmd;
