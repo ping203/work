@@ -173,25 +173,25 @@ function _getDateOffset(add_day_count, base_date) {
 
 ////////////////////////////////////////////////////////////
 
-function diff2(targettime, endtime) {
-    let targettime = new Date(targettime);
-    let endtime = new Date(endtime);
+function diff2(_targettime, _endtime) {
+    let targettime = new Date(_targettime);
+    let endtime = new Date(_endtime);
     if (DEBUG) console.log("targettime: ", targettime);
     if (DEBUG) console.log("endtime: ", endtime);
     return targettime.getTime() - endtime.getTime();
 }
 
-function diff(endtime) {
+function diff(_endtime) {
     let curtime = new Date();
-    let endtime = new Date(endtime);
+    let endtime = new Date(_endtime);
     if (DEBUG) console.log("curtime: ", curtime);
     if (DEBUG) console.log("endtime: ", endtime);
     return curtime.getTime() - endtime.getTime();
 }
 
-function leftDays(starttime) {
+function leftDays(_starttime) {
     let curtime = new Date();
-    let starttime = new Date(starttime);
+    let starttime = new Date(_starttime);
     if (DEBUG) console.log("curtime: ", curtime);
     if (DEBUG) console.log("starttime: ", starttime);
 

@@ -154,7 +154,6 @@ class UCLoudPayCard {
             client.Request(req, function (err, resp) {
                 if(err){
                     cb(err);
-                    reject(err);
                     return;
                 }
                 console.log(resp);

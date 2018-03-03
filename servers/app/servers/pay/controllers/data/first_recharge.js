@@ -19,6 +19,8 @@ const logicResponse = require('../../../common/logicResponse');
      * @param {*} req 
      * @param {*} res 
      */
+
+     //TODO LINYNG @YXL 首冲奖励未完成
 async function reward(data) {
     const FUNC = "FirstRecharge:reward --- ";
     const HINT = "首充奖励领取";

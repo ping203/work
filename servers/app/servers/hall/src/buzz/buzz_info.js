@@ -121,7 +121,7 @@ function getHuafeiquan(dataObj, cb) {
     if (!lPrepare(dataObj)) return;
     BuzzUtil.cacheLinkDataApi(dataObj, "get_huafeiquan");
 
-    _getHuafeiquan(req, dataObj, cb);
+    _getHuafeiquan(dataObj, cb);
 
     function lPrepare(input) {
         return BuzzUtil.checkParams(input, ['token'], "buzz_info", cb);

@@ -54,7 +54,7 @@ function getInviteProgress(pool, dataObj, cb) {
     const FUNC = TAG + "getInviteProgress() --- ";
 
     let token = dataObj["token"];
-    let uid = token.split("_")[0];// 受请者的uid
+    let uid = token.split("_")[0]; // 受请者的uid
 
     CacheAccount.getAccountById(uid, function (err, account) {
         // 需要计算邀请的好友是否已经达到了50倍炮的倍率.
@@ -146,7 +146,7 @@ function getEnshrineStatus(pool, dataObj, cb) {
     const FUNC = TAG + "getEnshrineStatus() --- ";
 
     let token = dataObj["token"];
-    let uid = token.split("_")[0];// 受请者的uid
+    let uid = token.split("_")[0]; // 受请者的uid
 
     CacheAccount.getAccountById(uid, function (err, account) {
         if (err) {
@@ -154,7 +154,9 @@ function getEnshrineStatus(pool, dataObj, cb) {
             cb(err);
             return;
         }
-        let ret = {enshrine_status: account.social_enshrine_status};
+        let ret = {
+            enshrine_status: account.social_enshrine_status
+        };
         cb(null, ret);
     });
 }
@@ -166,8 +168,8 @@ function inviteSuccess(pool, dataObj, cb) {
     const FUNC = TAG + "inviteSuccess() --- ";
 
     let token = dataObj["token"];
-    let type = dataObj["type"];// 100(邀请) | 101(分享)
-    let fuid = dataObj["fuid"];// 邀请者的uid
+    let type = dataObj["type"]; // 100(邀请) | 101(分享)
+    let fuid = dataObj["fuid"]; // 邀请者的uid
 
     DaoCommon.checkAccount(pool, token, function (error, account) {
         if (error) {
@@ -181,8 +183,7 @@ function inviteSuccess(pool, dataObj, cb) {
         if (account.jointype != 0) {
             logger.info(FUNC + "已经记录了加入类型, 不做任何事直接返回");
             cb();
-        }
-        else {
+        } else {
             account.jointype = type;
             if (type != JOIN_TYPE.SELF) {
                 if (type === JOIN_TYPE.INVITE) {
@@ -196,8 +197,8 @@ function inviteSuccess(pool, dataObj, cb) {
                         let friends = faccount.social_invite_friends;
                         friends.push(account.id);
                         faccount.social_invite_friends = friends;
-                        faccount.social_invite_week += 1;//本周邀请数量
-                        faccount.social_invite_month += 1;//本月邀请数量
+                        faccount.social_invite_week += 1; //本周邀请数量
+                        faccount.social_invite_month += 1; //本月邀请数量
                         faccount.commit();
                     });
                 } else if (type === JOIN_TYPE.SHARE) {
@@ -255,8 +256,8 @@ function shareSuccess(pool, dataObj, cb) {
     const FUNC = TAG + "shareSuccess() --- ";
 
     let token = dataObj["token"];
-    let share_id = dataObj["share_id"];// 100(邀请) | 101(分享)
-    let uid = token.split("_")[0];// 受请者的uid
+    let share_id = dataObj["share_id"]; // 100(邀请) | 101(分享)
+    let uid = token.split("_")[0]; // 受请者的uid
 
     CacheAccount.getAccountById(uid, function (err, account) {
         if (err) {
@@ -276,7 +277,7 @@ function enshrineSuccess(pool, dataObj, cb) {
     const FUNC = TAG + "enshrineSuccess() --- ";
 
     let token = dataObj["token"];
-    let uid = token.split("_")[0];// 收藏者的uid
+    let uid = token.split("_")[0]; // 收藏者的uid
 
     CacheAccount.getAccountById(uid, function (err, account) {
         if (err) {
@@ -306,7 +307,7 @@ function getSocialReward(pool, dataObj, cb) {
         }
         let reward = _getRewardObj(account, type, share_id);
         if (reward.length > 0) {
-            dao_reward.getReward(null, account, reward,function () {
+            dao_reward.getReward(null, account, reward, function () {
                 // 领奖后根据type设置状态
                 _afterReward(type, account, share_id);
                 cb(null, account);
@@ -339,8 +340,7 @@ function addSocialDiamondLog(uid, account, reward, type) {
         let scene = common_log_const_cfg.SHARE_REWARD;
         if (JOIN_TYPE.INVITE == type || JOIN_TYPE.INVITE_DAILY == type) {
             scene = common_log_const_cfg.INVITE_REWARD;
-        }
-        else if (JOIN_TYPE.ENSHRINE == type) {
+        } else if (JOIN_TYPE.ENSHRINE == type) {
             scene = common_log_const_cfg.ENSHRINE_REWARD;
         }
 
@@ -376,8 +376,7 @@ function addSocialGoldLog(pool, uid, token, account, reward, type) {
         let scene = common_log_const_cfg.SHARE_REWARD;
         if (JOIN_TYPE.INVITE == type || JOIN_TYPE.INVITE_DAILY == type) {
             scene = common_log_const_cfg.INVITE_REWARD;
-        }
-        else if (JOIN_TYPE.ENSHRINE == type) {
+        } else if (JOIN_TYPE.ENSHRINE == type) {
             scene = common_log_const_cfg.ENSHRINE_REWARD;
         }
 
@@ -395,11 +394,9 @@ function addSocialGoldLog(pool, uid, token, account, reward, type) {
 
         if (JOIN_TYPE.SHARE == type) {
             logger.info(FUNC + "分享插入一条金币日志:", data);
-        }
-        else if (JOIN_TYPE.INVITE == type || JOIN_TYPE.INVITE_DAILY == type) {
+        } else if (JOIN_TYPE.INVITE == type || JOIN_TYPE.INVITE_DAILY == type) {
             logger.info(FUNC + "邀请插入一条金币日志:", data);
-        }
-        else if (JOIN_TYPE.ENSHRINE == type) {
+        } else if (JOIN_TYPE.ENSHRINE == type) {
             logger.info(FUNC + "收藏插入一条金币日志:", data);
         }
 
@@ -415,7 +412,7 @@ function getInviteDailyReward(pool, dataObj, cb) {
     let token = dataObj["token"];
     let type = dataObj["type"];
     let share_id = dataObj["share_id"];
-    let uid = token.split("_")[0];// 受请者的uid
+    let uid = token.split("_")[0]; // 受请者的uid
     logger.info(FUNC + "INVITE_DAILY call");
 
     CacheAccount.getAccountById(uid, function (err, account) {
@@ -583,7 +580,7 @@ function _getSocialData(pool, uid, cb) {
             return;
         }
         //魅力值和十大高手分享判断
-        redisAccountSync.getAccount(uid, ['platform','match_rank'], function (err, account) {
+        redisAccountSync.getAccount(uid, ['platform', 'match_rank'], function (err, account) {
             let ret = results[0];
             if (account) {
                 if (account.match_rank > 25) {
@@ -646,8 +643,7 @@ function _getFriendsWeaponOver50(pool, invite_friends, uid, cb) {
             let invite_progress = result[0].invite_progress;
             if (cb) cb(result[0].invite_progress);
         });
-    }
-    else {
+    } else {
         logger.info(FUNC + "还没有邀请好友");
         if (cb) cb(0);
     }
@@ -697,8 +693,7 @@ function _updateTableSocialWithUid(pool, fuid, uid, invitor_social, type, cb) {
     if (!uids) {
         uids = uid;
         // invite_progress = 1;
-    }
-    else {
+    } else {
         // 已经添加的uid就不能重复添加了
         let uids_json = uids.split(",");
         ArrayUtil.addOnly(uids_json, uid);
@@ -753,40 +748,18 @@ function _updateTableSocialWithShare(account, share_id, status) {
 }
 
 function _getShareStatus(account, repeat) {
+    let share_status = -1;
     switch (repeat) {
         case REPEAT_TYPE.WEEKLY:
-            return account.social_share_status_2;
+            share_status = account.social_share_status_2;
+            break;
         case REPEAT_TYPE.DAILY:
-            return account.social_share_status_1;
+            share_status = account.social_share_status_1;
+            break;
         default:
-            return account.social_share_status_0;
+            share_status = account.social_share_status_0;
     }
     return share_status;
-}
-
-/**
- * 更新tbl_social中的邀请奖励领取状态.
- */
-function _updateTableSocialWithInviteReward(uid, account) {
-    const FUNC = TAG + "_updateTableSocialWithInviteReward() --- ";
-
-    account.invite_reward += 1;
-
-    let invite_reward = invitor_social.invite_reward;
-
-    let sql = "";
-    sql += "UPDATE tbl_social ";
-    sql += "SET invite_reward=invite_reward+1 ";
-    sql += "WHERE id=? ";
-
-    let sql_data = [uid];
-
-    logger.info(FUNC + "sql:", sql);
-    logger.info(FUNC + "sql_data:", sql_data);
-
-    pool.query(sql, sql_data, function (err, result) {
-        cb(err, result);
-    });
 }
 
 /**
@@ -799,7 +772,9 @@ function _updateRedisSocialWithInviteDailyReward(uid) {
     const FUNC = TAG + "_updateRedisSocialWithInviteDailyReward() --- ";
     logger.info(FUNC + "call:");
 
-    CacheAccount.setAccountById(uid, {social_invite_daily_state: 2});
+    CacheAccount.setAccountById(uid, {
+        social_invite_daily_state: 2
+    });
 
     // RedisUtil.expire(PAIR.UID_SOCIAL_INVITE_DAILY, DateUtil.getNexyDayBySeconds());
 }
@@ -857,8 +832,7 @@ function _updateTableSocial(pool, fuid, uids, type, cb) {
         sql += "SET invite_friends=? ";
         // sql += ",invite_progress=? ";
         RedisUtil.hset("pair:uid:social_invite_friends", fuid, uids);
-    }
-    else if (type == JOIN_TYPE.SHARE) {
+    } else if (type == JOIN_TYPE.SHARE) {
         sql += "SET share_friends=? ";
         RedisUtil.hset("pair:uid:social_share_friends", fuid, uids);
     }
@@ -927,7 +901,7 @@ function _getShareReward(account, share_id) {
         let share_status = _getShareStatus(account, repeat);
         // let share_status_json = JSON.parse(share_status);
         logger.info(FUNC + "share_status_json:", share_status);
-        let status = share_status["" + share_id];//状态为1(未领取)时才可以领取
+        let status = share_status["" + share_id]; //状态为1(未领取)时才可以领取
         logger.info(FUNC + "status:", status);
 
         if (status == SHARE_STATUS.REWARD) {
@@ -942,8 +916,8 @@ function _getShareReward(account, share_id) {
  * 获得邀请奖励对象.
  */
 function _getInviteReward(account) {
-    let reward_id = account.social_invite_reward;// 已经领取的邀请奖励ID.
-    let next_reward_id = reward_id + 1;// 下一级邀请奖励ID.
+    let reward_id = account.social_invite_reward; // 已经领取的邀请奖励ID.
+    let next_reward_id = reward_id + 1; // 下一级邀请奖励ID.
 
     let invite = getInviteById(next_reward_id);
     let invite_number = 10000;
@@ -953,7 +927,7 @@ function _getInviteReward(account) {
     if (invite_number <= account.social_invite_progress) {
         return invite.reward;
     }
-    return [];// 没有奖励
+    return []; // 没有奖励
 }
 
 /**
@@ -986,7 +960,7 @@ function _afterReward(type, account, share_id) {
             break;
         case JOIN_TYPE.ENSHRINE:
             if (account.social_enshrine_status > 2) {
-                logger.error("玩家尝试逆反收藏状态(原状态:" + account.enshrine_status + ", 想设置的状态:" + status + ")");
+                logger.error("玩家尝试逆反收藏状态(原状态:" + account.enshrine_status + ", 想设置的状态:" + ")");
                 return;
             }
             account.social_enshrine_status = 2;

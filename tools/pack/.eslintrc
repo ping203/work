@@ -12,7 +12,7 @@
         // "no-unreachable": 2,//不能有无法执行的代码
         // "no-unused-expressions": 2,//禁止无用的表达式
         "strict": 2, //使用严格模式
-        "no-undef": 1,//不能有未定义的变量
+        // "no-undef": 0,//不能有未定义的变量
         "no-undef-init": 2,//变量初始化时不能直接给它赋值为undefined
         // "no-undefined": 2,//不能使用undefined
         "no-unused-vars": [0, {"vars": "all", "args": "after-used"}],//不能有声明后未被使用的变量或参数
@@ -40,37 +40,6 @@
     },
     "globals": {
         "console": true,
-        "module": true,
-        "require": true,
-        "process": true,
-        "logger": true,
-        "Map": true,
-        "Set": true,
-        "utils": true,
-        "CONSTS":true,
-        "setInterval": true,
-        "clearInterval": true,
-        "global": true,
-        "Buffer": true,
-        "setTimeout": true,
-        "clearTimeout": true,
-        "__filename": true,
-        "redisConnector": true,
-        "Promise": true,
-        "mysqlConnector": true,
-        "mysqlPool": true,
-        "Symbol": true,
-        "cache": true,
-        "answer": true,
-        "redisClient": true,
-        "exports":true,
-        "loggerEx":true,
-        "redisSync":true,
-        "myDao":true,
-        "logGold":true,
-        "logDiamond":true,
-        "logLogin":true,
-        "logHuafei":true,
-        "logBuilder":true
+        "module": true
     }
 }

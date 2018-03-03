@@ -31,7 +31,7 @@ async function listAccount(data) {
 async function saveAccount(data) {
     return new Promise(function(resolve, reject){
         _checkAdmin(function () {
-            DaoAccount.updateDb(req.pool, function (err, results) {
+            DaoAccount.updateDb({pool:mysqlPool}, function (err, results) {
                 if (err) {
                     logger.error('保存所有玩家信息到数据库:', err);
                     reject(err);

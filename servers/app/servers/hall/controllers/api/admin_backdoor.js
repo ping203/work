@@ -323,18 +323,14 @@ async function queryCfgs(data) {
 }
 
 async function getGoldLog(data) {
-    const FUNC = TAG + "getGoldLog()---";
-    logger.info("【CALL】 getGoldLog");
-
-    var data = admin_common.getDataObj(req);
+    
     var account_id = data.account_id;
 
-    logger.info(FUNC + "account_id:", account_id);
+    logger.info("account_id:", account_id);
 
     var ret = CacheGold.getLogListByAccountId(account_id);
 
     return logicResponse.ask(ret);
-
 }
 
 async function queryAdminLog(data) {

@@ -31,7 +31,7 @@ exp.post = async function (data) {
                 logger.error('pages-am-backdoor err:', err);
                 reject(err);
             }
-            var params = _makeVar(req);
+            var params = _makeVar();
             params = _.extend(params, { user_auth: user_auth });
             resolve(logicResponse.askEjs("admin/pages-am-backdoor", params));
         });

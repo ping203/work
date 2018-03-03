@@ -1,6 +1,8 @@
 const Task = require('../../../utils/task/task')
 const async = require('async');
 const utils = require('../../../utils/utils');
+
+//TODO LINYNG@DFC 未完成
 /**
  * 用户数据重置
  */
@@ -56,7 +58,7 @@ function resetDB(myPool) {
         // cmds.push(['hset', `pair:uid:${item}`, item, 1000])
     });
 
-    RedisUtil.multi(cmds, function (err, results) {
+    redisConnector.multi(cmds, function (err, results) {
         if (!!err) {
             console.error('redis 获取活动数据异常:', err);
             return;
@@ -71,7 +73,7 @@ function resetDB(myPool) {
             });
 
             if(subCmds.length > 0){
-                RedisUtil.multi(subCmds, function (err, results) {
+                redisConnector.multi(subCmds, function (err, results) {
                     if (!!err) {
                         console.error('redis 重置活动数据异常:', err);
                         return;
