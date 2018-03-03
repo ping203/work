@@ -8,7 +8,6 @@ const eslint = require('gulp-eslint'); //代码语法检查
 const concat = require('gulp-concat'); //合并代码，即将项目中各种JS合并成一个JS文件
 const zip = require('gulp-zip'); //zip压缩
 const scp = require('gulp-scp2');
-
 const runSequence = require('run-sequence');
 const argv = require('minimist')(process.argv.slice(2)); //读取命令行参数
 const fs = require('fs');
@@ -18,11 +17,6 @@ const moment = require('moment');
 
 const config = require('./pack.config');
 
-const exclude = new Set(['node_modules', 'dist']);
-
-const DEST_DIR = 'dist/';
-const ORIGIN_DIR = 'origin/';
-const SRC_MAP = 'src-map';
 const SRC_DIR = '';
 
 let pkgName = '';
