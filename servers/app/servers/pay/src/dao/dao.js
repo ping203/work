@@ -24,6 +24,7 @@ const DaoSocial = require('./dao_social');
 const DaoChange = require('./dao_change');
 const DaoOperation = require('./dao_operation');
 const AccountCommon = require('./account/common');
+const DaoAdminPayuser = require('./dao_admin_payuser');
 
 function _findAccountByToken(pool, token, cb) {
     var sql = 'SELECT `id`,`tempname`,`created_at`,`updated_at` FROM `tbl_account` WHERE `token`=?';

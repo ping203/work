@@ -28,7 +28,7 @@ class DownloadRes {
             });
 
             req.on('error', function (error) {
-                console.log('error:', error);
+                logger.error('getRemoteResource error:', error);
                 reject(error);
             });
             req.end();
@@ -51,7 +51,7 @@ class DownloadRes {
             ctx.body = 'redirect';
         } else {
             try {
-                let [data, headers] = await getRemoteResource(ctx.protocol == 'https', figure_url);
+                let [data, headers] = await this.getRemoteResource(ctx.protocol == 'https', figure_url);
                 headers["Access-Control-Allow-Origin"] = "*";
                 ctx.response.headers = headers;
                 ctx.body = data;

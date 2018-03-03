@@ -14,73 +14,53 @@ class RankBuildTask extends Task {
     }
 
     _getRank(task, platform, skip, limit) {
-        // /* yxl */console.log(`_getRank()------------------------------`);
-        let promise = new Promise(function (resolve, reject) {
-            // /* yxl */console.log(`skip:${skip}, limit:${limit}`);
+        return new Promise(function (resolve, reject) {
             redisConnector.cmd.zrevrange(`${task.redisKey}:${platform}`, skip, limit, 'WITHSCORES', function (err, results) {
                 if (err) {
-                    /* yxl */console.log('err:', err);
+                    console.log('err:', err);
                     reject(err);
                     return;
                 }
-                // /* yxl */console.log('resolve(results):', results);
                 resolve(results);
             });
         });
-
-        return promise;
     }
 
-    _getPlayerExInfoByMysql(task, player){
-        let promise = new Promise(function (resolve, reject) {
+    _getPlayerExInfoByMysql(task, player) {
+        return new Promise(function (resolve, reject) {
             mysqlAccountSync.getAccount(player.uid, task.ext, function (err, account) {
-                if(err || !account){
+                if (err || !account) {
                     resolve(player);
                     return;
                 }
-                // /* yxl */console.log('_getPlayerExInfoByMysql - account:', account);
-                // player.ext = account.toJSON();
                 player.ext = account;
-                if(player.ext.match_rank) {
-                    // console.log(`${player.uid}处理match_rank，处理前${player.ext.match_rank}`);
-                    let rankId = consts.getRankIdFromPointsAndRank(player.score, i);
-                    // console.log(`${player.uid}处理match_rank，getRankIdFromPointsAndRank处理后${rankId}`);
+                if (player.ext.match_rank) {
+                    let rankId = consts.getRankIdFromPointsAndRank(player.score, account.match_rank);
                     if (0 == rankId) {
                         rankId = consts.getRankIdFromPoints(player.score);
                     }
-                    // console.log(`${player.uid}处理match_rank，getRankIdFromPoints处理后${consts.getRankIdFromPoints(player.score)}`);
                     player.ext.match_rank = rankId;
-                    // console.log(`${player.uid}处理match_rank，处理后${rankId}`);
                 }
                 resolve();
             });
-
         });
-        return promise;
     }
 
-    async _getPlayerExInfoByRedis(task, player,i){
+    async _getPlayerExInfoByRedis(task, player, i) {
         try {
             let account = await redisAccountSync.getAccountAsync(player.uid, task.ext);
-            // /* yxl */console.log('account:', account);
-            if(account){
+            if (account) {
                 player.ext = account.toJSON();
-                //对match_rank特殊处理
-                if(player.ext.match_rank) {
-                    // console.log(`${player.uid}处理match_rank，处理前${player.ext.match_rank}`);
+                if (player.ext.match_rank) {
                     let rankId = consts.getRankIdFromPointsAndRank(player.score, i);
-                    // console.log(`${player.uid}处理match_rank，getRankIdFromPointsAndRank处理后${rankId}`);
                     if (0 == rankId) {
                         rankId = consts.getRankIdFromPoints(player.score);
                     }
-                    // console.log(`${player.uid}处理match_rank，getRankIdFromPoints处理后${consts.getRankIdFromPoints(player.score)}`);
                     player.ext.match_rank = rankId;
-                    // console.log(`${player.uid}处理match_rank，处理后${rankId}`);
                 }
                 return null;
             }
-        }catch (err){
-            /* yxl */console.log('err:', err);
+        } catch (err) {
             logger.error(`${this.taskId}执行_getPlayerExInfoByRedis玩家数据异常uid:`, player.uid);
         }
         return player;
@@ -95,18 +75,20 @@ class RankBuildTask extends Task {
      */
     async _getPlayerExInfo(task, players) {
         let fromMysqlPlayers = [];
-        for(let i = 0; i< players.length; i++){
-            let p = await this._getPlayerExInfoByRedis(task, players[i],i);
-            if(p){
+        for (let i = 0; i < players.length; i++) {
+            let p = await this._getPlayerExInfoByRedis(task, players[i], i);
+            if (p) {
                 fromMysqlPlayers.push(p);
             }
         }
 
-        if(0 == fromMysqlPlayers.length){return;}
+        if (0 == fromMysqlPlayers.length) {
+            return;
+        }
 
-        for(let i = 0; i< fromMysqlPlayers.length; i++){
+        for (let i = 0; i < fromMysqlPlayers.length; i++) {
             let p = await this._getPlayerExInfoByMysql(task, fromMysqlPlayers[i]);
-            if(p){
+            if (p) {
                 logger.error(`${this.taskId}执行_getUserExInfo玩家数据异常uid:`, p.uid);
             }
         }
@@ -122,7 +104,10 @@ class RankBuildTask extends Task {
             let rank100 = await this._getRank(task, platform, 0, task.showDetail - 1);
 
             for (let i = 0; i < rank100.length; i += 2) {
-                rankInfo.players.push({uid: rank100[i], score: task.originScore ? task.originScore(rank100[i + 1]): rank100[i + 1]});
+                rankInfo.players.push({
+                    uid: rank100[i],
+                    score: task.originScore ? task.originScore(rank100[i + 1]) : rank100[i + 1]
+                });
                 rankInfo.ranks[rank100[i]] = rankInfo.players.length;
             }
 
@@ -130,9 +115,9 @@ class RankBuildTask extends Task {
 
             //获取排名100以后玩家名次
             let skip = 0;
-            while (skip < task.range){
-                let ranks = await this._getRank(task, platform, skip, (skip + task.limit)-1);
-                if(0 == ranks.length) break;
+            while (skip < task.range) {
+                let ranks = await this._getRank(task, platform, skip, (skip + task.limit) - 1);
+                if (0 == ranks.length) break;
                 for (let i = 0; i < ranks.length && skip < task.range; i += 2) {
                     skip++;
                     rankInfo.ranks[ranks[i]] = skip;
@@ -146,23 +131,20 @@ class RankBuildTask extends Task {
         return rankInfo;
     }
 
-    _saveRankInfo(task, platform, rankInfo){
-        let promise = new Promise(function (resolve, reject) {
-            // console.log(JSON.stringify(rankInfo).length);
+    _saveRankInfo(task, platform, rankInfo) {
+        return new Promise(function (resolve, reject) {
             redisConnector.cmd.set(`${REDISKEY.getRankDataKey(task.redisKey)}:${platform}`, JSON.stringify(rankInfo), function (err, result) {
-                if(err){
+                if (err) {
                     logger.error(`${this.taskId}执行_saveRankInfo异常`, err);
                 }
-                // console.log('------_saveRankInfo ok')
                 resolve(result);
             });
         });
-        return promise;
     }
 
     async _build(task) {
-        for(let platform of Object.values(REDISKEY.PLATFORM_TYPE)){
-            let result =await this._getRankInfo(task, platform);
+        for (let platform of Object.values(REDISKEY.PLATFORM_TYPE)) {
+            let result = await this._getRankInfo(task, platform);
             await this._saveRankInfo(task, platform, result);
         }
     }
@@ -170,7 +152,7 @@ class RankBuildTask extends Task {
     async _exeTask(cb) {
         logger.info('排行榜生成开始');
         let tasks = this.taskConf.subTask;
-        for(let i = 0; i< tasks.length; i++){
+        for (let i = 0; i < tasks.length; i++) {
             await this._build(tasks[i]);
         }
         logger.info('排行榜生成完成');

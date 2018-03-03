@@ -32,7 +32,7 @@ let exp = module.exports;
 exp.get = async function (data) {
     return new Promise(function(resolve, reject){
         var params = _makeVar();
-        _getUserList(req, function (rows) {
+        _getUserList(function (rows) {
             params = _.extend(params, { user_list: rows });
             resolve(logicResponse.askEjs('admin/pages-am-user', params));
         });
