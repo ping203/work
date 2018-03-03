@@ -2,22 +2,23 @@ module.exports = {
     gitTag: 'v1.0.0',
     input: {
         js: ['../../servers*/**/*.js',
+            '!../../servers/node_modules/**/*',
             '!../../servers/config/**/*',
             '!../../servers/shared/**/*',
         ],
         plugins: [
-            ['../../servers/config*/**/*', './dist/servers'],
-            ['../../servers/shared*/**/*', './dist/servers'],
-            ['../../servers/*.json', './dist/servers']
+            ['../../servers/config*/**/*', './build/servers'],
+            ['../../servers/shared*/**/*', './build/servers'],
+            ['../../servers/*.json', './build/servers']
 
         ],
-        zip: './dist/**/*.*',
+        zip: './build/**/*.*',
     },
     output: {
-        dist: './dist',
+        dist: './build',
         origin: 'origin',
         sourcemap: 'map',
-        zip: './',
+        zip: './packages',
     },
     scp: {
         host: '119.28.176.122',

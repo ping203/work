@@ -35,20 +35,17 @@ gulp.task('checkout', ['commit'], function () {
   });
 });
 
-gulp.task('prod', function (cb) {
-  // runSequence('clean', 'eslint', ['mix', 'copy'], 'zip', 'scp', cb);
-  // runSequence('clean', ['mix', 'copy'], 'zip', cb);
-  runSequence('clean', ['mix'],'copy', 'zip',cb);
-  // runSequence('zip',cb);
-  // runSequence('clean', ['mix', 'copy'],'copyCfg', 'zip','scp', cb);
-  // runSequence('copy', cb);
-  // runSequence('copy', ['zip'], cb);
-  // runSequence('copyCfg', cb);
-  // runSequence('clean', ['mix', 'copy'], cb);
-  // runSequence('zip', cb);
-  // runSequence('file_scp', cb);
-  // runSequence('eslint', cb);
+//清理、不混肴压缩发布、打包、上传
+gulp.task('default', function (cb) {
+  runSequence('clean', ['unmix', 'copy'], 'zip', 'scp', cb);
 });
+
+//清理、混肴压缩发布、打包、上传
+gulp.task('prod', function (cb) {
+  runSequence('clean', ['mix', 'copy'], 'zip', 'scp', cb);
+});
+
+
 
 gulp.task('clean', function () {
   return del([
@@ -100,7 +97,7 @@ gulp.task('copy', function () {
   console.error('---------------config.input.plugins', config.input.plugins);
   config.input.plugins.forEach(function (item) {
     console.error('---------------item', item);
-    task =  gulp.src(item[0])
+    task = gulp.src(item[0])
       .pipe(gulp.dest(item[1]));
   });
   return task;
@@ -188,6 +185,24 @@ gulp.task('mix', function () {
     //合并成一个文件
     // .pipe(concat('index.min.js'))
     // 3\. 另存压缩后的文件
+    .pipe(gulp.dest(config.output.dist))
+    .on('error', function (err) {
+      console.log(err.stack);
+      gulp.emit('end');
+    });
+});
+
+gulp.task('unmix', function () {
+  return gulp.src(config.input.js)
+    .pipe(babel({
+      presets: ['es2015', 'es2016', 'es2017'],
+      plugins: [
+        ["transform-runtime", {
+          "polyfill": false,
+          "regenerator": true
+        }]
+      ]
+    }))
     .pipe(gulp.dest(config.output.dist))
     .on('error', function (err) {
       console.log(err.stack);
