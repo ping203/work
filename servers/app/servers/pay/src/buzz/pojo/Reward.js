@@ -51,13 +51,13 @@ function Reward(list) {
         let item_id = item[IDX_ID];
         let itemInfo = item_item_cfg[item_id];
 
-        if (DEBUG) console.log("i:", i);
-        if (DEBUG) console.log("item:", item);
-        if (DEBUG) console.log("item_id:", item_id);
-        if (DEBUG) console.log("itemInfo:", itemInfo);
+        if (DEBUG) logger.info("i:", i);
+        if (DEBUG) logger.info("item:", item);
+        if (DEBUG) logger.info("item_id:", item_id);
+        if (DEBUG) logger.info("itemInfo:", itemInfo);
 
         if (itemInfo) {
-            if (DEBUG) console.log("item_type:", itemInfo.type);
+            if (DEBUG) logger.info("item_type:", itemInfo.type);
             switch (itemInfo.type) {
                 case ItemType.GOLD:
                     this.gold = this.gold + item[IDX_NUM];
@@ -69,11 +69,11 @@ function Reward(list) {
 
                 case ItemType.SPECIAL:
                     if ("i102" == item_id) {
-                        console.log("获得了活跃值-item_id:", item_id);
+                        logger.info("获得了活跃值-item_id:", item_id);
                         this.active_point = this.active_point + item[IDX_NUM];
                     }
                     if ("i103" == item_id) {
-                        console.log("获得了成就点-item_id:", item_id);
+                        logger.info("获得了成就点-item_id:", item_id);
                         this.achieve_point = this.achieve_point + item[IDX_NUM];
                     }
                     break;
@@ -108,10 +108,10 @@ function Reward(list) {
             }
         }
         else {
-            if (ERROR) console.error("错误的物品, 物品信息如下:");
-            if (ERROR) console.error("----item:", item);
-            if (ERROR) console.error("----item_id:", item_id);
-            if (ERROR) console.error("----itemInfo:", itemInfo);
+            if (ERROR) logger.error("错误的物品, 物品信息如下:");
+            if (ERROR) logger.error("----item:", item);
+            if (ERROR) logger.error("----item_id:", item_id);
+            if (ERROR) logger.error("----itemInfo:", itemInfo);
         }
     }
 }

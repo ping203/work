@@ -73,7 +73,7 @@ function notifyLogin(uId) {
         "act":"login",
     };
     callHttp(data, function(err, responseString) {
-        if (DEBUG) console.log(FUNC + "responseString:", responseString);
+        if (DEBUG) logger.info(FUNC + "responseString:", responseString);
     });
 }
 
@@ -98,7 +98,7 @@ function notifyPayment(uId, orderId, num) {
         "dataType":"wb",
     };
     callHttp(data, function(err, responseString) {
-        if (DEBUG) console.log(FUNC + "responseString:", responseString);
+        if (DEBUG) logger.info(FUNC + "responseString:", responseString);
     });
 }
 
@@ -127,22 +127,22 @@ function callHttp(data, cb) {
         }
     };
 
-    console.log(FUNC + "直接调用");
+    logger.info(FUNC + "直接调用");
     var link = "http://api-tx.gz.1251278653.clb.myqcloud.com/v2/user/stat?data=" + dataString + "&sign=" + sign;
-    console.log(FUNC + "link:\n", link);
+    logger.info(FUNC + "link:\n", link);
     http.get(link, function(res) {
-        console.log(FUNC + "Got response: " + res.statusCode);
+        logger.info(FUNC + "Got response: " + res.statusCode);
         var html = "";
         res.on("data", function(data){
             html+=data;
         });
 
         res.on("end", function(){
-            console.log(FUNC + "html:\n", html);
+            logger.info(FUNC + "html:\n", html);
             cb(null, html);
         });
     }).on('error', function(e) {
-        console.log(FUNC + "Got error: " + e.message);
+        logger.info(FUNC + "Got error: " + e.message);
     });
 
 
@@ -152,24 +152,24 @@ function callHttp(data, cb) {
     //     var responseString = '';
 
     //     res.on('data', function (chunk) {
-    //         if (DEBUG) console.log(FUNC + 'STATUS: ' + res.statusCode);
-    //         // if (DEBUG) console.log(FUNC + 'HEADERS: ' + JSON.stringify(res.headers));
-    //         if (DEBUG) console.log(FUNC + 'http request data... length:', chunk.length);
-    //         if (DEBUG) console.log(FUNC + 'chunk:', chunk);
+    //         if (DEBUG) logger.info(FUNC + 'STATUS: ' + res.statusCode);
+    //         // if (DEBUG) logger.info(FUNC + 'HEADERS: ' + JSON.stringify(res.headers));
+    //         if (DEBUG) logger.info(FUNC + 'http request data... length:', chunk.length);
+    //         if (DEBUG) logger.info(FUNC + 'chunk:', chunk);
     //         responseString += chunk;
     //     });
 
     //     res.on('end', function () {
-    //         if (DEBUG) console.log(FUNC + 'STATUS: ' + res.statusCode);
-    //         // if (DEBUG) console.log(FUNC + 'HEADERS: ' + JSON.stringify(res.headers));
-    //         if (DEBUG) console.log(FUNC + 'http request end...');
-    //         if (DEBUG) console.log(FUNC + 'responseString:', responseString);
+    //         if (DEBUG) logger.info(FUNC + 'STATUS: ' + res.statusCode);
+    //         // if (DEBUG) logger.info(FUNC + 'HEADERS: ' + JSON.stringify(res.headers));
+    //         if (DEBUG) logger.info(FUNC + 'http request end...');
+    //         if (DEBUG) logger.info(FUNC + 'responseString:', responseString);
     //         cb(null, responseString);
     //     });
     // });
         
     // req.on('error', function (e) {
-    //     if (ERROR) console.error(FUNC + 'problem with request: ' + e.message);
+    //     if (ERROR) logger.error(FUNC + 'problem with request: ' + e.message);
     // });
 
     // req.write(bodyString);
@@ -180,4 +180,4 @@ function callHttp(data, cb) {
 var crypto = require('crypto');
 function md5(text) {
     return crypto.createHash('md5').update(text).digest('hex');
-};
+}

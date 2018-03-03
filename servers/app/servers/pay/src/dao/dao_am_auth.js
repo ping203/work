@@ -39,15 +39,15 @@ function _getAuthList(pool, data, cb) {
     
     var sql_data = [];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });
@@ -68,7 +68,7 @@ function _addAuth(pool, data, cb) {
         return;
     }
     _didAddAuth(pool, data, cb);
-};
+}
 
 function _didAddAuth(pool, data, cb) {
     
@@ -84,15 +84,15 @@ function _didAddAuth(pool, data, cb) {
     
     var sql_data = [page, description, parent, level];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });
@@ -103,14 +103,14 @@ function _didAddAuth(pool, data, cb) {
  */
 function _deleteAuth(pool, data, cb) {
     _enableAuth(pool, data, cb, false);
-};
+}
 
 /**
  * 激活权限(在角色管理中该权限可见)
  */
 function _validAuth(pool, data, cb) {
     _enableAuth(pool, data, cb, true);
-};
+}
 
 function _enableAuth(pool, data, cb, isValid) {
     var param_name_list = [
@@ -134,15 +134,15 @@ function _didEnableAuth(pool, data, cb, isValid) {
     
     var sql_data = [isValid, id];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });
@@ -164,7 +164,7 @@ function _editAuth(pool, data, cb) {
         return;
     }
     _didEditAuth(pool, data, cb);
-};
+}
 
 // 更新权限数据
 function _didEditAuth(pool, data, cb) {
@@ -182,15 +182,15 @@ function _didEditAuth(pool, data, cb) {
     
     var sql_data = [page, description, parent, level, id];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });

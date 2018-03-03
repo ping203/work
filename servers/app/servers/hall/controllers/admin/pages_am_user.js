@@ -22,7 +22,7 @@ function _getUserList(cb) {
         if (err) {
             //res.success({ type: 1, msg: '更新玩家金币数据失败', err: '' + err });
         } else {
-            console.log("user_list:", rows);
+            logger.info("user_list:", rows);
             cb(rows);
         }
     });

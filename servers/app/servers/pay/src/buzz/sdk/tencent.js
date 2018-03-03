@@ -109,9 +109,9 @@ function sig(data, path) {
     // 第2步：将除“sig”外的所有参数按key进行字典升序排列，排列结果为：appid，format，openid，openkey，pf，userip 
     var sortData = sort(data);
     
-    console.log("=========================================================");
-    console.log(FUNC + "sortData:", sortData);
-    console.log("=========================================================");
+    logger.info("=========================================================");
+    logger.info(FUNC + "sortData:", sortData);
+    logger.info("=========================================================");
     
     // 第3步： 将第2步中排序后的参数(key = value) 用 & 拼接起来
     var params = '';
@@ -220,7 +220,7 @@ function _getCommonData(data) {
 
 function _callTencentApi(params, req_client, cb) {
 
-    console.log("params.action: ", params.action);
+    logger.info("params.action: ", params.action);
 
     var action = params.action;
     var data = params.data;
@@ -229,9 +229,9 @@ function _callTencentApi(params, req_client, cb) {
     }
     
     data.userip = _getClientIp(req_client);
-    console.log("data: ", data);
+    logger.info("data: ", data);
     
-    console.log("-----------------action: ", action);
+    logger.info("-----------------action: ", action);
     API_INFO[action].handler(data, action, req_client, cb);
 }
 
@@ -260,20 +260,20 @@ function _getClientIp(req) {
 // content(获取请求服务器的内容——调用接口后面跟的一串参数)
 //------------------------------------------------------------------------------
 function _contentInfo(data, action) {
-    console.log("CALL _contentInfo()");
+    logger.info("CALL _contentInfo()");
     const FUNC = TAG + "_contentInfo() --- ";
     
     data = ObjUtil.str2Data(data);
     
     var content = getCommonContent(data);
     content += '&sig=' + sig(data, API_INFO[action].path);
-    console.log(FUNC + "params content: " + content);
+    logger.info(FUNC + "params content: " + content);
     
     return content;
 }
 
 function _contentBuy(data, action) {
-    console.log("CALL _contentBuy()");
+    logger.info("CALL _contentBuy()");
     const FUNC = TAG + "_contentBuy() --- ";
     
     data = ObjUtil.str2Data(data);
@@ -282,33 +282,33 @@ function _contentBuy(data, action) {
     content += '&zoneid=' + data.zoneid;
     content += '&itemid=' + data.itemid;
     content += '&sig=' + sig(data, API_INFO[action].path);
-    console.log(FUNC + "params content: " + content);
+    logger.info(FUNC + "params content: " + content);
     
     return content;
 }
 
 function _contentIsLogin(data, action) {
-    console.log("CALL _contentIsLogin()");
+    logger.info("CALL _contentIsLogin()");
     const FUNC = TAG + "_contentIsLogin() --- ";
     
     data = ObjUtil.str2Data(data);
     
     var content = getCommonContent(data);
     content += '&sig=' + sig(data, API_INFO[action].path);
-    console.log(FUNC + "params content: " + content);
+    logger.info(FUNC + "params content: " + content);
     
     return content;
 }
 
 function _contentFriends(data, action) {
-    console.log("CALL _contentFriends()");
+    logger.info("CALL _contentFriends()");
     const FUNC = TAG + "_contentFriends() --- ";
 
     data = ObjUtil.str2Data(data);
     
     var content = getCommonContent(data);
     content += '&sig=' + sig(data, API_INFO[action].path);
-    console.log(FUNC + "params content: " + content);
+    logger.info(FUNC + "params content: " + content);
     
     return content;
 }
@@ -358,33 +358,33 @@ function _handleIsLogin(data, action, req_client, cb) {
 }
 
 function _handleFriends(data, action, req_client, cb) {
-    console.log("【CALL】 _handleFriends()");
+    logger.info("【CALL】 _handleFriends()");
     const FUNC = TAG + "_handleFriends() --- ";
     
     var data = ObjUtil.str2Data(data);
     if (!_checkOpenId(data.openid, cb)) return;
     
     // 联网请求
-    console.log(FUNC + "action: ", action);
+    logger.info(FUNC + "action: ", action);
     var options = _getOptions(action, data);
     //_httpRequest(options, cb);
 }
 
 function _httpRequest(data, cb) {
-    console.log("【CALL】 _httpRequest()");
+    logger.info("【CALL】 _httpRequest()");
     const FUNC = TAG + "_httpRequest() --- ";
     
     var options = data.options;
     var content = data.content;
     var req = http.request(options, function (res) {
-        console.log(FUNC + 'STATUS:' + res.statusCode);
-        console.log(FUNC + 'HEADERS:' + JSON.stringify(res.headers));
+        logger.info(FUNC + 'STATUS:' + res.statusCode);
+        logger.info(FUNC + 'HEADERS:' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         res.on('data', _success);
     });
     
     req.on('error', function (e) {
-        console.log(FUNC + 'problem with request: ' + e.message);
+        logger.info(FUNC + 'problem with request: ' + e.message);
         cb(e);
     });
     req.write(content);
@@ -394,7 +394,7 @@ function _httpRequest(data, cb) {
     function _success(chunk) {
         chunk = ObjUtil.str2Data(chunk);
         
-        console.log(FUNC + "chunk:", chunk);
+        logger.info(FUNC + "chunk:", chunk);
         
         if (chunk.ret != null) {
             chunk.code = chunk.ret;
@@ -413,10 +413,10 @@ function _httpRequest(data, cb) {
 function _getOptions(action, data) {
     const FUNC = TAG + "_getOptions() --- ";
 
-    console.log(FUNC + 'API_INFO:', API_INFO);
-    console.log(FUNC + 'action:', action);
+    logger.info(FUNC + 'API_INFO:', API_INFO);
+    logger.info(FUNC + 'action:', action);
     var apiInfo = API_INFO[action];
-    console.log(FUNC + 'apiInfo:', apiInfo);
+    logger.info(FUNC + 'apiInfo:', apiInfo);
     var content = apiInfo.content(data, action);
     
     var options = {

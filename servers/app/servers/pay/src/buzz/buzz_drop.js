@@ -74,7 +74,7 @@ exports.updateLeftDropCount = updateLeftDropCount;
 function initDropOnce() {
     const FUNC = TAG + "initDropOnce() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     return strInitDropOnce;
 }
@@ -85,7 +85,7 @@ function initDropOnce() {
 function initDropReset() {
     const FUNC = TAG + "initDropReset() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     return strInitDropReset;
 }
@@ -96,7 +96,7 @@ function initDropReset() {
 function updateLeftDropCount(pool, cb) {
     const FUNC = TAG + "updateLeftDropCount() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var hourIdx = DateUtil.getHourIdx();
 
@@ -122,7 +122,7 @@ function updateLeftDropCount(pool, cb) {
                 return;
             }
             // DEBUG = 0;
-            if (DEBUG) console.log(FUNC + 'results:\n', results);
+            if (DEBUG) logger.info(FUNC + 'results:\n', results);
             // 更新DropRecord中的数据
             for (var i = 0; i < results.length; i++) {
                 var result = results[i];

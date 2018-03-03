@@ -56,7 +56,7 @@ function setFirstLogin(pool, uid, first_login, cb) {
 
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error("err:", err);
+            if (ERROR) logger.error("err:", err);
             cb(err);
             return;
         }
@@ -82,18 +82,18 @@ function channelLogin(pool, data, cb) {
 
     pool.query(sql, sql_data, function (err, rows) {
         if (err) {
-            if (ERROR) console.error("查询渠道点击信息出错====err:", err);
+            if (ERROR) logger.error("查询渠道点击信息出错====err:", err);
             cb(err);
             return;
         }
         if (rows.length == 0) {
-            if (DEBUG) console.log("需要创建一条tbl_account_create数据并返回insertId");
+            if (DEBUG) logger.info("需要创建一条tbl_account_create数据并返回insertId");
             _insertChannelCreate(pool, channel_uid, function (err, insertId) {
                 _insertChannelLogin(pool, insertId, cb);
             });
         }
         else {
-            if (DEBUG) console.log("直接使用id进行插入");
+            if (DEBUG) logger.info("直接使用id进行插入");
             let channel_user = rows[0];
             _insertChannelLogin(pool, channel_user.id, cb);
         }
@@ -114,7 +114,7 @@ function _insertChannelCreate(pool, channel_uid, cb) {
 
     pool.query(sql, sql_data, function (err, rows) {
         if (err) {
-            if (ERROR) console.error(FUNC + "插入渠道用户首次点击记录失败====err:", err);
+            if (ERROR) logger.error(FUNC + "插入渠道用户首次点击记录失败====err:", err);
             cb(err);
             return;
         }
@@ -136,11 +136,11 @@ function _insertChannelLogin(pool, channel_create_id, cb) {
 
     pool.query(sql, sql_data, function (err, rows) {
         if (err) {
-            if (ERROR) console.error(FUNC + "插入渠道用户点击记录失败====err:", err);
+            if (ERROR) logger.error(FUNC + "插入渠道用户点击记录失败====err:", err);
             cb(err);
             return;
         }
-        console.log("insertId:", rows.insertId);
+        logger.info("insertId:", rows.insertId);
         _updateChannelCreate(pool, channel_create_id, function(err, result) {
             cb(err, result);
         });
@@ -161,7 +161,7 @@ function _updateChannelCreate(pool, channel_create_id, cb) {
 
     pool.query(sql, sql_data, function (err, rows) {
         if (err) {
-            if (ERROR) console.error(FUNC + "更新渠道用户总点击次数失败====err:", err);
+            if (ERROR) logger.error(FUNC + "更新渠道用户总点击次数失败====err:", err);
             cb(err);
             return;
         }
@@ -183,8 +183,8 @@ function _addLogoutLog(pool, id, nickname) {
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
             // Do nothing but log the error
-            console.log('call function _addLogoutLog');
-            console.log(err);
+            logger.info('call function _addLogoutLog');
+            logger.info(err);
             return;
         }
     });
@@ -219,15 +219,15 @@ function _getDayReward(pool, data, cb) {
     sql += 'SELECT `id`, `day_reward`, `day_reward_weekly` ';
     sql += 'FROM `tbl_account` ';
     sql += 'WHERE `id`=? AND `token`=?';
-    console.log('sql: ' + sql);
+    logger.info('sql: ' + sql);
 
     let sql_data = [id, token];
 
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            console.error(FUNC + "err:\n", err);
-    	    console.error(FUNC + "sql:\n", sql);
-    	    console.error(FUNC + "sql_data:\n", sql_data);
+            logger.error(FUNC + "err:\n", err);
+    	    logger.error(FUNC + "sql:\n", sql);
+    	    logger.error(FUNC + "sql_data:\n", sql_data);
             cb(err);
             return;
         }
@@ -238,9 +238,9 @@ function _getDayReward(pool, data, cb) {
             return;
         }
         if (results.length == 0) {
-            console.error('-----------------------------------------------------');
-            console.error('TOKEN_INVALID: dao_account._getDayReward()');
-            console.error('-----------------------------------------------------');
+            logger.error('-----------------------------------------------------');
+            logger.error('TOKEN_INVALID: dao_account._getDayReward()');
+            logger.error('-----------------------------------------------------');
             cb(CstError.ERROR_OBJ.TOKEN_INVALID);
             return;
         }
@@ -271,15 +271,15 @@ function _didGetDayReward(pool, data, cb) {
     sql += 'UPDATE `tbl_account` ';
     sql += 'SET `day_reward`=0, `day_reward_weekly`=`day_reward_weekly`+1 ';
     sql += 'WHERE `id`=? AND `token`=?';
-    console.log('sql: ' + sql);
+    logger.info('sql: ' + sql);
     
     let sql_data = [account_id, token];
     
     pool.query(sql, sql_data, function (err) {
         if (err) {
-            console.error(FUNC + "err:\n", err);
-    	    console.error(FUNC + "sql:\n", sql);
-    	    console.error(FUNC + "sql_data:\n", sql_data);
+            logger.error(FUNC + "err:\n", err);
+    	    logger.error(FUNC + "sql:\n", sql);
+    	    logger.error(FUNC + "sql_data:\n", sql_data);
             cb(err);
             return;
         }
@@ -289,8 +289,8 @@ function _didGetDayReward(pool, data, cb) {
 
 function _getVipInfo(vip_level) {
     for (let idx in vip_vip_cfg) {
-        console.log('vip_level: ', vip_level);
-        console.log('cfg::vip_level: ', vip_vip_cfg[idx].vip_level);
+        logger.info('vip_level: ', vip_level);
+        logger.info('cfg::vip_level: ', vip_vip_cfg[idx].vip_level);
         if (vip_vip_cfg[idx].vip_level == vip_level) {
             return vip_vip_cfg[idx];
         }
@@ -330,16 +330,16 @@ function _getBankruptcyCompensation(pool, data, cb) {
         let vip = account.vip;
         let vipInfo = _getVipInfo(vip);
         let vip_alms_value = 0;
-        if (DEBUG) console.log(FUNC + 'vipInfo: ', vipInfo);
+        if (DEBUG) logger.info(FUNC + 'vipInfo: ', vipInfo);
         if (vipInfo) {
             let vip_alms_times = vipInfo.vip_alms_times;
             let vip_alms_value = vipInfo.vip_alms_value;
 
-            if (DEBUG) console.log(FUNC + 'account.broke_times: ', account.broke_times);
-            if (DEBUG) console.log(FUNC + 'vip_alms_times: ', vip_alms_times);
+            if (DEBUG) logger.info(FUNC + 'account.broke_times: ', account.broke_times);
+            if (DEBUG) logger.info(FUNC + 'vip_alms_times: ', vip_alms_times);
 
             if (account.broke_times >= vip_alms_times) {
-                if (ERROR) console.log(FUNC + '【ERROR】今日的破产补偿已经领取完毕，明天再来吧');
+                if (ERROR) logger.info(FUNC + '【ERROR】今日的破产补偿已经领取完毕，明天再来吧');
                 cb(new Error('今日的破产补偿已经领取完毕，明天再来吧'));
                 return;
             }

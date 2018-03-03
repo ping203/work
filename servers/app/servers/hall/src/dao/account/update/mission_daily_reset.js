@@ -32,7 +32,7 @@ exports.checkMissionDailyReset = checkMissionDailyReset;
  * 账户数据更新(每日任务完成度).
  */
 function _update(pool, data, cb, my_account) {
-    if (DEBUG) console.log("CALL mission_daily_reset.update()");
+    if (DEBUG) logger.info("CALL mission_daily_reset.update()");
     
     var uid = my_account['id'];
     var token = my_account['token'];
@@ -51,26 +51,26 @@ function _update(pool, data, cb, my_account) {
 function checkMissionDailyReset(my_account, data) {
     var mission_daily_reset_old = my_account['mission_daily_reset'];
     var mission_daily_reset_new = data['mission_daily_reset'] || mission_daily_reset_old;
-    if (DEBUG) console.log("mission_daily_reset_old: ", mission_daily_reset_old);
-    if (DEBUG) console.log("mission_daily_reset_new: ", mission_daily_reset_new);
+    if (DEBUG) logger.info("mission_daily_reset_old: ", mission_daily_reset_old);
+    if (DEBUG) logger.info("mission_daily_reset_new: ", mission_daily_reset_new);
         
     var json_mission_daily_reset_old = {};
     var json_mission_daily_reset_new = {};
     try {
         json_mission_daily_reset_old = ObjUtil.str2Data(mission_daily_reset_old);
-        if (DEBUG) console.log("parse mission_daily_reset_old success");
+        if (DEBUG) logger.info("parse mission_daily_reset_old success");
         json_mission_daily_reset_new = ObjUtil.str2Data(mission_daily_reset_new);
-        if (DEBUG) console.log("parse mission_daily_reset_new success");
+        if (DEBUG) logger.info("parse mission_daily_reset_new success");
     }
     catch (err_parse) {
-        if (DEBUG) console.log(err_parse);
+        if (DEBUG) logger.info(err_parse);
     }
         
     // DONE: 验证每日重置任务数据
     if (!(mission_daily_reset_old == null || mission_daily_reset_old == "{}")) {
-        if (DEBUG) console.log("需要验证数据有效性");
+        if (DEBUG) logger.info("需要验证数据有效性");
         for (var key in json_mission_daily_reset_new) {
-            if (DEBUG) console.log("key:" + key);
+            if (DEBUG) logger.info("key:" + key);
             var old_value = json_mission_daily_reset_old[key];// 获取旧值
             var new_value = json_mission_daily_reset_new[key];// 获取新值
             if (old_value == null) {
@@ -80,7 +80,7 @@ function checkMissionDailyReset(my_account, data) {
             if (old_value > new_value) {
                 // cb(new Error("每日任务的完成度只能增加不能减少(任务ID:" + key + ",旧数据:" + old_value + ",新数据:" + new_value + ")"));
                 // return;
-                console.error("每日任务的完成度只能增加不能减少(任务ID:" + key + ",旧数据:" + old_value + ",新数据:" + new_value + ")");
+                logger.error("每日任务的完成度只能增加不能减少(任务ID:" + key + ",旧数据:" + old_value + ",新数据:" + new_value + ")");
                 json_mission_daily_reset_new[key] = old_value;
             }
             // 已经全部完成的任务, 不能再被客户端重置

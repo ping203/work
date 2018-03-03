@@ -23,7 +23,7 @@ function _getAuthList(cb) {
         if (err) {
             //res.success({ type: 1, msg: '更新玩家金币数据失败', err: '' + err });
         } else {
-            console.log("auth_list:", rows);
+            logger.info("auth_list:", rows);
             cb(rows);
         }
     });

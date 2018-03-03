@@ -35,7 +35,7 @@ class DailyTask extends Task {
                 if (REDISKEY.GODDESS_FREE == task.redisKey) {
                     redisClient.cmd.multi(cmds1).exec(function (err, res) {
                         if (err) {
-                            console.log(`执行${task.redisKey}1:`, err);
+                            logger.info(`执行${task.redisKey}1:`, err);
                             cb();
                         } else {
                             let sub_cmds = [];
@@ -56,7 +56,7 @@ class DailyTask extends Task {
             });
 
         }, function (err) {
-            console.log(`执行${task.redisKey}重置完成`);
+            logger.info(`执行${task.redisKey}重置完成`);
             utils.invokeCallback(cb, null);
         });
     }

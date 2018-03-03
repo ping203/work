@@ -78,7 +78,7 @@ class RankHall{
             if (code != 0) {
                 cb && cb();
                 return;
-            };
+            }
             cb && cb(null, room.getPlayersInfo());
         });
     }

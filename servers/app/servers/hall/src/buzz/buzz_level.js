@@ -105,9 +105,9 @@ function _levelUp(req, dataObj, cb) {
             var player_level = BuzzUtil.getPlayerLevelByLevel(oldLevel);
             var player_level_next = BuzzUtil.getPlayerLevelByLevel(newLevel);
 
-            // console.error(FUNC + "AAA玩家的经验值不可能涨到下一级oldExp=" + oldExp);
-            // console.error(FUNC + "AAA玩家的经验值不可能涨到下一级player_level.exp_max=" + player_level.exp_max);
-            // console.error(FUNC + "AAA玩家的经验值不可能涨到下一级newExp=" + newExp);
+            // logger.error(FUNC + "AAA玩家的经验值不可能涨到下一级oldExp=" + oldExp);
+            // logger.error(FUNC + "AAA玩家的经验值不可能涨到下一级player_level.exp_max=" + player_level.exp_max);
+            // logger.error(FUNC + "AAA玩家的经验值不可能涨到下一级newExp=" + newExp);
 
             if (oldExp - player_level.exp_max >= newExp) {
                 return;
@@ -123,13 +123,13 @@ function _levelUp(req, dataObj, cb) {
                 };
                 cb(null, ret);
             });
-            // console.error(FUNC + ":升级奖励发放成功");
+            // logger.error(FUNC + ":升级奖励发放成功");
         }
         
         // 校验方法1
         function _checkLevelup1() {
             if (oldLevel == 99) {
-                if (ERROR) console.error(FUNC + "玩家已经是最大等级");
+                if (ERROR) logger.error(FUNC + "玩家已经是最大等级");
                 cb(ERROR_OBJ.LEVELUP_MAX_LEVEL);
                 return false;
             }
@@ -139,7 +139,7 @@ function _levelUp(req, dataObj, cb) {
 
         function _checkLevelup2() {
             if (player_level_next != null && player_level_next.exp_max < oldExp) {
-                if (ERROR) console.error(FUNC + "玩家的经验值不可能涨到下一级");
+                if (ERROR) logger.error(FUNC + "玩家的经验值不可能涨到下一级");
                 cb(ERROR_OBJ.LEVELUP_EXP_TOO_MUCH);
                 return false;
             }

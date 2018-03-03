@@ -64,9 +64,9 @@ function buy(req_client, data, cb) {
         data["itemid"] = channelItemId;
         data["id"] = itemid;
 
-        console.log(FUNC + "itemid:", itemid);
-        console.log(FUNC + "itemtype:", itemtype);
-        console.log(FUNC + "玩吧配置的道具ID:", data.itemid);
+        logger.info(FUNC + "itemid:", itemid);
+        logger.info(FUNC + "itemtype:", itemtype);
+        logger.info(FUNC + "玩吧配置的道具ID:", data.itemid);
 
         // 2. 订单生成
         getGameOrder(req_client, data, function (err, ret) {
@@ -92,14 +92,14 @@ function buy(req_client, data, cb) {
                 // err = null;
                 if (err) {
                     err.game_order_id = game_order_id;
-                    console.log(FUNC + "购买失败, 记录到数据库, 可能是openid不合法");
+                    logger.info(FUNC + "购买失败, 记录到数据库, 可能是openid不合法");
                     cb(err);
                     return;
                 }
 
                 succ_chunk.game_order_id = game_order_id;//给客户端返回game_order_id
                 if (succ_chunk.code != 0) {
-                    console.log(FUNC + "购买失败, 记录到数据库");
+                    logger.info(FUNC + "购买失败, 记录到数据库");
 
                     // 购买失败, 记录到数据库.
                     let cdata = {
@@ -117,8 +117,8 @@ function buy(req_client, data, cb) {
                 }
                 else {
                     // 购买成功, 记录到数据库.
-                    console.log(FUNC + "购买成功, 记录到数据库");
-                    console.log(FUNC + "succ_chunk:", succ_chunk);
+                    logger.info(FUNC + "购买成功, 记录到数据库");
+                    logger.info(FUNC + "succ_chunk:", succ_chunk);
                     /**
                      chunk: {
 code: 0,

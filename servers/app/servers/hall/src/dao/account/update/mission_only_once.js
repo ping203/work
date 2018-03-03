@@ -32,7 +32,7 @@ exports.checkMissionOnlyOnce = checkMissionOnlyOnce;
  * 账户数据更新(一次任务).
  */
 function _update(pool, data, cb, my_account) {
-    if (DEBUG) console.log("CALL mission_only_once.update()");
+    if (DEBUG) logger.info("CALL mission_only_once.update()");
     
     var account_id = my_account['id'];
     var token = my_account['token'];
@@ -50,26 +50,26 @@ function _update(pool, data, cb, my_account) {
 function checkMissionOnlyOnce(my_account, data) {
     var mission_only_once_old = my_account['mission_only_once'];
     var mission_only_once_new = data['mission_only_once'] || mission_only_once_old;
-    if (DEBUG) console.log("mission_only_once_old: ", mission_only_once_old);
-    if (DEBUG) console.log("mission_only_once_new: ", mission_only_once_new);
+    if (DEBUG) logger.info("mission_only_once_old: ", mission_only_once_old);
+    if (DEBUG) logger.info("mission_only_once_new: ", mission_only_once_new);
         
     var json_mission_only_once_old = {};
     var json_mission_only_once_new = {};
     try {
         json_mission_only_once_old = ObjUtil.str2Data(mission_only_once_old);
-        if (DEBUG) console.log("parse mission_only_once_old success");
+        if (DEBUG) logger.info("parse mission_only_once_old success");
         json_mission_only_once_new = ObjUtil.str2Data(mission_only_once_new);
-        if (DEBUG) console.log("parse mission_only_once_new success");
+        if (DEBUG) logger.info("parse mission_only_once_new success");
     }
     catch (err_parse) {
-        if (DEBUG) console.log(err_parse);
+        if (DEBUG) logger.info(err_parse);
     }
         
     // TODO: 验证一次任务数据
     if (!(mission_only_once_old == null || mission_only_once_old == "{}")) {
-        if (DEBUG) console.log("需要验证数据有效性");
+        if (DEBUG) logger.info("需要验证数据有效性");
         for (var key in json_mission_only_once_new) {
-            if (DEBUG) console.log("key:" + key);
+            if (DEBUG) logger.info("key:" + key);
             var old_value = json_mission_only_once_old[key];// 获取旧值
             var new_value = json_mission_only_once_new[key];// 获取新值
             if (old_value == null) {
@@ -79,7 +79,7 @@ function checkMissionOnlyOnce(my_account, data) {
             if (old_value > new_value) {
                 // cb(new Error("一次任务的完成度只能增加不能减少(任务ID:" + key + ",旧数据:" + old_value + ",新数据:" + new_value + ")"));
                 // return;
-                console.error("一次任务的完成度只能增加不能减少(任务ID:" + key + ",旧数据:" + old_value + ",新数据:" + new_value + ")");
+                logger.error("一次任务的完成度只能增加不能减少(任务ID:" + key + ",旧数据:" + old_value + ",新数据:" + new_value + ")");
                 json_mission_only_once_new[key] = old_value;
             }
             // 已经全部完成的任务, 不能再被客户端重置

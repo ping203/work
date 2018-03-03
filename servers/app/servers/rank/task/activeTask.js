@@ -44,9 +44,9 @@ exports.resetDB = resetDB;
 function resetDB(myPool) {
     myPool.query(activeReset_sql, function (err, result) {
         if(err){
-            console.error('mysql 活动数据重置失败:', err);
+            logger.error('mysql 活动数据重置失败:', err);
         }else {
-            console.log('mysql 活动数据重置成功');
+            logger.info('mysql 活动数据重置成功');
         }
     });
 
@@ -59,8 +59,8 @@ function resetDB(myPool) {
     });
 
     redisConnector.multi(cmds, function (err, results) {
-        if (!!err) {
-            console.error('redis 获取活动数据异常:', err);
+        if (err) {
+            logger.error('redis 获取活动数据异常:', err);
             return;
         }
 
@@ -74,11 +74,11 @@ function resetDB(myPool) {
 
             if(subCmds.length > 0){
                 redisConnector.multi(subCmds, function (err, results) {
-                    if (!!err) {
-                        console.error('redis 重置活动数据异常:', err);
+                    if (err) {
+                        logger.error('redis 重置活动数据异常:', err);
                         return;
                     }
-                    console.log('redis 重置活动数据成功');
+                    logger.info('redis 重置活动数据成功');
                 });
             }
         }
@@ -86,7 +86,7 @@ function resetDB(myPool) {
     });
 
     CacheAccount.resetActive(function() {
-        console.log('缓存 重置活动数据成功');
+        logger.info('缓存 重置活动数据成功');
     });
 
 }
@@ -97,10 +97,10 @@ function runActiveReset(myPool) {
 
         let eTime = new Date(item.endtime.replace('&', ' '));
         let time_str = `${eTime.getSeconds()} ${eTime.getMinutes()} ${eTime.getHours()} ${eTime.getDate()} ${eTime.getMonth()+1} ${eTime.getDay()}`;
-        console.log('启动活动结束重置数据模块', time_str);
+        logger.info('启动活动结束重置数据模块', time_str);
 
         this.schedule = schedule.scheduleJob(time_str, function(){
-            console.log('执行活动结束重置数据业务');
+            logger.info('执行活动结束重置数据业务');
             resetDB(myPool);
         });
 

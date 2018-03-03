@@ -57,7 +57,7 @@ function merge(o1, o2) {
         o1[key] = o2[key];
     }
     return o1;
-};
+}
 
 /**
 l1 = [
@@ -87,7 +87,7 @@ function mergeItemList(l1, l2) {
         }
     }
 
-    // console.log("o1:", o1);
+    // logger.info("o1:", o1);
 
     return obj2arr(o1);
 }
@@ -139,7 +139,7 @@ function str2Data(data) {
             ret = JSON.parse(data);
         }
         catch (err) {
-            if (ERROR) console.error(FUNC + "2.Parse Error, data:\n", data);
+            if (ERROR) logger.error(FUNC + "2.Parse Error, data:\n", data);
             throw err;// 依然抛出
         }
         return ret;
@@ -159,7 +159,7 @@ function str2Arr(data) {
     var ret = null;
     if (StringUtil.isString(data)) {
         if (StringUtil.startsWith(data, '"') && StringUtil.endsWith(data, '"')) {
-            if (ERROR) console.error(FUNC + "1.Parse Error, data:\n", data);
+            if (ERROR) logger.error(FUNC + "1.Parse Error, data:\n", data);
             data = StringUtil.subString(data, 1, data.length - 1);
         }
         // TODO: BUG(20170407【8】)
@@ -167,7 +167,7 @@ function str2Arr(data) {
             ret = JSON.parse(data);
         }
         catch (err) {
-            if (ERROR) console.error(FUNC + "2.Parse Error, data:\n", data);
+            if (ERROR) logger.error(FUNC + "2.Parse Error, data:\n", data);
             throw err;// 依然抛出
         }
         return ret;
@@ -210,7 +210,7 @@ function getPlayerName(data) {
     if (ret == null) {
         ret = data.tempname;
     }
-    // console.log(FUNC + "ret:", ret);
+    // logger.info(FUNC + "ret:", ret);
     return ret;
 }
 
@@ -220,19 +220,19 @@ function getPlayerName(data) {
  * update({"i1":1, "i2":2}, {"i1":2, "i3":3}) = {"i1":3, "i2":2, "i3":3}
  */
 function update(obj_old, obj_new) {
-    //console.log("obj_old:", obj_old);
-    //console.log("obj_new:", obj_new);
+    //logger.info("obj_old:", obj_old);
+    //logger.info("obj_new:", obj_new);
     for (var key in obj_new) {
-        // console.log("(...)key:", key);
-        // console.log("(...)obj_old[key]:", obj_old[key]);
-        // console.log("(...)obj_new[key]:", obj_new[key]);
+        // logger.info("(...)key:", key);
+        // logger.info("(...)obj_old[key]:", obj_old[key]);
+        // logger.info("(...)obj_new[key]:", obj_new[key]);
         if (obj_old[key] == null) {
             obj_old[key] = obj_new[key];
         }
         else {
-            //console.log("(1)obj_old[key]:", obj_old[key]);
+            //logger.info("(1)obj_old[key]:", obj_old[key]);
             obj_old[key] = obj_old[key] + obj_new[key];
-            //console.log("(2)obj_old[key]:", obj_old[key]);
+            //logger.info("(2)obj_old[key]:", obj_old[key]);
         }
     }
     return obj_old;
@@ -350,7 +350,7 @@ function TimeQueue(timeInterval, timeOffset, recentRetLength, maxQueueLength) {
 
     var crossQueue = this.queue;
     setInterval(function () {
-        if (DEBUG) console.log('检测时间队列');
+        if (DEBUG) logger.info('检测时间队列');
         var currentTimesamp = Date.parse(new Date());
         for (var i = 0; i < crossQueue.length; i++) {
             var broadcast = crossQueue[i];

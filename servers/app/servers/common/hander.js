@@ -14,7 +14,7 @@ class Handler {
     }
 
     response(err, result, next) {
-        if (!!err) {
+        if (err) {
             utils.invokeCallback(next, null, answer.respNoData(err));
             return;
         }

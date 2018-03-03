@@ -33,33 +33,33 @@ exports.update = _update;
  */
 function _update(pool, data, cb, my_account) {
     const FUNC = TAG + "_update() --- ";
-    if (DEBUG) console.log("CALL first_buy.update()");
+    if (DEBUG) logger.info("CALL first_buy.update()");
     
     var account_id = my_account['id'];
     var token = my_account['token'];
     
     var first_buy_old = my_account['first_buy'];
     var first_buy_new = data['first_buy'] || first_buy_old;
-    if (DEBUG) console.log("first_buy_old: ", first_buy_old);
-    if (DEBUG) console.log("first_buy_new: ", first_buy_new);
+    if (DEBUG) logger.info("first_buy_old: ", first_buy_old);
+    if (DEBUG) logger.info("first_buy_new: ", first_buy_new);
         
     var json_first_buy_old = {};
     var json_first_buy_new = {};
     try {
         json_first_buy_old = ObjUtil.str2Data(first_buy_old);
-        if (DEBUG) console.log("parse first_buy_old success");
+        if (DEBUG) logger.info("parse first_buy_old success");
         json_first_buy_new = ObjUtil.str2Data(first_buy_new);
-        if (DEBUG) console.log("parse first_buy_new success");
+        if (DEBUG) logger.info("parse first_buy_new success");
     }
     catch (err_parse) {
-        if (DEBUG) console.log(err_parse);
+        if (DEBUG) logger.info(err_parse);
     }
         
     // DONE: 验证首充数据
     if (!(first_buy_old == null || first_buy_old == "{}")) {
-        if (DEBUG) console.log("需要验证数据有效性");
+        if (DEBUG) logger.info("需要验证数据有效性");
         for (var key in json_first_buy_new) {
-            if (DEBUG) console.log("key:" + key);
+            if (DEBUG) logger.info("key:" + key);
             var old_value = json_first_buy_old[key];// 获取旧值
             var new_value = json_first_buy_new[key];// 获取新值
             if (old_value == null) {
@@ -87,14 +87,14 @@ function _update(pool, data, cb, my_account) {
         
     var sql_data = [first_buy_new, account_id, token];
         
-    if (DEBUG) console.log('sql: ', sql);
-    if (DEBUG) console.log('sql_data: ', sql_data);
+    if (DEBUG) logger.info('sql: ', sql);
+    if (DEBUG) logger.info('sql_data: ', sql_data);
         
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.error(FUNC + "err:\n", err);
-    	    console.error(FUNC + "sql:\n", sql);
-    	    console.error(FUNC + "sql_data:\n", sql_data);
+            logger.error(FUNC + "err:\n", err);
+    	    logger.error(FUNC + "sql:\n", sql);
+    	    logger.error(FUNC + "sql_data:\n", sql_data);
             cb(err);
         } else {
             cb(null, "success");

@@ -148,7 +148,7 @@ function query(request_uid, timestamp, count, need_hot4) {
     }
 
     var hot4 = [];
-    if (DEBUG) console.log(FUNC + "need_hot4:", need_hot4);
+    if (DEBUG) logger.info(FUNC + "need_hot4:", need_hot4);
     if (need_hot4) {
         var sortList = _.sortBy(gProposeCache, function(propose) {
             return propose.like_count;
@@ -172,8 +172,8 @@ function query(request_uid, timestamp, count, need_hot4) {
         }
     }
 
-    if (DEBUG) console.log(FUNC + "msg_list:", msg_list);
-    if (DEBUG) console.log(FUNC + "hot4:", hot4);
+    if (DEBUG) logger.info(FUNC + "msg_list:", msg_list);
+    if (DEBUG) logger.info(FUNC + "hot4:", hot4);
     return {
         server_time: new Date().getTime(),
         msg_list: msg_list,
@@ -187,8 +187,8 @@ function query(request_uid, timestamp, count, need_hot4) {
 function like(uid, mid) {
     const FUNC = TAG + "like() --- ";
 
-    if (DEBUG) console.log(FUNC + "uid:", uid);
-    if (DEBUG) console.log(FUNC + "mid:", mid);
+    if (DEBUG) logger.info(FUNC + "uid:", uid);
+    if (DEBUG) logger.info(FUNC + "mid:", mid);
 
     var ret = {
         like_count:0,
@@ -205,7 +205,7 @@ function like(uid, mid) {
         ret = target.like(uid);
     }
 
-    if (DEBUG) console.log(FUNC + "target:", target);
+    if (DEBUG) logger.info(FUNC + "target:", target);
     return ret;
 }
 
@@ -215,7 +215,7 @@ function like(uid, mid) {
 function del(mid) {
     const FUNC = TAG + "del() --- ";
     
-    if (DEBUG) console.log(FUNC + "mid:", mid);
+    if (DEBUG) logger.info(FUNC + "mid:", mid);
     for (var i = gProposeCache.length - 1; i >= 0; i--) {
         var propose = gProposeCache[i];
         if (propose.mid == mid) {
@@ -256,7 +256,7 @@ function loadAll(rows,clear) {
             propose.like_count = record.like_count;
             gProposeCache.push(propose);
         }
-        if (DEBUG) console.log(FUNC + "共加载留言数:", rows.length);
+        if (DEBUG) logger.info(FUNC + "共加载留言数:", rows.length);
     }
 }
 

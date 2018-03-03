@@ -109,7 +109,7 @@ function mailList(pool, data, cb) {
 function readMail(pool, data, cb) {
     // 数据验证
     _prepareReadMail(data, function (err, ret) {
-        if(!!ret){
+        if(ret){
             BuzzUtil.cacheLinkDataApi(data, "read_mail");
             _didReadMail(pool, data, cb);
         }

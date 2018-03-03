@@ -934,7 +934,7 @@ class FishModel {
         return this._fishBasePct[fishKey] || 1;
     }    
 
-};
+}
 
 
 FishModel.EventType = {

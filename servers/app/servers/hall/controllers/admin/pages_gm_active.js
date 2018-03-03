@@ -18,7 +18,7 @@ function _makeVar() {
     data = _.extend(data, { title: 'Data', expanded_id: 'menu_game_mgmt' });
     //data = _.extend(data, { action_list : [{ id: 1, description: '111' }, { id: 2, description: '222' }] });
     data.action_list = active_cdkey_cfg;
-    console.log("data: ", data);
+    logger.info("data: ", data);
     return data;
 }
 

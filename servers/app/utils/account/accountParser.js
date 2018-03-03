@@ -11,7 +11,7 @@ class AccountParser {
         let serialVal = null;
         let typeInfo = accountConf.getFieldDef(key);
         if (!typeInfo) {
-            console.log('非法字段，请检查字段名是否正确', __filename, key);
+            logger.info('非法字段，请检查字段名是否正确', __filename, key);
             return '';
         }
 
@@ -62,7 +62,7 @@ class AccountParser {
         let serialVal = null;
         let typeInfo = accountConf.getFieldDef(key);
         if (!typeInfo) {
-            console.log('解析redis数据失败，非法字段，请检查字段名是否正确', __filename, key);
+            logger.info('解析redis数据失败，非法字段，请检查字段名是否正确', __filename, key);
             return null;
         }
 
@@ -95,7 +95,7 @@ class AccountParser {
                         serialVal = JSON.parse(value);
                     }
                 } catch (err) {
-                    console.log("---can not JSON.parse ", key, value);
+                    logger.info("---can not JSON.parse ", key, value);
                 }
             }
                 break;

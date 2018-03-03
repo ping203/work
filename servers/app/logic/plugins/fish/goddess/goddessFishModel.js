@@ -168,7 +168,7 @@ class GoddessFishModel extends FishModel {
                 }
             }
         }else{
-            console.log("牛，所有波已搞定！");
+            logger.info("牛，所有波已搞定！");
         }
    }
 

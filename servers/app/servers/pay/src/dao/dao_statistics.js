@@ -45,14 +45,14 @@ function _getDailyStatistics(pool, data, cb) {
     sql += "WHERE date ";
     sql += "BETWEEN STR_TO_DATE('" + start_date + "','%Y-%m-%d') ";
     sql += "AND STR_TO_DATE('" + end_date + "','%Y-%m-%d')";
-    console.log("_getDailyStatistics()");
-    console.log(sql);
+    logger.info("_getDailyStatistics()");
+    logger.info(sql);
 
     var sql_data = [];
 
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -73,40 +73,40 @@ function _genStatistics(pool, cb) {
     
     // 从tbl_login_log中查询前一日有登录的用户
     _getLoginData(pool, function (err, result_login) {
-        console.log("result_login: ", result_login);
+        logger.info("result_login: ", result_login);
         if (result_login.length == 0) {
             cb(new Error('result_login.length == 0: 昨日没有用户登录!!!'));
             return;
         }
         var accounts = _makeLoginData(result_login);
-        console.log(FUNC + "加入login数据后:", ObjUtil.length(accounts));
+        logger.info(FUNC + "加入login数据后:", ObjUtil.length(accounts));
 
         _getLogoutData(pool, function (err, result_logout) {
-            //console.log("result_logout: ", result_logout);
+            //logger.info("result_logout: ", result_logout);
             accounts = _addLogoutData(accounts, result_logout);
 
             _getGoldData(pool, function (err, result_gold) {
-                if (DEBUG) console.log("result_gold: ", result_gold);
+                if (DEBUG) logger.info("result_gold: ", result_gold);
                 accounts = _addGoldData(accounts, result_gold);
-                console.log(FUNC + "加入gold数据后:", ObjUtil.length(accounts));
+                logger.info(FUNC + "加入gold数据后:", ObjUtil.length(accounts));
 
                 _getPearlData(pool, function (err, result_pearl) {
-                    //console.log("result_pearl: ", result_pearl);
+                    //logger.info("result_pearl: ", result_pearl);
                     accounts = _addPearlData(accounts, result_pearl);
 
                     _getSkillData(pool, function (err, result_skill) {
-                        //console.log("result_skill: ", result_skill);
+                        //logger.info("result_skill: ", result_skill);
                         accounts = _addSkillData(accounts, result_skill);
 
                         _getWeaponData(pool, function (err, result_weapon) {
-                            //console.log("result_weapon: ", result_weapon);
+                            //logger.info("result_weapon: ", result_weapon);
                             accounts = _addWeaponData(accounts, result_weapon);
 
                             _getShopData(pool, function (err, result_shop) {
-                                if (DEBUG) console.log("result_shop: ", result_shop);
+                                if (DEBUG) logger.info("result_shop: ", result_shop);
                                 accounts = _addShopData(accounts, result_shop);
                                 
-                                console.log(FUNC + "插入数据总条数:", ObjUtil.length(accounts));
+                                logger.info(FUNC + "插入数据总条数:", ObjUtil.length(accounts));
                                 // _insertAccounts(pool, accounts, cb);
                                 _insert10Accounts(pool, accounts, cb);
                             });
@@ -116,7 +116,7 @@ function _genStatistics(pool, cb) {
             });
         });
     });
-};
+}
 exports.genStatistics = _genStatistics;
 
 // 最大插入数据的条数
@@ -138,9 +138,9 @@ function _insert10Accounts(pool, accounts, cb) {
     }
     _insertAccounts(pool, accountsTobeHandle, function(err) {
         if (err) {
-            if (ERROR) console.error(FUNC + "插入数据出现问题, 不中断流程, 继续插入"); 
-            if (ERROR) console.error(FUNC + "本次插入条数:", ObjUtil.length(accountsTobeHandle));
-            if (ERROR) console.error(FUNC + "剩余未插入条数:", ObjUtil.length(accounts));
+            if (ERROR) logger.error(FUNC + "插入数据出现问题, 不中断流程, 继续插入"); 
+            if (ERROR) logger.error(FUNC + "本次插入条数:", ObjUtil.length(accountsTobeHandle));
+            if (ERROR) logger.error(FUNC + "剩余未插入条数:", ObjUtil.length(accounts));
         }
         if (ObjUtil.length(accounts) > 0) {
             _insert10Accounts(pool, accounts, cb);
@@ -187,7 +187,7 @@ function _insertAccounts(pool, accounts, cb) {
             sql += ',(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, date_sub(curdate(),interval 1 day))';
         }
     }
-    //console.log('sql: ', sql);
+    //logger.info('sql: ', sql);
     
     var sql_data = [];
     for (var account_id in accounts) {
@@ -210,14 +210,14 @@ function _insertAccounts(pool, accounts, cb) {
         sql_data.push(account["pearl_shop_amount"]);
     }
 
-    //console.log('accounts: ', accounts);
-    //console.log('sql_data: ', sql_data);
+    //logger.info('accounts: ', accounts);
+    //logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
             cb(err);
         } else {
             cb(null);
@@ -234,13 +234,13 @@ function _getGoldData(pool, cb) {
     sql += 'FROM tbl_gold_log ';
     sql += 'WHERE TO_DAYS(NOW()) - TO_DAYS(`log_at`) = 1 ';
     sql += 'GROUP BY account_id, scene';
-    //console.log('sql: ', sql);
+    //logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -279,13 +279,13 @@ function _getPearlData(pool, cb) {
     sql += 'FROM tbl_pearl_log ';
     sql += 'WHERE TO_DAYS(NOW()) - TO_DAYS(`log_at`) = 1 ';
     sql += 'GROUP BY account_id, scene';
-    //console.log('sql: ', sql);
+    //logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -324,13 +324,13 @@ function _getSkillData(pool, cb) {
     sql += 'FROM tbl_skill_log ';
     sql += 'WHERE TO_DAYS(NOW()) - TO_DAYS(`log_at`) = 1 ';
     sql += 'GROUP BY account_id, skill_id';
-    //console.log('sql: ', sql);
+    //logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -369,13 +369,13 @@ function _getWeaponData(pool, cb) {
     sql += 'FROM tbl_weapon_log ';
     sql += 'WHERE TO_DAYS(NOW()) - TO_DAYS(`log_at`) = 1 ';
     sql += 'GROUP BY account_id, type';
-    //console.log('sql: ', sql);
+    //logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -412,13 +412,13 @@ function _getShopData(pool, cb) {
     sql += 'FROM tbl_shop_log ';
     sql += 'WHERE TO_DAYS(NOW()) - TO_DAYS(`log_at`) = 1 ';
     sql += 'GROUP BY account_id, item_type';
-    //console.log('sql: ', sql);
+    //logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -435,7 +435,7 @@ function _addShopData(accounts, result_shop) {
             shop_account = _checkAccount(accounts, shop_account, account_id, '此账号在本日有商店log却没有登录log!!!');
 
             var type = result_shop[idx_shop]['item_type'];
-            //console.log('type: ', type);
+            //logger.info('type: ', type);
             if (type == cfg.shop_item_type.IT_GOLD) {
                 shop_account['gold_shop_count'] += 1;
                 shop_account['gold_shop_amount'] += result_shop[idx_shop]['item_amount'];
@@ -494,9 +494,9 @@ function _checkAccount(accounts, account, account_id, errInfo) {
 }
 
 function _logErrorNoLogin(errInfo, account_id) {
-    console.error(errInfo);
-    console.error('account_id: ', account_id);
-    console.error('=============================================================');
+    logger.error(errInfo);
+    logger.error('account_id: ', account_id);
+    logger.error('=============================================================');
 }
 
 function _insertOneAccount(account_id) {
@@ -526,13 +526,13 @@ function _getLogData(pool, cb, table) {
     sql += 'FROM ' + table + ' ';
     sql += 'WHERE TO_DAYS(NOW()) - TO_DAYS(`log_at`) = 1 ';
     sql += 'GROUP BY account_id';
-    //console.log('sql: ', sql);
+    //logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);

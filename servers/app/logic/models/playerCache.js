@@ -19,8 +19,8 @@ class PlayerCache{
                 utils.invokeCallback(cb, CONSTS.SYS_CODE.DB_ERROR);
                 return;
             }
-            console.log(data);
-            console.log(data.info);
+            logger.info(data);
+            logger.info(data.info);
             utils.invokeCallback(cb, null, data);
         });
     }

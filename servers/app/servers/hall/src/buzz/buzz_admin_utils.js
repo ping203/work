@@ -19,20 +19,20 @@ function _checkTokenPost(req, cb) {
     // TODO: 从req.body中获取用户的token等信息, 查找用户角色对应的权限, 决定用户所能看到的页面
     var token = req.body.token;
     if (token == null) {
-        console.log("跳转到登录界面");
+        logger.info("跳转到登录界面");
         // res.render("admin/login", _makeVar());
     }
     else {
-        console.log("回调，直接渲染仪表盘");
-        console.log("通过token查找用户信息(权限，角色等)");
+        logger.info("回调，直接渲染仪表盘");
+        logger.info("通过token查找用户信息(权限，角色等)");
         myDao.getUserInfo(req.body, function (err, user_info) {
-            console.log("getUserInfo complete...");
+            logger.info("getUserInfo complete...");
             if (err) {
-                console.log(JSON.stringify(err));
+                logger.info(JSON.stringify(err));
                 cb(err);
             } else {
                 // 在这里统一处理auth
-                console.log('----------user_info: ', user_info);
+                logger.info('----------user_info: ', user_info);
                 var rows = user_info['auth_list'];
                 var user_auth = {};
                 for (var i = 0; i < rows.length; i++) {
@@ -47,5 +47,5 @@ function _checkTokenPost(req, cb) {
 }
 
 function _printReq(req) {
-    console.log("req.body: ", req.body);
+    logger.info("req.body: ", req.body);
 }

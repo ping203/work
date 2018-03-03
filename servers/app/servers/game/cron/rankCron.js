@@ -4,7 +4,7 @@ class Cron{
     }
 
     update(){
-        // console.log('Cron test call');
+        // logger.info('Cron test call');
     }
 }
 

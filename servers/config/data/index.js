@@ -5,4 +5,4 @@ module.exports = {
     GAME_CFGS:require('./wanba') //TODO 开发测试
     // GAME_CFGS:require(`./${VERSION_KEY[PUB]}`)
 
-}
+};

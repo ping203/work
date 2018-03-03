@@ -66,7 +66,7 @@ exports.getGoddessTop1 = getGoddessTop1;
  * 获取初始化的女神数据
  */
 function init() {
-    if (DEBUG) console.log("【CALL】 buzz_goddess.init()");
+    if (DEBUG) logger.info("【CALL】 buzz_goddess.init()");
 
     return JSON.stringify(_initGods());
 }
@@ -83,7 +83,7 @@ function getLeftDays() {
 }
 
 function getDefend(req, data, cb) {
-    if (DEBUG) console.log("【CALL】 buzz_goddess.getDefend()");
+    if (DEBUG) logger.info("【CALL】 buzz_goddess.getDefend()");
     
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "get_god_data");
@@ -126,7 +126,7 @@ function updateLevel(account) {
     let list = account.goddess;
     for (let idx in list) {
         let goddess = list[idx];
-        if (DEBUG) console.log(FUNC + "goddess:", goddess);
+        if (DEBUG) logger.info(FUNC + "goddess:", goddess);
         if (_isGoddessUnlocked(goddess)) {
             if (!aquarium_goddess['' + goddess.id]) {
                 aquarium_goddess['' + goddess.id] = {};
@@ -144,14 +144,14 @@ function updateLevel(account) {
 function challengeGoddess(req, data, cb) {
     let FUNC = TAG + "challengeGoddess() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "challenge_god");
     
     buzz_account.check(req, data, function (err, account) {
         if (err) {
-            if (ERROR) console.log(FUNC + "err:", err);
+            if (ERROR) logger.info(FUNC + "err:", err);
             cb(err);
             return;
         }
@@ -166,14 +166,14 @@ function challengeGoddess(req, data, cb) {
 function rewardTimes(req, data, cb) {
     let FUNC = TAG + "rewardTimes() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "goddess_reward_times");
     
     buzz_account.check(req, data, function (err, account) {
         if (err) {
-            if (ERROR) console.log(FUNC + "err:", err);
+            if (ERROR) logger.info(FUNC + "err:", err);
             cb(err);
             return;
         }
@@ -285,15 +285,15 @@ function getGoddessTop1(platform) {
  */
 function _isGoddessUnlocked(goddess) {
     const FUNC = TAG + "_isGoddessUnlocked()---";
-    // console.log(FUNC + "hao gui yi goddess:\n", goddess);
+    // logger.info(FUNC + "hao gui yi goddess:\n", goddess);
 
     let unlock = goddess.unlock;
     
     // TODO: BUG(20170407【10】)
     if (unlock == null) {
-        if (ERROR) console.error("--------------------------------------------------------");
-        if (ERROR) console.error(FUNC + "goddess:\n", goddess);
-        if (ERROR) console.error("--------------------------------------------------------");
+        if (ERROR) logger.error("--------------------------------------------------------");
+        if (ERROR) logger.error(FUNC + "goddess:\n", goddess);
+        if (ERROR) logger.error("--------------------------------------------------------");
         return false;
     }
     for (let i = 0; i < unlock.length; i++) {
@@ -344,7 +344,7 @@ function _didGetDefend(req, data, account, cb) {
         ctimes: goddess_ctimes,
     };
 
-    // if (DEBUG) console.log(FUNC + "response:", response);
+    // if (DEBUG) logger.info(FUNC + "response:", response);
 
     cb(null, response);
     
@@ -359,20 +359,20 @@ function _didChallengeGoddess(req, data, account, cb) {
     let uid = account.id;
     let goddess_free = account.goddess_free;
     let goddess_ctimes = account.goddess_ctimes;
-    if (DEBUG) console.log(FUNC + "goddess_free:\n", goddess_free);
-    if (DEBUG) console.log(FUNC + "goddess_ctimes:\n", goddess_ctimes);
+    if (DEBUG) logger.info(FUNC + "goddess_free:\n", goddess_free);
+    if (DEBUG) logger.info(FUNC + "goddess_ctimes:\n", goddess_ctimes);
     if (goddess_free > 0) {
-        if (DEBUG) console.log(FUNC + "不消耗钻石");
+        if (DEBUG) logger.info(FUNC + "不消耗钻石");
         goddess_free--;
         CacheAccount.setGoddessFree(uid, goddess_free);
     }
     else {
-        if (DEBUG) console.log(FUNC + "计算消耗钻石");
+        if (DEBUG) logger.info(FUNC + "计算消耗钻石");
         let pearl_cost = _getPrice(goddess_ctimes);
-        if (DEBUG) console.log(FUNC + "pearl_cost:", pearl_cost);
+        if (DEBUG) logger.info(FUNC + "pearl_cost:", pearl_cost);
         // 消耗钻石
         if (account.pearl < pearl_cost) {
-            if (ERROR) console.error(FUNC + "玩家钻石不足, 不能挑战女神");
+            if (ERROR) logger.error(FUNC + "玩家钻石不足, 不能挑战女神");
             // 客户端无法把这个错误导向钻石购买, 返回一个消耗钻石数
             // cb(ERROR_OBJ.DIAMOND_NOT_ENOUGH);
             let ret = {
@@ -415,7 +415,7 @@ function _didRewardTimes(req, data, account, cb) {
         [
             function step1(cb) {
                 CacheAccount.getGoddessCrossover(account.id, function(err, res) {
-                    console.log(FUNC + 'res:', res);
+                    logger.info(FUNC + 'res:', res);
                     if (res == null) {
                         res = 1;
                     }
@@ -432,7 +432,7 @@ function _didRewardTimes(req, data, account, cb) {
 
     function calGodReward(crossover) {
 
-        console.log(FUNC + 'crossover:', crossover);
+        logger.info(FUNC + 'crossover:', crossover);
         let times = 1 + crossover * 0.5;
         if (times > 4) {
             times = 4;
@@ -440,7 +440,7 @@ function _didRewardTimes(req, data, account, cb) {
 
         // 从tid获取奖励
         let item_list = BuzzUtil.getItemListByTid(account, tid);
-        console.log(FUNC + 'item_list:', item_list);
+        logger.info(FUNC + 'item_list:', item_list);
         // yDONE: BUG修改——需要在放入时就乘以倍数
         let times_item_list = [];
         for (let i = 0; i < item_list.length; i++) {
@@ -510,7 +510,7 @@ function _prepare(data, cb) {
     
     let token = data['token'];
     
-    if (DEBUG) console.log("token:", token);
+    if (DEBUG) logger.info("token:", token);
 
     if (!CommonUtil.isParamExist("buzz_goddess", token, "接口调用请传参数token", cb)) return false;
     
@@ -546,7 +546,7 @@ function _unlock(req, dataObj, cb) {
     let goddess_id = dataObj.goddess_id;
     let idx = dataObj.idx;
     let pool = req.pool;
-    console.log(FUNC + "goddess_id:", goddess_id);
+    logger.info(FUNC + "goddess_id:", goddess_id);
 
     DaoCommon.checkAccount(pool, token, function(error, account) {
         if (error) {
@@ -614,7 +614,7 @@ function _unlock(req, dataObj, cb) {
             return true;
         }
         function _checkUnlock2() {
-            console.log(FUNC + "goddess_unlock[" + idx + "]:", goddess_unlock[idx]);
+            logger.info(FUNC + "goddess_unlock[" + idx + "]:", goddess_unlock[idx]);
             if (idx < 0 || idx > 8) {
                 cb(ERROR_OBJ.GODDESS_UNLOCK_IDX_ERROR);
                 return false;
@@ -670,7 +670,7 @@ function _levelup(req, dataObj, cb) {
 
     // DEBUG = 1;
 
-    if (DEBUG) console.log(FUNC + "女神ID:", goddess_id);
+    if (DEBUG) logger.info(FUNC + "女神ID:", goddess_id);
 
     DaoCommon.checkAccount(pool, token, function(error, account) {
         if (error) {
@@ -691,7 +691,7 @@ function _levelup(req, dataObj, cb) {
         if (!_checkLevelup1()) return;
         let goddess = _getGoddessById(goddess_list, goddess_id);
         let goddess_level = goddess.level;
-        if (DEBUG) console.log(FUNC + "女神当前等级:", goddess_level);
+        if (DEBUG) logger.info(FUNC + "女神当前等级:", goddess_level);
         let goddessup = BuzzUtil.getGoddessUpByIdAndLevel(goddess_id, goddess_level + 1);
         if (!_checkLevelup2()) return;
         let needitem_id = goddessup.needitem[0];
@@ -702,13 +702,13 @@ function _levelup(req, dataObj, cb) {
         if (goddessup.needgold > 0) {
             levelup_cost.push([coinId, goddessup.needgold]);
         }
-        if (DEBUG) console.log(FUNC + "levelup_cost:", levelup_cost);
+        if (DEBUG) logger.info(FUNC + "levelup_cost:", levelup_cost);
         let item_list = _getItemList(levelup_cost);
-        if (DEBUG) console.log(FUNC + "item_list:", item_list);
+        if (DEBUG) logger.info(FUNC + "item_list:", item_list);
 
         BuzzUtil.removeFromPack(req, account, item_list, function(cost_info) {
             goddess.level++;
-            if (DEBUG) console.log(FUNC + "女神升级到:", goddess.level);
+            if (DEBUG) logger.info(FUNC + "女神升级到:", goddess.level);
             let change = BuzzUtil.getChange(account, cost_info);
             let ret = {
                 change: change,
@@ -788,7 +788,7 @@ function _weekReward(req, dataObj, cb) {
 
     dataObj.type = RANK_TYPE.GODDESS_LW;
     buzz_charts.getChartReward(req, dataObj, function(err, resposne) {
-        console.log('------------------getChartReward:', resposne);
+        logger.info('------------------getChartReward:', resposne);
         if (_.keys(resposne).length == 0) {
             cb({code:11111, msg:"用户奖励已经领取"});
         }
@@ -842,17 +842,17 @@ function _weekReward(req, dataObj, cb) {
     //     // 校验方法
     //     function _checkWeekReward1() {
     //         if (WEEK_REWARD_STATUS.UNABLE == week_reward) {
-    //             if (ERROR) console.error(FUNC + "保卫女神周奖励领取错误(week_reward为不可领取)");
+    //             if (ERROR) logger.error(FUNC + "保卫女神周奖励领取错误(week_reward为不可领取)");
     //             cb(ERROR_OBJ.GODDESS_WEEKREWARD_UNABLE);
     //             return false;
     //         }
     //         if (WEEK_REWARD_STATUS.ALREADY == week_reward) {
-    //             if (ERROR) console.error(FUNC + "保卫女神周奖励领取错误(week_reward为已领取)");
+    //             if (ERROR) logger.error(FUNC + "保卫女神周奖励领取错误(week_reward为已领取)");
     //             cb(ERROR_OBJ.GODDESS_WEEKREWARD_ALREADY);
     //             return false;
     //         }
     //         if (week_rank < MIN_RATE || week_rank > MAX_RATE) {
-    //             if (ERROR) console.error(FUNC + "保卫女神未进入排名, 不可领取:", week_rank);
+    //             if (ERROR) logger.error(FUNC + "保卫女神未进入排名, 不可领取:", week_rank);
     //             cb(ERROR_OBJ.GODDESS_WEEKREWARD_OUT_OF_RANKS);
     //             return false;
     //         }
@@ -876,7 +876,7 @@ function _queryWeekReward(req, dataObj, cb) {
     dataObj.account_id = dataObj.uid;
 
     buzz_charts.getUserRank(req, dataObj, function(err, info) {
-        console.log(FUNC + "info:", info);
+        logger.info(FUNC + "info:", info);
         let rank_reward = BuzzUtil.getGoddessChartRewardByRank(info.my_rank, info.score);
         let ret = {};
         ret.week_reward = info.reward;
@@ -915,7 +915,7 @@ function _queryWeekReward(req, dataObj, cb) {
     //         // 这里直接将week_reward设置为不可领取的状态即可, 无需返回错误
     //         if (WEEK_REWARD_STATUS.AVAILABLE == week_reward) {
     //             if (week_rank < MIN_RATE || week_rank > MAX_RATE) {
-    //                 if (ERROR) console.error(FUNC + "保卫女神周奖励状态错误(week_reward为可领取,但是week_rank在1~1000之外)");
+    //                 if (ERROR) logger.error(FUNC + "保卫女神周奖励状态错误(week_reward为可领取,但是week_rank在1~1000之外)");
     //                 week_reward = WEEK_REWARD_STATUS.UNABLE;
     //                 account.week_reward = WEEK_REWARD_STATUS.UNABLE;
     //             }

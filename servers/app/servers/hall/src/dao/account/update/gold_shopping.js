@@ -55,7 +55,7 @@ exports.getAllGoddessAddRate = getAllGoddessAddRate;
 function update(pool, data, cb, account) {
     const FUNC = TAG + "update() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     let coinIdTarget = shop_shop_buy_type_cfg.BUY_GOLD_GAIN.id;
     let coinTypeTarget = shop_shop_buy_type_cfg.BUY_GOLD_GAIN.name;
@@ -74,9 +74,9 @@ function update(pool, data, cb, account) {
     // 新增字段: 表示本次购买金币的次数.
     var times = data['times'];
         
-    if (DEBUG) console.log(FUNC + "gold_shopping_old: " + gold_shopping_old);
-    if (DEBUG) console.log(FUNC + "gold_shopping_new: " + gold_shopping_new);
-    if (DEBUG) console.log(FUNC + "times: " + times);
+    if (DEBUG) logger.info(FUNC + "gold_shopping_old: " + gold_shopping_old);
+    if (DEBUG) logger.info(FUNC + "gold_shopping_new: " + gold_shopping_new);
+    if (DEBUG) logger.info(FUNC + "times: " + times);
         
     // 数据验证1: 购买次数只能增加不能减少
     if (gold_shopping_new <= gold_shopping_old) {
@@ -94,10 +94,10 @@ function update(pool, data, cb, account) {
     var all_gold = getAllGold(gold_shopping_old, gold_shopping_new, times);
     if (all_gold == 0) {
         if (ERROR) {
-            console.error("玩家购买金币的数额为0, OMG!!!");
-            console.error("gold_shopping_old:", gold_shopping_old);
-            console.error("gold_shopping_new:", gold_shopping_new);
-            console.error("times:", times);
+            logger.error("玩家购买金币的数额为0, OMG!!!");
+            logger.error("gold_shopping_old:", gold_shopping_old);
+            logger.error("gold_shopping_new:", gold_shopping_new);
+            logger.error("times:", times);
         }
     }
         
@@ -120,15 +120,15 @@ function update(pool, data, cb, account) {
     var addRate = getAllGoddessAddRate(my_goddess_json);
 
     delta_target = Math.round(delta_target * addRate);
-    console.log(FUNC + "addRate:", addRate);
-    console.log(FUNC + "delta_target:", delta_target);
+    logger.info(FUNC + "addRate:", addRate);
+    logger.info(FUNC + "delta_target:", delta_target);
 
     var target_new = target_old + delta_target;
     var cost_new = cost_old - delta_cost;
         
-    if (DEBUG) console.log(FUNC + "cost_old: " + cost_old);
-    if (DEBUG) console.log(FUNC + "delta_cost: " + delta_cost);
-    if (DEBUG) console.log(FUNC + "cost_new: " + cost_new);
+    if (DEBUG) logger.info(FUNC + "cost_old: " + cost_old);
+    if (DEBUG) logger.info(FUNC + "delta_cost: " + delta_cost);
+    if (DEBUG) logger.info(FUNC + "cost_new: " + cost_new);
         
     // 数据验证2: 保证玩家有足够的钻石购买
     if (cost_new < 0) {
@@ -144,14 +144,14 @@ function update(pool, data, cb, account) {
     // account[coinTypeTarget] = delta_target;
     // account[coinTypeCost] = cost_new;
 
-    console.log(FUNC + 'target_old:', target_old);
-    console.log(FUNC + 'cost_old:', cost_old);
+    logger.info(FUNC + 'target_old:', target_old);
+    logger.info(FUNC + 'cost_old:', cost_old);
 
     BuzzUtil.addCoin(account, coinIdTarget, delta_target, function(err, res) {
         BuzzUtil.useCoin(account, coinIdCost, delta_cost, function (err, res) {
 
-            console.log(FUNC + 'target_new:', target_new);
-            console.log(FUNC + 'cost_new:', cost_new);
+            logger.info(FUNC + 'target_new:', target_new);
+            logger.info(FUNC + 'cost_new:', cost_new);
 
             account.gold_shopping = gold_shopping_old + times;
             account.commit();

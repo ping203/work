@@ -21,12 +21,12 @@ exports.getAccount = getAccount;
 function checkTest(test, server_token, uid, cb) {
     const FUNC = TAG + "checkTest() --- ";
     if (server_token && StringUtil.endsWith(server_token, "cheat")) {
-        if (ERROR) console.error(FUNC + "Token显示玩家作弊");
+        if (ERROR) logger.error(FUNC + "Token显示玩家作弊");
         cb && cb(ERROR_OBJ.TOKEN_INVALID);// 1001
         return false;
     }
     if (test == -1) {
-        if (ERROR) console.error(FUNC + "玩家作弊被封号:" + uid);
+        if (ERROR) logger.error(FUNC + "玩家作弊被封号:" + uid);
         let token = uid + "_cheat";
         CacheAccount.setToken(uid, token);
         cb && cb(ERROR_OBJ.PLAYER_CHEAT);
@@ -39,19 +39,19 @@ function checkToken(server_token, token) {
     let FUNC = 'checkToken';
 
     if (server_token == "daily_reset") {
-        if (ERROR) console.error(FUNC + "服务器跨天更新token");
+        if (ERROR) logger.error(FUNC + "服务器跨天更新token");
         // cb && cb(ERROR_OBJ.DAILY_RESET);// 1013
         return false;
     }
     if (server_token == "server_update") {
-        if (ERROR) console.error(FUNC + "服务器更新重启");
+        if (ERROR) logger.error(FUNC + "服务器更新重启");
         // cb && cb(ERROR_OBJ.SERVER_UPDATE);// 1012
         return false;
     }
     if (server_token != token) {
-        if (ERROR) console.error(FUNC + "Token过期");
-        if (ERROR) console.error(FUNC + "client_token:", token);
-        if (ERROR) console.error(FUNC + "server_token:", server_token);
+        if (ERROR) logger.error(FUNC + "Token过期");
+        if (ERROR) logger.error(FUNC + "client_token:", token);
+        if (ERROR) logger.error(FUNC + "server_token:", server_token);
         // cb && cb(ERROR_OBJ.TOKEN_INVALID);// 1001
         return false;
     }
@@ -75,16 +75,16 @@ function checkAccount(pool, token, cb) {
                 if (!account) {
                     DaoAccountCommon.getAccountByUid(pool, uid, function(err, account) {
                         if (err) {
-                            if (ERROR) console.error(FUNC + "数据库读写错误");
+                            if (ERROR) logger.error(FUNC + "数据库读写错误");
                             _cb(ERROR_OBJ.DB_ERR);
                             return;
                         }
-                        if (DEBUG)console.log(FUNC + "玩家数据来自数据库:", uid);
+                        if (DEBUG)logger.info(FUNC + "玩家数据来自数据库:", uid);
                         _cb(null, account);
                     });
                 }
                 else {
-                    if (DEBUG)console.log(FUNC + "玩家数据来自缓存:", uid);
+                    if (DEBUG)logger.info(FUNC + "玩家数据来自缓存:", uid);
                     _cb(null, account);
                 }
             }
@@ -109,23 +109,23 @@ function checkAccount(pool, token, cb) {
 function getAccount(pool, uid, cb) {
     const FUNC = TAG + "getAccount() --- ";
 
-    console.log(FUNC + "updateSingleValue()uid:", uid);
+    logger.info(FUNC + "updateSingleValue()uid:", uid);
     async.waterfall([function (_cb) {
         CacheAccount.getAccountById(uid, _cb);
     }, function (account, _cb) {
         if (!account) {
             DaoAccountCommon.getAccountByUid(pool, uid, function(err, account) {
                 if (err) {
-                    if (ERROR) console.error(FUNC + "数据库读写错误");
+                    if (ERROR) logger.error(FUNC + "数据库读写错误");
                     _cb(ERROR_OBJ.DB_ERR);
                     return;
                 }
-                console.log(FUNC + "updateSingleValue()玩家数据来自数据库:", uid);
+                logger.info(FUNC + "updateSingleValue()玩家数据来自数据库:", uid);
                 _cb(null, account);
             });
         }
         else {
-            console.log(FUNC + "updateSingleValue()玩家数据来自缓存:", uid);
+            logger.info(FUNC + "updateSingleValue()玩家数据来自缓存:", uid);
             _cb(null, account);
         }
     }], function(err, account) {
@@ -148,11 +148,11 @@ function checkAccountById(pool, uid, cb) {
     const FUNC = TAG + "checkAccountById() --- ";
     DaoAccountCommon.getAccountByUid(pool, uid, function (err, account) {
         if (err) {
-            if (ERROR) console.error(FUNC + "数据库读写错误");
+            if (ERROR) logger.error(FUNC + "数据库读写错误");
             cb(ERROR_OBJ.DB_ERR);
             return;
         }
-        if (DEBUG)console.log(FUNC + "玩家数据来自数据库:", uid);
+        if (DEBUG)logger.info(FUNC + "玩家数据来自数据库:", uid);
         cb(null, account);
     });
 }
@@ -164,7 +164,7 @@ function checkAccountById(pool, uid, cb) {
  */
 function handleError(err, cb) {
     if (err) {
-        console.log(JSON.stringify(err));
+        logger.info(JSON.stringify(err));
         cb(err);
     }
     return err;

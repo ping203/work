@@ -93,7 +93,7 @@ function addDrawCount(account, type, times) {
         // do nothing
     }
     else {
-        if (ERROR) console.error(FUNC + "[ERROR]错误的抽奖类型:" + type);
+        if (ERROR) logger.error(FUNC + "[ERROR]错误的抽奖类型:" + type);
     }
 
     account.total_draw = total_draw;
@@ -247,8 +247,8 @@ function _getItemTypeByKey(item_key) {
             return item.type;
         }
     }
-    console.log("item_key:", item_key);
-    console.log("不该走到这里");
+    logger.info("item_key:", item_key);
+    logger.info("不该走到这里");
 }
 
 // 获取抽奖一次的花费, 返回一个item : ["i001",50000]或["i002",50].

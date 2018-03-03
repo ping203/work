@@ -32,12 +32,12 @@ class RedisLogInsert {
             datas.splice(0, datas.length);
             redisConnector.cmd.multi(cmds).exec(function (err, result) {
                 if(err){
-                    console.log('日志写入redis失败', err);
+                    logger.info('日志写入redis失败', err);
                 }
                 else {
-                    console.log('批量日志写入成功,数量', len);
+                    logger.info('批量日志写入成功,数量', len);
                     // console.timeEnd('mysqlExec')
-                    console.log('日志写入redis成功');
+                    logger.info('日志写入redis成功');
                 }
                 utils.invokeCallback(cb, err, result);
             });

@@ -8,7 +8,7 @@ class GoddessReward extends RankReward {
     }
 
     async handle(task, week) {
-        // /* yxl */ console.log('handle');
+        // /* yxl */ logger.info('handle');
         await super.handle(task, week);
     }
 
@@ -21,8 +21,8 @@ class GoddessReward extends RankReward {
     }
 
     async generateChart(rankInfo, week, task) {
-        // /* yxl */ console.log('2222222222222222222222222222rankInfo:', rankInfo);
-        // /* yxl */ console.log('GoddessReward.generateChart');
+        // /* yxl */ logger.info('2222222222222222222222222222rankInfo:', rankInfo);
+        // /* yxl */ logger.info('GoddessReward.generateChart');
         let uids = this._getUids(rankInfo);
         if (uids.length == 0) {
             return;
@@ -30,8 +30,8 @@ class GoddessReward extends RankReward {
 
         let maxWaves = await redisAccountSync.oneCmdAsync(['hmget', `${REDISKEY.MAX_WAVE}`, uids]);
 
-        /* yxl */ console.log('maxWaves', maxWaves);
-        console.log('uids', uids);
+        /* yxl */ logger.info('maxWaves', maxWaves);
+        logger.info('uids', uids);
 
         let cmds = [];
         for (let uid in rankInfo.ranks) {
@@ -49,10 +49,10 @@ class GoddessReward extends RankReward {
                     rank: rankInfo.ranks[uid],
                     score:maxWaves[i]
                 };
-                // console.log("======================>",award);
+                // logger.info("======================>",award);
                 cmds.push(['hset', `${REDISKEY.RANK_WEEK_AWARD}:${task.redisKey}`, uid, JSON.stringify(week_ret)]);
             }
-            // console.log("===================>",cmds);
+            // logger.info("===================>",cmds);
             if (cmds.length >= task.limit) {
                 await redisAccountSync.multiAsync(cmds);
                 cmds = [];

@@ -37,10 +37,10 @@ exports.parseDataObj = parseDataObj;
  * 打印请求信息
  */
 function request_info(req, func_name) {
-    if (DEBUG) console.log("call " + func_name + "()...");
-    if (DEBUG) console.log("req: " + req);
-    if (DEBUG) console.log("req.body: " + JSON.stringify(req.body));
-    if (DEBUG) console.log("req.params: " + JSON.stringify(req.params));
+    if (DEBUG) logger.info("call " + func_name + "()...");
+    if (DEBUG) logger.info("req: " + req);
+    if (DEBUG) logger.info("req.body: " + JSON.stringify(req.body));
+    if (DEBUG) logger.info("req.params: " + JSON.stringify(req.params));
 }
 
 /**
@@ -69,8 +69,8 @@ function get_dao_data(req, res) {
 function handleReturn(res, aes, err, result, hint) {
     const FUNC = TAG + "handleReturn() --- ";
     if (err) {
-        if (ERROR) console.error(FUNC + "msg:", hint + "失败");
-        if (ERROR) console.error(FUNC + "err:", err);
+        if (ERROR) logger.error(FUNC + "msg:", hint + "失败");
+        if (ERROR) logger.error(FUNC + "err:", err);
         res.success({ type: 1, msg: hint + "失败", err: err });
     } else {
         var res_data = buzz_cst_game.getResData(result, aes);
@@ -90,8 +90,8 @@ function parseDataObj(req, hint) {
         dataObj = buzz_cst_game.getDataObj(req.body.data, req.body.aes);
     }
     catch (json_parse_err) {
-        if (ERROR) console.error("msg:", hint + "失败(json解析错误)");
-        if (ERROR) console.error("err:", json_parse_err);
+        if (ERROR) logger.error("msg:", hint + "失败(json解析错误)");
+        if (ERROR) logger.error("err:", json_parse_err);
     }
 
     return dataObj;

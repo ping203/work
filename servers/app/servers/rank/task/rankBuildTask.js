@@ -17,7 +17,7 @@ class RankBuildTask extends Task {
         return new Promise(function (resolve, reject) {
             redisConnector.cmd.zrevrange(`${task.redisKey}:${platform}`, skip, limit, 'WITHSCORES', function (err, results) {
                 if (err) {
-                    console.log('err:', err);
+                    logger.info('err:', err);
                     reject(err);
                     return;
                 }

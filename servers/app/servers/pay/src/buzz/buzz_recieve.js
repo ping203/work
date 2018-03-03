@@ -245,7 +245,7 @@ function minigameReward(req, dataObj, cb) {
  */
 function _openBox(req, dataObj, cb) {
     const FUNC = TAG + "_openBox() --- ";
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
     let uid = dataObj.uid;
     let token = dataObj.token;
     let bid = "" + dataObj.box_id;
@@ -345,13 +345,13 @@ function _didTurntableDraw(req, dataObj, cb) {
             bonus.wintimes = [0, 0, 0, 0, 0, 0];
         }
         bonus.wintimes[goldlevel - 1]++;
-        console.log(`这是等级${goldlevel}的奖金鱼第${bonus.wintimes[goldlevel - 1]}次抽奖`);
+        logger.info(`这是等级${goldlevel}的奖金鱼第${bonus.wintimes[goldlevel - 1]}次抽奖`);
 
         let reward_list = _getRewardList(goldlevel);
         let probability = _getRewardProbability(reward_list);
 
-        if (DEBUG) console.log(FUNC + "reward_list:\n", reward_list);
-        if (DEBUG) console.log(FUNC + "probability:\n", probability);
+        if (DEBUG) logger.info(FUNC + "reward_list:\n", reward_list);
+        if (DEBUG) logger.info(FUNC + "probability:\n", probability);
 
         let drop_info = {
             drop_id: reward_list,
@@ -485,11 +485,11 @@ function _didPackMix(req, dataObj, cb) {
         let gain_item = mix.mixid;
 
         if (DEBUG) {
-            console.log(FUNC + "cost:", cost);
-            console.log(FUNC + "gain:", gain);
-            console.log(FUNC + "gold_cost:", gold_cost);
-            console.log(FUNC + "cost_item:", cost_item);
-            console.log(FUNC + "gain_item:", gain_item);
+            logger.info(FUNC + "cost:", cost);
+            logger.info(FUNC + "gain:", gain);
+            logger.info(FUNC + "gold_cost:", gold_cost);
+            logger.info(FUNC + "cost_item:", cost_item);
+            logger.info(FUNC + "gain_item:", gain_item);
         }
 
         let gain_item_list = [{
@@ -544,9 +544,9 @@ function _checkMix(account, item_key, num, cb) {
     // 条件2: 物品没有售价, 有售价的物品不能合成
     if (item.type != item_type || item.saleprice > 0) {
         if (DEBUG) {
-            console.log(FUNC + "item.type:", item.type);
-            console.log(FUNC + "item_type:", item_type);
-            console.log(FUNC + "saleprice:", item.saleprice);
+            logger.info(FUNC + "item.type:", item.type);
+            logger.info(FUNC + "item_type:", item_type);
+            logger.info(FUNC + "saleprice:", item.saleprice);
         }
         cb(ERROR_OBJ.MIX_WRONG_ITEM);
         return false;
@@ -626,7 +626,7 @@ function _didChangeInKind(req, dataObj, cb) {
 
             let item_info = BuzzUtil.getItemById(item_key);
             if (null == item_info) {
-                console.log(FUNC + "物品信息不存在——item_key:", item_key);
+                logger.info(FUNC + "物品信息不存在——item_key:", item_key);
                 cb(ERROR_OBJ.CIK_WRONG_ITEM);
                 return;
             }
@@ -658,7 +658,7 @@ function _didChangeInKind(req, dataObj, cb) {
             // 扣除相应的兑换券
             let tokens = account.package[ItemType.TOKENS]["i003"];
             let cost = change_info.cost;
-            console.log(FUNC + "需要消耗兑换券:", cost);
+            logger.info(FUNC + "需要消耗兑换券:", cost);
             account.package[ItemType.TOKENS]["i003"] -= cost;
             let costItemList = {
                 item_id: "i003",
@@ -697,8 +697,8 @@ function _didChangeInKind(req, dataObj, cb) {
                 ret.change.package = {
                     "9": { "i003": account.package[ItemType.TOKENS]["i003"] },
                 };
-                // console.log(FUNC + "item_type:", item_type);
-                // console.log(FUNC + "ItemType.PEARL:", ItemType.PEARL);
+                // logger.info(FUNC + "item_type:", item_type);
+                // logger.info(FUNC + "ItemType.PEARL:", ItemType.PEARL);
                 switch (item_type) {
                     case ItemType.GOLD:
                         ret.change.gold = account.gold;
@@ -801,8 +801,8 @@ function _checkChangeInKind1(account, change_id, cb) {
     tokens = account.package[ItemType.TOKENS]["i003"];
 
     // 需要的话费券是否足够判断
-    console.log(FUNC + "需要消耗兑换券:", change_info.cost);
-    console.log(FUNC + "拥有兑换券:", tokens);
+    logger.info(FUNC + "需要消耗兑换券:", change_info.cost);
+    logger.info(FUNC + "拥有兑换券:", tokens);
     if (change_info.cost > tokens) {
         cb(ERROR_OBJ.CIK_TOKEN_NOT_ENOUGH);
         return false;
@@ -902,7 +902,7 @@ function _didGetCikInfo(req, dataObj, cb) {
     // 调用负载均衡服的接口获取此数据
     let data = {};
     HttpUtil.postBalance('/server_api/get_cik_info', data, function (ret) {
-        console.log(FUNC + "ret:", ret);
+        logger.info(FUNC + "ret:", ret);
         HttpUtil.handleReturn(ret, cb);
     });
 }
@@ -1034,7 +1034,7 @@ function _buyVipGift(req, dataObj, cb) {
                     item_list: item_list,
                     change: change,
                 };
-                console.log('ret:', ret);
+                logger.info('ret:', ret);
                 cb(null, ret);
                 
                 account.commit();
@@ -1051,11 +1051,11 @@ function _buyVipGift(req, dataObj, cb) {
                 };
                 switch(coinType) {
                     case "pearl":
-                        console.log(FUNC + uid + "购买VIP" + buyLevel + "礼包消耗钻石" + giftPrice);
+                        logger.info(FUNC + uid + "购买VIP" + buyLevel + "礼包消耗钻石" + giftPrice);
                         logDiamond.push(logInfo);
                     break;
                     case "gold":
-                        console.log(FUNC + uid + "购买VIP" + buyLevel + "礼包消耗金币" + giftPrice);
+                        logger.info(FUNC + uid + "购买VIP" + buyLevel + "礼包消耗金币" + giftPrice);
                         logInfo.duration = 0;
                         logInfo.level = account.level;
                         account.cost = giftPrice;//其他消耗 购买VIP礼包累加
@@ -1089,7 +1089,7 @@ function _vipDailyReward(req, dataObj, cb) {
 
     function doNextWithAccount(account) {
         if (account.vip_daily_reward == 1) {
-            if (ERROR) console.error(FUNC + '玩家今日已经领取了VIP奖励');
+            if (ERROR) logger.error(FUNC + '玩家今日已经领取了VIP奖励');
             cb(ERROR_OBJ.VIP_DAILY_REWARD_GOTTEN);
             return;
         }

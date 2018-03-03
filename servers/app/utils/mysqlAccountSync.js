@@ -107,7 +107,7 @@ function setAccount(accounts, cb) {
         }
     }
     if (sqlParams.length == 0) {
-        console.log(FUNC + "数据异常");
+        logger.info(FUNC + "数据异常");
         cb && cb("数据异常");
         return;
     }

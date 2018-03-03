@@ -60,7 +60,7 @@ function insert(table, field_list, value_list, cb) {
         _handleResults(sql, sql_data, FUNC, ERROR_HINT, err, results, cb);
     });
 
-};
+}
 
 /**
  * 批量增加数据
@@ -132,7 +132,7 @@ function del(table, where, cb) {
         const ERROR_HINT = "数据库删除错误";
         _handleResults(sql, sql_data, FUNC, ERROR_HINT, err, results, cb);
     });
-};
+}
 
 /**
  * 查询数据库(可按条件查询).
@@ -168,7 +168,7 @@ function query(table, field_list, where, cb) {
         _handleResults(sql, sql_data, FUNC, ERROR_HINT, err, results, cb);
     });
 
-};
+}
 
 /**
  * 更新数据库(可按条件更新).
@@ -214,9 +214,9 @@ function _hasList(list) {
 /** 处理SQL执行后的返回值 */
 function _handleResults(sql, sql_data, FUNC, ERROR_HINT, err, results, cb) {
     if (err) {
-        console.error(FUNC + "err:", err);
-        console.error(FUNC + "sql:", sql);
-        console.error(FUNC + "sql_data:", sql_data);
+        logger.error(FUNC + "err:", err);
+        logger.error(FUNC + "sql:", sql);
+        logger.error(FUNC + "sql_data:", sql_data);
         return cb && cb(new Error(ERROR_HINT));
     }
     cb && cb(null, results);

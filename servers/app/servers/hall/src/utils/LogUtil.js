@@ -57,23 +57,23 @@ exports.LogObj = class LogObj {
         this.timeFields = timeFields;
         /** 日志记录数组 */
         this.list = [];
-    };
+    }
 
     /** 插入一条日志. */
     push(data) {
         logger.info( 'push data:', data);
         this.list.push(data);
-    };
+    }
 
     /** 输出日志准备. */
 	cache() {
         logger.info('get cache:', this.list);
         return this.list;
-    };
+    }
 
     /** 返回日志总条数. */
     length() {
         logger.info('get cache length:', this.list.length);
         return this.list.length;
-    };
+    }
 };

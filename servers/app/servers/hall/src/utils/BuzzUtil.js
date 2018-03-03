@@ -205,7 +205,7 @@ function removeFromPack(req, account, item_list, cb) {
         let reward = ObjUtil.str2Data(reward_list);
         cb(new Reward(reward));
     });
-};
+}
 
 /**
  * 获取改变量.

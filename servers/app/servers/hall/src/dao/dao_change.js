@@ -158,17 +158,17 @@ function updateWay(pool, params, cb) {
 function handleQuery(pool, sql, sql_data, cb) {
     const FUNC = TAG + "handleQuery() --- ";
     //----------------------------------
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
         } else {
             // DEBUG = 0;
-            if (DEBUG) console.log(FUNC + 'result: ', result);
+            if (DEBUG) logger.info(FUNC + 'result: ', result);
         }
         cb(err, result);
         DEBUG = 0;
@@ -193,17 +193,17 @@ function _didRead(pool, cb) {
 
     var sql_data = [];
 
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
         } else {
             DEBUG = 0;
-            if (DEBUG) console.log(FUNC + 'result: ', result);
+            if (DEBUG) logger.info(FUNC + 'result: ', result);
         }
         cb(err, result);
         DEBUG = 0;
@@ -240,16 +240,16 @@ function _didInsert(pool, data, cb) {
         data.icon,
     ];
 
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
         } else {
-            if (DEBUG) console.log(FUNC + 'result: ', result);
+            if (DEBUG) logger.info(FUNC + 'result: ', result);
         }
         cb(err, result);
         DEBUG = 0;

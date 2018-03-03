@@ -92,8 +92,8 @@ function getDraw(pool, data, cb) {
 
         // 需要检查玩家的金币或钻石是否足够
         let cost = _getCost(type);
-        console.log(FUNC + "cost:", cost);
-        console.log(FUNC + "type:", type);
+        logger.info(FUNC + "cost:", cost);
+        logger.info(FUNC + "type:", type);
         if (cost) {
 
             let draw_type = cost.type === ItemType.GOLD ? DRAW_TYPE.GOLD : DRAW_TYPE.PEARL;
@@ -103,12 +103,12 @@ function getDraw(pool, data, cb) {
             switch (cost.type) {
                 case ItemType.GOLD:
                     let goldTimes = buzz_draw.getActualCostTimes(account, draw_type, times);
-                    // console.log(FUNC + "抽奖消耗金币的次数-goldTimes:", goldTimes);
+                    // logger.info(FUNC + "抽奖消耗金币的次数-goldTimes:", goldTimes);
                     buzz_draw.useFree(account, DRAW_TYPE.GOLD, times - goldTimes);
                     cost.num = cost.num * goldTimes;
-                    console.log(FUNC + "使用金币:", cost.num);
+                    logger.info(FUNC + "使用金币:", cost.num);
                     if (account.gold < cost.num) {
-                        console.log(FUNC + "抽奖金币不足, 需要" + cost.num + "，实际拥有" + account.gold);
+                        logger.info(FUNC + "抽奖金币不足, 需要" + cost.num + "，实际拥有" + account.gold);
                         cb(ERROR_OBJ.GOLD_NOT_ENOUGH);
                         return;
                     }
@@ -118,9 +118,9 @@ function getDraw(pool, data, cb) {
                     let pearlTimes = buzz_draw.getActualCostTimes(account, DRAW_TYPE.PEARL, times);
                     buzz_draw.useFree(account, DRAW_TYPE.PEARL, times - pearlTimes);
                     cost.num = cost.num * pearlTimes;
-                    console.log(FUNC + "使用钻石:", cost.num);
+                    logger.info(FUNC + "使用钻石:", cost.num);
                     if (account.pearl < cost.num) {
-                        console.log(FUNC + "抽奖钻石不足, 需要" + cost.num + "，实际拥有" + account.pearl);
+                        logger.info(FUNC + "抽奖钻石不足, 需要" + cost.num + "，实际拥有" + account.pearl);
                         cb(ERROR_OBJ.DIAMOND_NOT_ENOUGH);
                         return;
                     }
@@ -130,28 +130,28 @@ function getDraw(pool, data, cb) {
                 case ItemType.SKIN_DEBRIS:
                     let weaponSkinOwn = account.weapon_skin.own;
                     let weaponDrawId = type % 100;
-                    console.log(FUNC + "weaponSkinOwn:", weaponSkinOwn);
-                    console.log(FUNC + "weaponDrawId:", weaponDrawId);
+                    logger.info(FUNC + "weaponSkinOwn:", weaponSkinOwn);
+                    logger.info(FUNC + "weaponDrawId:", weaponDrawId);
                     if (!ArrayUtil.contain(weaponSkinOwn, weaponDrawId)) {
-                        console.log(FUNC + "玩家没有皮肤" + weaponDrawId + "，抽奖被禁止");
+                        logger.info(FUNC + "玩家没有皮肤" + weaponDrawId + "，抽奖被禁止");
                         cb(ERROR_OBJ.WEAPON_SKIN_DRAW_WRONG_SKIN_ID);
                         return;
                     }
 
                     let tokensTimes = buzz_draw.getActualCostTimes(account, type, times);
-                    console.log(FUNC + "tokensTimes:", tokensTimes);
+                    logger.info(FUNC + "tokensTimes:", tokensTimes);
                     buzz_draw.useFree(account, type, times - tokensTimes);
                     cost.num = cost.num * tokensTimes;
-                    console.log(FUNC + "使用代币:", cost.num);
+                    logger.info(FUNC + "使用代币:", cost.num);
                     /** 玩家拥有的代币数量. */
                     let tokensCount = account.package[cost.type][cost.item];
 
                     if (tokensCount < cost.num) {
-                        console.log(FUNC + "抽奖代币不足, 需要" + cost.num + "，实际拥有" + tokensCount);
+                        logger.info(FUNC + "抽奖代币不足, 需要" + cost.num + "，实际拥有" + tokensCount);
                         let lessTokens = cost.num - tokensCount;
-                        console.log(FUNC + "代币还差" + lessTokens);
+                        logger.info(FUNC + "代币还差" + lessTokens);
                         let diamondNeed = lessTokens * common_const_cfg.WEAPONS_DRAW_COST;
-                        console.log(FUNC + "使用钻石补充不足的代币:", diamondNeed);
+                        logger.info(FUNC + "使用钻石补充不足的代币:", diamondNeed);
                         if (account.pearl < diamondNeed) {
                             cb(ERROR_OBJ.DIAMOND_NOT_ENOUGH);
                             return;
@@ -159,7 +159,7 @@ function getDraw(pool, data, cb) {
                         account.pearl = -diamondNeed;
                         cost.num = tokensCount;
                     }
-                    console.log(FUNC + "cost.num :", cost.num);
+                    logger.info(FUNC + "cost.num :", cost.num);
 
                 break;
             }
@@ -169,23 +169,23 @@ function getDraw(pool, data, cb) {
             let idx = [];
             for (let i = 0; i < times; i++) {
                 let r = _.random(1, RANDOM_MAX[type]);
-                console.log(FUNC + 'r:', r);
+                logger.info(FUNC + 'r:', r);
                 let item = _pickup1(draw_pool, r);
-                console.log(FUNC + 'item:', item);
+                logger.info(FUNC + 'item:', item);
                 rand.push(r);
                 items.push(item.item);
                 idx.push(item.idx);
             }
 
-            console.log(FUNC + "-----------------items:", items);
-            console.log(FUNC + "-----------------idx:", idx);
+            logger.info(FUNC + "-----------------items:", items);
+            logger.info(FUNC + "-----------------idx:", idx);
             // 获取物品
             DaoReward.getReward(pool, account, items, function (err_get_reward, results_get_reward) {
                 // AccountCommon.getAccountByToken(pool, token, function (err1, results1) {
                 // AccountCommon.getAccountByUid(pool, token, function (err1, account) {
 
                 let cost_items = [[cost.item, cost.num]];
-                console.log(FUNC + "cost_items:", cost_items);
+                logger.info(FUNC + "cost_items:", cost_items);
                 // 消耗金币或钻石
                 DaoReward.cost(pool, account, cost_items, function (err, ret) {
 
@@ -247,7 +247,7 @@ function getDraw(pool, data, cb) {
                             gain += item_num;
                         }
                     }
-                    console.log(FUNC + "-----------------cost_items:", cost_items);
+                    logger.info(FUNC + "-----------------cost_items:", cost_items);
                     for (let i = 0; i < cost_items.length; i++) {
                         let item = cost_items[i];
                         let item_id = item[0];
@@ -256,8 +256,8 @@ function getDraw(pool, data, cb) {
                             cost += item_num;
                         }
                     }
-                    console.log(FUNC + "gain:", gain);
-                    console.log(FUNC + "cost:", cost);
+                    logger.info(FUNC + "gain:", gain);
+                    logger.info(FUNC + "cost:", cost);
                     if (gain > 0 || cost > 0) {
                         let data = {
                             account_id: ret_account.id,
@@ -270,9 +270,9 @@ function getDraw(pool, data, cb) {
                                 "scene": common_log_const_cfg.ACTIVE_DRAW,
                             }],
                         };
-                        console.log(FUNC + "插入一条金币日志:", data);
+                        logger.info(FUNC + "插入一条金币日志:", data);
                         dao_gold.addGoldLogCache(pool, data, function(err, res) {
-                            if (err) return console.error(FUNC + "err:", err);
+                            if (err) return logger.error(FUNC + "err:", err);
                         });
                     }
                     
@@ -311,9 +311,9 @@ function getDraw(pool, data, cb) {
             });
         }
         else {
-            console.error(FUNC + "type:", type);
-            console.error(FUNC + "times:", times);
-            console.error(FUNC + "uid:", account.id);
+            logger.error(FUNC + "type:", type);
+            logger.error(FUNC + "times:", times);
+            logger.error(FUNC + "uid:", account.id);
         }
 
     });
@@ -364,8 +364,8 @@ function _getItemTypeByKey(item_key) {
             return item.type;
         }
     }
-    console.log("item_key:", item_key);
-    console.log("不该走到这里");
+    logger.info("item_key:", item_key);
+    logger.info("不该走到这里");
 }
 
 // 获取抽奖一次的花费, 返回一个item : ["i001",50000]或["i002",50].

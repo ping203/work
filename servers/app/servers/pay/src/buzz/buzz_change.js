@@ -89,11 +89,11 @@ function _modifyOrders(req, dataObj, cb) {
     var thingnum = dataObj.thingnum;
     var status = dataObj.status;
 
-    console.log(FUNC + "op:", op);
-    console.log(FUNC + "orderid:", orderid);
-    console.log(FUNC + "way:", way);
-    console.log(FUNC + "thingnum:", thingnum);
-    console.log(FUNC + "status:", status);
+    logger.info(FUNC + "op:", op);
+    logger.info(FUNC + "orderid:", orderid);
+    logger.info(FUNC + "way:", way);
+    logger.info(FUNC + "thingnum:", thingnum);
+    logger.info(FUNC + "status:", status);
 
     if ("status" == op) {
         CacheChange.updateStatus(req, orderid, status);

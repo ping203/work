@@ -5,7 +5,7 @@ const numCPUs = require('os').cpus().length;
 if (cluster.isMaster) {
   let numReqs = 0;
   setInterval(() => {
-    console.log(`numReqs = ${numReqs}`);
+    logger.info(`numReqs = ${numReqs}`);
   }, 1000);
 
 
@@ -15,22 +15,22 @@ if (cluster.isMaster) {
   }
   
   cluster.on('exit', (worker, code, signal) => {
-    console.log(`worker process ${worker.process.pid} exit`);
+    logger.info(`worker process ${worker.process.pid} exit`);
   });
 
   function messageHandler(msg) {
-    console.log(msg);
+    logger.info(msg);
     if (msg.cmd && msg.cmd === 'notifyRequest') {
       numReqs += 1;
     }
   }
 
   for (const id in cluster.workers) {
-    console.log('--------------------------cluster.workers:', id);
+    logger.info('--------------------------cluster.workers:', id);
     cluster.workers[id].on('message', messageHandler);
   }
 
-    console.log(`master ${process.pid} started`);
+    logger.info(`master ${process.pid} started`);
 } else {
   http.createServer((req, res) => {
     res.writeHead(200);
@@ -41,5 +41,5 @@ if (cluster.isMaster) {
 
   }).listen(7001);
 
-  console.log(`worker process ${process.pid} started`);
+  logger.info(`worker process ${process.pid} started`);
 }

@@ -65,7 +65,7 @@ class HappyWeekend {
             let ttime = new Date(temp.time).getTime();
             let mseconds = ttime - now;
             let tdays = Math.ceil(mseconds / dd);
-            //console.log('tdays = ', tdays, mseconds);
+            //logger.info('tdays = ', tdays, mseconds);
             if (tdays >= 0 && tdays <= offsetDays) {
                 if (mseconds < 0 && tdays == 0) {
                     mseconds = 0;
@@ -246,7 +246,7 @@ class HappyWeekend {
     //跨天重置
     clear() {
         RedisUtil.del(UID_WEEKEND_REWARD_GOT, function () {
-            console.log('已清空周末狂欢数据!');
+            logger.info('已清空周末狂欢数据!');
         });
     }
 

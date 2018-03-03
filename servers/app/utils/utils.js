@@ -143,7 +143,7 @@ utils.myPrint = function () {
         for (var i = 0; i < len; ++i) {
             aimStr += arguments[i] + ' ';
         }
-        console.log('\n' + aimStr);
+        logger.info('\n' + aimStr);
     }
 };
 // print the file name and the line number ~ end

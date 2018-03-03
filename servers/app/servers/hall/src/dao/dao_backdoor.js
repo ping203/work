@@ -50,7 +50,7 @@ exports.switchCik = switchCik;
 function modifyUserData(pool, data, cb) {
     const FUNC = TAG + "modifyUserData() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var uid = data.uid;
     var field = data.field;
@@ -61,7 +61,7 @@ function modifyUserData(pool, data, cb) {
             updateNuclear(pool, uid, value, cb);
         }
         else if (field == 'goddess') {
-            if (DEBUG) console.log(FUNC + "field == 'goddess'");
+            if (DEBUG) logger.info(FUNC + "field == 'goddess'");
             updateGoddess(pool, uid, value, cb);
         }
         // else if (field == 'card') {
@@ -72,7 +72,7 @@ function modifyUserData(pool, data, cb) {
         }
     }
     else {
-        if (ERROR) console.error(FUNC + "此字段数据暂不支持修改:", field);
+        if (ERROR) logger.error(FUNC + "此字段数据暂不支持修改:", field);
     }
 }
 
@@ -83,10 +83,10 @@ function modifyUserData(pool, data, cb) {
 function kickUser(pool, data, cb) {
     const FUNC = TAG + "kickUser() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var uid_list = data.uid_list;
-    if (DEBUG) console.log(FUNC + "uid_list:", uid_list);
+    if (DEBUG) logger.info(FUNC + "uid_list:", uid_list);
     // 是否踢出指定玩家
     var kick_specific_user = uid_list != null && uid_list.length > 0;
     
@@ -102,17 +102,17 @@ function kickUser(pool, data, cb) {
         sql_data.push(uid_list);
     }
 
-    if (DEBUG) console.log(FUNC + "sql:", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:", sql_data);
 
     pool.query(sql, sql_data, function (err, rows) {
         if (cb != null) cb(err, rows);
 
         if (err) {
-            if (ERROR) console.error(FUNC + "err: ", err);
+            if (ERROR) logger.error(FUNC + "err: ", err);
         }
         else {
-            if (DEBUG) console.log(FUNC + "踢出玩家成功");
+            if (DEBUG) logger.info(FUNC + "踢出玩家成功");
         }
     });
  
@@ -125,10 +125,10 @@ function kickUser(pool, data, cb) {
 function accountForbidden(pool, data, cb) {
     const FUNC = TAG + "accountForbidden() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var uid_list = data.uid;
-    if (DEBUG) console.log(FUNC + "uid_list:", uid_list);
+    if (DEBUG) logger.info(FUNC + "uid_list:", uid_list);
 
     var sql = "";
     sql += "UPDATE `tbl_account` ";
@@ -137,17 +137,17 @@ function accountForbidden(pool, data, cb) {
 
     var sql_data = [uid_list];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, rows) {
         if (cb != null) cb(err, rows);
 
         if (err) {
-            if (ERROR) console.error(FUNC + "err: ", err);
+            if (ERROR) logger.error(FUNC + "err: ", err);
         }
         else {
-            if (DEBUG) console.log(FUNC + "重置玩家成功");
+            if (DEBUG) logger.info(FUNC + "重置玩家成功");
         }
     });
  
@@ -160,12 +160,12 @@ function accountForbidden(pool, data, cb) {
 function accountAuth(pool, data, cb) {
     const FUNC = TAG + "accountForbidden() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var uid_list = data.uid;
     var test = data.test;
-    if (DEBUG) console.log(FUNC + "uid_list:", uid_list);
-    if (DEBUG) console.log(FUNC + "test:", test);
+    if (DEBUG) logger.info(FUNC + "uid_list:", uid_list);
+    if (DEBUG) logger.info(FUNC + "test:", test);
 
     var sql = "";
     sql += "UPDATE `tbl_account` ";
@@ -174,17 +174,17 @@ function accountAuth(pool, data, cb) {
 
     var sql_data = [test, uid_list];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, rows) {
         if (cb != null) cb(err, rows);
 
         if (err) {
-            if (ERROR) console.error(FUNC + "err: ", err);
+            if (ERROR) logger.error(FUNC + "err: ", err);
         }
         else {
-            if (DEBUG) console.log(FUNC + "修改账号权限成功");
+            if (DEBUG) logger.info(FUNC + "修改账号权限成功");
         }
     });
  
@@ -196,7 +196,7 @@ function accountAuth(pool, data, cb) {
 function switchMatch(pool, data, cb) {
     const FUNC = TAG + "switchMatch() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var uid_list = data.uid;
     var action = data.action;
@@ -204,8 +204,8 @@ function switchMatch(pool, data, cb) {
     if ("on" == action) {
         match_on = 1;
     }
-    if (DEBUG) console.log(FUNC + "action:", action);
-    if (DEBUG) console.log(FUNC + "match_on:", match_on);
+    if (DEBUG) logger.info(FUNC + "action:", action);
+    if (DEBUG) logger.info(FUNC + "match_on:", match_on);
 
     var sql = "";
     sql += "UPDATE `tbl_switch` ";
@@ -214,22 +214,22 @@ function switchMatch(pool, data, cb) {
 
     var sql_data = [match_on];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, rows) {
         if (cb != null) cb(err, rows);
 
         if (err) {
-            if (ERROR) console.error(FUNC + "err: ", err);
+            if (ERROR) logger.error(FUNC + "err: ", err);
         }
         else {
             if (DEBUG) {
                 if (match_on) {
-                    console.log(FUNC + uid_list + "排位赛开启成功");
+                    logger.info(FUNC + uid_list + "排位赛开启成功");
                 }
                 else {
-                    console.log(FUNC + uid_list + "排位赛关闭成功");
+                    logger.info(FUNC + uid_list + "排位赛关闭成功");
                 }
             }
         }
@@ -242,7 +242,7 @@ function switchMatch(pool, data, cb) {
 function switchCik(pool, data, cb) {
     const FUNC = TAG + "switchCik() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var uid_list = data.uid;
     var action = data.action;
@@ -250,8 +250,8 @@ function switchCik(pool, data, cb) {
     if ("on" == action) {
         cik_on = 1;
     }
-    if (DEBUG) console.log(FUNC + "action:", action);
-    if (DEBUG) console.log(FUNC + "cik_on:", cik_on);
+    if (DEBUG) logger.info(FUNC + "action:", action);
+    if (DEBUG) logger.info(FUNC + "cik_on:", cik_on);
 
     var uid_list_array = uid_list.split(",");
     for (var i = 0; i < uid_list_array.length; i++) {
@@ -269,22 +269,22 @@ function switchCik(pool, data, cb) {
 
     var sql_data = [cik_on];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, rows) {
         if (cb != null) cb(err, rows);
 
         if (err) {
-            if (ERROR) console.error(FUNC + "err: ", err);
+            if (ERROR) logger.error(FUNC + "err: ", err);
         }
         else {
             if (DEBUG) {
                 if (cik_on) {
-                    console.log(FUNC + uid_list + "实物兑换开启成功");
+                    logger.info(FUNC + uid_list + "实物兑换开启成功");
                 }
                 else {
-                    console.log(FUNC + uid_list + "实物兑换关闭成功");
+                    logger.info(FUNC + uid_list + "实物兑换关闭成功");
                 }
             }
         }
@@ -312,14 +312,14 @@ function updateNuclear(pool, uid, data, cb) {
         if (cb != null) cb(err, rows);
 
         if (err) {
-            if (ERROR) console.error(FUNC + "err: ", err);
+            if (ERROR) logger.error(FUNC + "err: ", err);
         }
         else {
             // 修改缓存数据
             CacheAccount.setToken(uid, "modify");
             CacheAccount.getAccountById(uid, function (err, account) {
                 let skill = account.skill;
-                if (DEBUG) console.log(FUNC + "skill:", skill);
+                if (DEBUG) logger.info(FUNC + "skill:", skill);
                 for (var key in data) {
                     skill[key] = data[key];
                 }
@@ -337,7 +337,7 @@ function updateNuclear(pool, uid, data, cb) {
 function updateGoddess(pool, uid, data, cb) {
     const FUNC = TAG + "updateGoddess() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var data  = JSON.parse(data);
 
@@ -348,22 +348,22 @@ function updateGoddess(pool, uid, data, cb) {
 
     var sql_data = [uid];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, rows) {
         if (cb != null) cb(err, rows);
 
         if (err) {
-            if (ERROR) console.error(FUNC + "err: ", err);
+            if (ERROR) logger.error(FUNC + "err: ", err);
         }
         else {
             // 修改缓存数据
             CacheAccount.setToken(uid, "modify");
             CacheAccount.getAccountById(uid, function (err, account) {
-                if(!!account){
+                if(account){
                     var goddess =account.goddess;
-                    if (DEBUG) console.log(FUNC + "goddess:", goddess);
+                    if (DEBUG) logger.info(FUNC + "goddess:", goddess);
                     for (var i = 0; i < data.length; i++) {
                         var id = data[i].id;
                         for (var j = 0; j < goddess.length; j++) {
@@ -379,16 +379,16 @@ function updateGoddess(pool, uid, data, cb) {
                     updateTableAccountGoddess(pool, uid, JSON.stringify(goddess), function(err, result) {
 
                         if (err) {
-                            if (ERROR) console.error(FUNC + "err: ", err);
+                            if (ERROR) logger.error(FUNC + "err: ", err);
                         }
                         else {
-                            if (DEBUG) console.log(FUNC + "修改玩家女神数据成功");
+                            if (DEBUG) logger.info(FUNC + "修改玩家女神数据成功");
                         }
 
                     });
                 }
                 else {
-                    if (DEBUG) console.log(FUNC + "玩家数据不在缓存中");
+                    if (DEBUG) logger.info(FUNC + "玩家数据不在缓存中");
                 }
             });
         }
@@ -416,7 +416,7 @@ function updateTableAccountGoddess(pool, uid, goddess, cb) {
 function updateCard(pool, uid, data, cb) {
     const FUNC = TAG + "updateCard() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var data  = JSON.parse(data);
 
@@ -427,37 +427,37 @@ function updateCard(pool, uid, data, cb) {
 
     var sql_data = [uid];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, rows) {
         if (cb != null) cb(err, rows);
 
         if (err) {
-            if (ERROR) console.error(FUNC + "err: ", err);
+            if (ERROR) logger.error(FUNC + "err: ", err);
         }
         else {
             // 修改缓存数据
             CacheAccount.setToken(uid, "modify");
             CacheAccount.getAccountById(uid, function (err, account) {
-                if(!!account){
+                if(account){
                     let card = account.card;
-                    if (DEBUG) console.log(FUNC + "card:", card);
+                    if (DEBUG) logger.info(FUNC + "card:", card);
                     account.card = data;
                     account.commit();
 
                     // 设置数据库中的数据
                     updateTableAccountCard(pool, uid, JSON.stringify(account.card), function(err, result) {
                         if (err) {
-                            if (ERROR) console.error(FUNC + "err: ", err);
+                            if (ERROR) logger.error(FUNC + "err: ", err);
                         }
                         else {
-                            if (DEBUG) console.log(FUNC + "修改玩家月卡数据成功");
+                            if (DEBUG) logger.info(FUNC + "修改玩家月卡数据成功");
                         }
                     });
                 }
                 else {
-                    if (DEBUG) console.log(FUNC + "玩家数据不在缓存中");
+                    if (DEBUG) logger.info(FUNC + "玩家数据不在缓存中");
                 }
             });
         }
@@ -498,21 +498,21 @@ function updateSingleValue(pool, uid, field, value, cb) {
         if (cb != null) cb(err, rows);
 
         if (err) {
-            if (ERROR) console.error(FUNC + "err: ", err);
+            if (ERROR) logger.error(FUNC + "err: ", err);
         }
         else {
             // 修改缓存数据
-            console.log(FUNC + "进入缓存修改");
+            logger.info(FUNC + "进入缓存修改");
             DaoCommon.getAccount(pool, uid, function(err, account) {
                 if (err) {
-                    console.log(FUNC + "获取用户数据出错:", err);
+                    logger.info(FUNC + "获取用户数据出错:", err);
                     return;
                 }
                 doNextWithAccount(account);
             });
 
             function doNextWithAccount(account) {
-                // console.log(FUNC + "获取了用户数据:", account);
+                // logger.info(FUNC + "获取了用户数据:", account);
                 CacheAccount.setToken(uid, "modify");
                 switch(field) {
                     case 'gold':
@@ -533,7 +533,7 @@ function updateSingleValue(pool, uid, field, value, cb) {
                         CacheAccount.setExp(account, parseInt(value));
                         break;
                     case 'vip':
-                        console.log(FUNC + "修改用户VIP:", value);
+                        logger.info(FUNC + "修改用户VIP:", value);
                         CacheAccount.setVip(account, parseInt(value));
                         break;
                     case 'rmb':
@@ -541,7 +541,7 @@ function updateSingleValue(pool, uid, field, value, cb) {
                         break;
                     case 'weapon_skin':
                         // {"own":[1,2],"equip":1}
-                        console.log(FUNC + "修改玩家皮肤数据:", value);
+                        logger.info(FUNC + "修改玩家皮肤数据:", value);
                         CacheAccount.setWeaponSkin(account, JSON.parse(value));
                         break;
                     case 'card':

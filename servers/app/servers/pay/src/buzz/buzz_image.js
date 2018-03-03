@@ -49,7 +49,7 @@ exports.load = load;
  */
 function load(req, data, cb) {
     const FUNC = TAG + "load() --- ";
-    if (DEBUG) console.log("CALL load()");
+    if (DEBUG) logger.info("CALL load()");
 
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "load_web_img");
@@ -59,8 +59,8 @@ function load(req, data, cb) {
     var web_url_id = data['web_url_id'];
     var download = false;
 
-    console.log(FUNC + 'web_url:', web_url);
-    console.log(FUNC + 'web_url_id:', web_url_id);
+    logger.info(FUNC + 'web_url:', web_url);
+    logger.info(FUNC + 'web_url_id:', web_url_id);
 
     if(!web_url_id || isNaN(Number(web_url_id)) || web_url_id<0){
         cb(null, 'img/0/0/jiaodie.png');
@@ -121,7 +121,7 @@ function load(req, data, cb) {
 // 准备工作: 传入参数验证
 function _prepare(data, cb) {
     const FUNC = TAG + "_prepare() --- ";
-    if (DEBUG) console.log(FUNC + "data:", data);
+    if (DEBUG) logger.info(FUNC + "data:", data);
 
     var token = data["token"];
     var web_url = data['web_url'];

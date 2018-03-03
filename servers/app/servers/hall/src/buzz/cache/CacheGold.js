@@ -42,7 +42,7 @@ function getLogListByAccountId(account_id) {
     var ret = [];
     for (var i = 0; i < gGoldLogCache.length; i++) {
         // TODO: 添加与用户ID相关的条件
-        // console.log("record[" + i + "]:", gGoldLogCache[i]);
+        // logger.info("record[" + i + "]:", gGoldLogCache[i]);
         if (gGoldLogCache[i].account_id == account_id) {
             ret.push(gGoldLogCache[i]);
         }

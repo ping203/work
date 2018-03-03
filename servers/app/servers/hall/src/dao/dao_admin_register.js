@@ -25,22 +25,22 @@ function _getRegisterData(pool, data, cb) {
     sql += "WHERE log_date ";
     sql += "BETWEEN STR_TO_DATE('" + start_date + "','%Y-%m-%d') ";
     sql += "AND STR_TO_DATE('" + end_date + "','%Y-%m-%d')";
-    console.log('sql: ', sql);
+    logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             if (result == null) {
-                console.log('查询结果为空');
+                logger.info('查询结果为空');
             }
             if (result.length == 0) {
-                console.log('查询结果长度为0');
+                logger.info('查询结果长度为0');
             }
-            console.log("result: ", result);
+            logger.info("result: ", result);
             // 格式化日期数据
             for (var i = 0; i < result.length; i++) {
                 var log_date = result[i]['log_date'];

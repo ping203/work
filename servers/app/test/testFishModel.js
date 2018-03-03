@@ -3,7 +3,7 @@
 //==============================================================================
 var FishModel = require('./src/mgr/FishModel');
 let fm = new FishModel(function (name, data) {
-    console.log('--------evtname = ', name, data);
+    logger.info('--------evtname = ', name, data);
 });
 fm.init('scene_mutiple_1');
 

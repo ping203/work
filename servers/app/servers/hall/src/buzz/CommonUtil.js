@@ -16,10 +16,10 @@ exports.isParamExist = isParamExist;
 function isParamExist(module, param, err_info, cb) {
     if (param == null) {
         var extraErrInfo = { debug_info: module + "._isParamExist()-" + err_info };
-        if (ERROR) console.error('------------------------------------------------------');
-        if (ERROR) console.error(extraErrInfo.debug_info);
-        if (ERROR) console.error('------------------------------------------------------');
-        if (cb == null) console.error('!!!!!!!!!!!!!!!!!!!!!!!');
+        if (ERROR) logger.error('------------------------------------------------------');
+        if (ERROR) logger.error(extraErrInfo.debug_info);
+        if (ERROR) logger.error('------------------------------------------------------');
+        if (cb == null) logger.error('!!!!!!!!!!!!!!!!!!!!!!!');
         cb(ObjUtil.merge(extraErrInfo, ERROR_OBJ.PARAM_MISSING));
         return false;
     }

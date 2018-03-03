@@ -48,14 +48,14 @@ class MatchReward extends RankReward {
             if (0 == ranks.length) {
                 break;
             }
-            // console.log("=======================================",ranks);
+            // logger.info("=======================================",ranks);
             let uids = [];
             for (let i = 0; i < ranks.length; i += 2) {
                 uids.push(ranks[i]);
             }
 
             let matchInfos = await this._getMatchInfo(uids);
-            // console.log(matchInfos);
+            // logger.info(matchInfos);
             let match_season_win = matchInfos[0];
             let match_season_box = matchInfos[1];
             let match_season_1st_win = matchInfos[2];

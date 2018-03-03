@@ -31,25 +31,25 @@ exports.update = _update;
 function _update(pool, data, cb, my_account) {
     let FUNC = TAG + "_update() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
     
     let get_card_new = ObjUtil.str2Data(data['get_card']);
     let get_card_old = ObjUtil.str2Data(my_account['get_card']);
     let card = ObjUtil.str2Data(my_account['card']);
 
-    console.log(FUNC + "get_card_new: ", get_card_new);
-    console.log(FUNC + "get_card_old: ", get_card_old);
-    console.log(FUNC + "card: ", card);
+    logger.info(FUNC + "get_card_new: ", get_card_new);
+    logger.info(FUNC + "get_card_old: ", get_card_old);
+    logger.info(FUNC + "card: ", card);
         
     let everyday = 0;
         
     // TODO: 判断card.normal
     if (get_card_new['normal']) {// 更新的是normal
         if (card['normal']) {
-            console.log(FUNC + "玩家的普通月卡有效");
+            logger.info(FUNC + "玩家的普通月卡有效");
             if (get_card_old['normal']) {
                 let err = FUNC + '[ERROR] 玩家今天已经领取了普通月卡奖励, 请勿重复领取';
-                if (ERROR) console.error(err);
+                if (ERROR) logger.error(err);
                 cb(err);
                 return;
             }
@@ -61,7 +61,7 @@ function _update(pool, data, cb, my_account) {
         }
         else {
             let err = FUNC + '[ERROR] 玩家没有购买普通月卡';
-            if (ERROR) console.error(err);
+            if (ERROR) logger.error(err);
             cb(err);
             return;
         }
@@ -69,26 +69,26 @@ function _update(pool, data, cb, my_account) {
 
     // TODO: 判断card.senior
     if (get_card_new['senior']) {// 更新的是senior
-        console.log(FUNC + "更新玩家的壕月卡领取状态");
-        console.log(FUNC + "card['senior']: ", card['senior']);
+        logger.info(FUNC + "更新玩家的壕月卡领取状态");
+        logger.info(FUNC + "card['senior']: ", card['senior']);
         if (card['senior']) {
-            console.log(FUNC + "玩家的壕月卡有效");
+            logger.info(FUNC + "玩家的壕月卡有效");
             if (get_card_old['senior']) {
                 let err = FUNC + '[ERROR] 玩家今天已经领取了壕月卡奖励, 请勿重复领取';
-                if (ERROR) console.error(err);
+                if (ERROR) logger.error(err);
                 cb(err);
                 return;
             }
             else {
                 // 重写get_card_old
-                console.log(FUNC + "领取壕月卡奖励，改变get_card字段的值");
+                logger.info(FUNC + "领取壕月卡奖励，改变get_card字段的值");
                 get_card_old['senior'] = true;
                 everyday = shop_card_cfg[1]['everyday'];
             }
         }
         else {
             let err = FUNC + '[ERROR] 玩家没有购买壕月卡';
-            if (ERROR) console.error(err);
+            if (ERROR) logger.error(err);
             cb(err);
             return;
         }

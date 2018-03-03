@@ -18,7 +18,7 @@ class Cost {
         this.MATH_ADJUST_CFG = GAMECFG.common_mathadjust_const_cfg;
 
         if (DEBUG === 1) {
-            this.log = console.log;
+            this.log = logger.info;
         } else if (DEBUG === 2) {
             this.log = logger.error;
         }

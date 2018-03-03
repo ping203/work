@@ -38,20 +38,20 @@ module.exports.getOriginScore = _getOriginScore;
 
 function test() {
     let A = _getTimeWeightScore(999999998);
-    console.log('AA:', A);
+    logger.info('AA:', A);
     setTimeout(function () {
 
         let B = _getTimeWeightScore(999999999);
-        console.log('BB:', B);
+        logger.info('BB:', B);
         if (A > B) {
-            console.log('A>b OK');
+            logger.info('A>b OK');
 
         }else {
-            console.log('A<=b OK');
+            logger.info('A<=b OK');
         }
 
-        console.log('A:', _getOriginScore(A));
-        console.log('B:', _getOriginScore(B));
+        logger.info('A:', _getOriginScore(A));
+        logger.info('B:', _getOriginScore(B));
 
     }, 10000);
 }

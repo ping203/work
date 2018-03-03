@@ -93,8 +93,8 @@ function _updateAll(pool, list, cb) {
     const FUNC = TAG + "_updateAll() --- ";
     var keys = _.keys(list);
     DEBUG = 0;
-    if (DEBUG) console.log(FUNC + "keys:", keys);
-    if (DEBUG) console.log(FUNC + "list:", list);
+    if (DEBUG) logger.info(FUNC + "keys:", keys);
+    if (DEBUG) logger.info(FUNC + "list:", list);
     DEBUG = 0;
     const ALTERABLE_FIELD = [
         { field: 'ship_at', type: 'timestamp'}, 
@@ -137,17 +137,17 @@ function _updateAll(pool, list, cb) {
     var sql_data = [];
 
     // DEBUG = 0;
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
     // DEBUG = 0;
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
         } else {
-            if (DEBUG) console.log(FUNC + 'result: ', result);
+            if (DEBUG) logger.info(FUNC + 'result: ', result);
         }
         cb(err, result);
         DEBUG = 0;
@@ -259,17 +259,17 @@ function updateWay(pool, params, cb) {
 function handleQuery(pool, sql, sql_data, cb) {
     const FUNC = TAG + "handleQuery() --- ";
     //----------------------------------
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
         } else {
             // DEBUG = 0;
-            if (DEBUG) console.log(FUNC + 'result: ', result);
+            if (DEBUG) logger.info(FUNC + 'result: ', result);
         }
         cb(err, result);
         DEBUG = 0;
@@ -294,17 +294,17 @@ function _didRead(pool, cb) {
 
     var sql_data = [];
 
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
         } else {
             DEBUG = 0;
-            if (DEBUG) console.log(FUNC + 'result: ', result);
+            if (DEBUG) logger.info(FUNC + 'result: ', result);
         }
         cb(err, result);
         DEBUG = 0;
@@ -341,16 +341,16 @@ function _didInsert(pool, data, cb) {
         data.icon,
     ];
 
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
         } else {
-            if (DEBUG) console.log(FUNC + 'result: ', result);
+            if (DEBUG) logger.info(FUNC + 'result: ', result);
         }
         cb(err, result);
         DEBUG = 0;

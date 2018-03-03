@@ -41,16 +41,16 @@ function sumUpLastHour(pool, data, cb) {
     _getSqlNewAccount(pool, data, function (err1, new_account) {
         _getSqlLoginCount(pool, data, function (err2, login_count) {
             _getSqlAccountCount(pool, data, function (err2, account_count) {
-                if (DEBUG) console.log(FUNC + 'new_account:', new_account);
-                if (DEBUG) console.log(FUNC + 'login_count:', login_count);
-                if (DEBUG) console.log(FUNC + 'account_count:', account_count);
+                if (DEBUG) logger.info(FUNC + 'new_account:', new_account);
+                if (DEBUG) logger.info(FUNC + 'login_count:', login_count);
+                if (DEBUG) logger.info(FUNC + 'account_count:', account_count);
                 _insertData(pool, data, new_account, login_count, account_count, function (err3, result) {
                     //cb(null, result);
                 });
             });
         });
     });
-};
+}
 
 //==============================================================================
 // private
@@ -75,9 +75,9 @@ function _insertData(pool, data, new_account, login_count, account_count, cb) {
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.log(FUNC + "err:\n", err);
-            if (ERROR) console.log(FUNC + "sql:\n", sql);
-            if (ERROR) console.log(FUNC + "sql_data:\n", sql_data);
+            if (ERROR) logger.info(FUNC + "err:\n", err);
+            if (ERROR) logger.info(FUNC + "sql:\n", sql);
+            if (ERROR) logger.info(FUNC + "sql_data:\n", sql_data);
             cb(err);
         } else {
             cb(null, result);
@@ -109,9 +109,9 @@ function _getSqlNewAccount(pool, data, cb) {
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.log(FUNC + "err:\n", err);
-            if (ERROR) console.log(FUNC + "sql:\n", sql);
-            if (ERROR) console.log(FUNC + "sql_data:\n", sql_data);
+            if (ERROR) logger.info(FUNC + "err:\n", err);
+            if (ERROR) logger.info(FUNC + "sql:\n", sql);
+            if (ERROR) logger.info(FUNC + "sql_data:\n", sql_data);
             cb(err);
         } else {
             cb(null, result[0].new_account);
@@ -143,9 +143,9 @@ function _getSqlLoginCount(pool, data, cb) {
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.log(FUNC + "err:\n", err);
-            if (ERROR) console.log(FUNC + "sql:\n", sql);
-            if (ERROR) console.log(FUNC + "sql_data:\n", sql_data);
+            if (ERROR) logger.info(FUNC + "err:\n", err);
+            if (ERROR) logger.info(FUNC + "sql:\n", sql);
+            if (ERROR) logger.info(FUNC + "sql_data:\n", sql_data);
             cb(err);
         } else {
             cb(null, result[0].login_count);
@@ -177,9 +177,9 @@ function _getSqlAccountCount(pool, data, cb) {
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.log(FUNC + "err:\n", err);
-            if (ERROR) console.log(FUNC + "sql:\n", sql);
-            if (ERROR) console.log(FUNC + "sql_data:\n", sql_data);
+            if (ERROR) logger.info(FUNC + "err:\n", err);
+            if (ERROR) logger.info(FUNC + "sql:\n", sql);
+            if (ERROR) logger.info(FUNC + "sql_data:\n", sql_data);
             cb(err);
         } else {
             cb(null, result[0].account_count);

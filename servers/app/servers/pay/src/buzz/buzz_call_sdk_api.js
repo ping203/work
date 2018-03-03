@@ -61,7 +61,7 @@ function callEgretApi(params, req_client, cb) {
     if (typeof(data) == "undefined") {
         data = JSON.stringify({ token: params.token });
     }
-    //console.log("-----------data: ", data);
+    //logger.info("-----------data: ", data);
     _handleEgretApi(data, egret_api[action], req_client, cb);
 }
 
@@ -71,10 +71,10 @@ function callEgretApi(params, req_client, cb) {
 function callTencentApi(data, req_client, cb) {
     const FUNC = TAG + "callTencentApi() --- ";
 
-    console.log(FUNC + "data: ", data);
+    logger.info(FUNC + "data: ", data);
     var action = data.action;
     // var data = params;
-    // console.log(FUNC + "data: ", data);
+    // logger.info(FUNC + "data: ", data);
 
     if (action == "user.getInfo") {
         _handleTencentApi(data, tencent_api[action], req_client, cb);
@@ -133,8 +133,8 @@ function _handleEgretApi(data, api, req_client, cb) {
     };
     
     var req = http.request(options, function (res) {
-        if (DEBUG) console.log(FUNC + 'STATUS: ' + res.statusCode);
-        if (DEBUG) console.log(FUNC + 'HEADERS: ' + JSON.stringify(res.headers));
+        if (DEBUG) logger.info(FUNC + 'STATUS: ' + res.statusCode);
+        if (DEBUG) logger.info(FUNC + 'HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             _handleReturnData("1001", chunk, req_client, cb);
@@ -142,7 +142,7 @@ function _handleEgretApi(data, api, req_client, cb) {
     });
     
     req.on('error', function (e) {
-        if (ERROR) console.error(FUNC + 'problem with request: ' + e.message);
+        if (ERROR) logger.error(FUNC + 'problem with request: ' + e.message);
         cb(e);
     });
     
@@ -157,7 +157,7 @@ function _handleTencentApi(data, api, req_client, cb) {
     const FUNC = TAG + "_handleTencentApi() --- ";
     
     var data = ObjUtil.str2Data(data);
-    if (DEBUG) console.log(FUNC + "data:", data);
+    if (DEBUG) logger.info(FUNC + "data:", data);
     var zoneId = data.zoneId;
     data.userip = _getClientIp(req_client);
 
@@ -182,15 +182,15 @@ function _handleTencentApi(data, api, req_client, cb) {
     }
     else {
         var req = http.request(options, function (res) {
-            if (DEBUG) console.log('STATUS: ' + res.statusCode);
-            if (DEBUG) console.log('HEADERS: ' + JSON.stringify(res.headers));
+            if (DEBUG) logger.info('STATUS: ' + res.statusCode);
+            if (DEBUG) logger.info('HEADERS: ' + JSON.stringify(res.headers));
             res.setEncoding('utf8');
             res.on('data', function (chunk) {
                 chunk = ObjUtil.str2Data(chunk);
                 chunk.data = { "id": data.openid };
                 chunk.openid = data.openid;
-                if (DEBUG) console.log('chunk:', chunk);
-                console.log('chunk:', chunk);
+                if (DEBUG) logger.info('chunk:', chunk);
+                logger.info('chunk:', chunk);
                 
                 var ret_data = {};
                 for (var key in chunk) {
@@ -198,8 +198,8 @@ function _handleTencentApi(data, api, req_client, cb) {
                 }
                 ret_data.data = { "id": data.openid };
                 ret_data.openid = data.openid;
-                if (DEBUG) console.log('ret_data:', ret_data);
-                console.log('ret_data:', ret_data);
+                if (DEBUG) logger.info('ret_data:', ret_data);
+                logger.info('ret_data:', ret_data);
                 
                 // 传递zoneId
                 if (zoneId != null) chunk.zoneId = zoneId;
@@ -208,25 +208,25 @@ function _handleTencentApi(data, api, req_client, cb) {
 
                 // TODO: 测试代码: 获取用户信息后8秒调用一次is_login
                 setTimeout(function () {
-                    if (DEBUG) console.log(FUNC + "调用了一次is_login");
-                    console.log(FUNC + "调用了一次is_login");
+                    if (DEBUG) logger.info(FUNC + "调用了一次is_login");
+                    logger.info(FUNC + "调用了一次is_login");
                     _handleTencentApiIsLogin(data, tencent_api["user.isLogin"], req_client, function () {
-                        if (DEBUG) console.log(FUNC + "is_login调用结束");
-                        console.log(FUNC + "is_login调用结束");
+                        if (DEBUG) logger.info(FUNC + "is_login调用结束");
+                        logger.info(FUNC + "is_login调用结束");
                     });
                 }, 8000);
                 //// TODO: 测试代码: 每2分钟调用一次is_login接口
                 //setInterval(function () {
-                //    console.log(FUNC + "调用了一次is_login");
+                //    logger.info(FUNC + "调用了一次is_login");
                 //    _handleTencentApiIsLogin(data, tencent_api["user.isLogin"], req_client, function () {
-                //        console.log(FUNC + "is_login调用结束");
+                //        logger.info(FUNC + "is_login调用结束");
                 //    });
                 //}, 120000);
             });
         });
         
         req.on('error', function (e) {
-            if (ERROR) console.error('problem with request: ' + e.message);
+            if (ERROR) logger.error('problem with request: ' + e.message);
             cb(e);
         });
         
@@ -241,7 +241,7 @@ function _handleTencentApiIsLogin(data, api, req_client, cb) {
     const FUNC = TAG + "_handleTencentApiIsLogin() --- ";
     
     var data = ObjUtil.str2Data(data);
-    if (DEBUG) console.log(FUNC + "data:", data);
+    if (DEBUG) logger.info(FUNC + "data:", data);
     var zoneId = data.zoneId;
     data.userip = _getClientIp(req_client);
 
@@ -262,12 +262,12 @@ function _handleTencentApiIsLogin(data, api, req_client, cb) {
     };
     
     var req = http.request(options, function (res) {
-        if (DEBUG) console.log(FUNC + 'STATUS: ' + res.statusCode);
-        if (DEBUG) console.log(FUNC + 'HEADERS: ' + JSON.stringify(res.headers));
+        if (DEBUG) logger.info(FUNC + 'STATUS: ' + res.statusCode);
+        if (DEBUG) logger.info(FUNC + 'HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         // TODO: 重写数据的拼接
         res.on('data', function (chunk) {
-            if (DEBUG) console.log(FUNC + 'http request data... length:', chunk.length);
+            if (DEBUG) logger.info(FUNC + 'http request data... length:', chunk.length);
             // 腾讯返回好友列表, 过长导致数据截断解析错误, 直接跳过不解析, 返回ret=0
             // chunk = ObjUtil.str2Data(chunk);
             chunk = {
@@ -275,7 +275,7 @@ function _handleTencentApiIsLogin(data, api, req_client, cb) {
             };
             chunk.data = { "id": data.openid };
             chunk.openid = data.openid;
-            console.log(FUNC + 'chunk:', chunk);
+            logger.info(FUNC + 'chunk:', chunk);
             
             var ret_data = {};
             for (var key in chunk) {
@@ -283,19 +283,19 @@ function _handleTencentApiIsLogin(data, api, req_client, cb) {
             }
             ret_data.data = { "id": data.openid };
             ret_data.openid = data.openid;
-            console.log(FUNC + 'ret_data:', ret_data);
+            logger.info(FUNC + 'ret_data:', ret_data);
 
             // 进一步的处理?
             cb(null, chunk);
         });
 
         res.on('end', function () {
-            if (DEBUG) console.log(FUNC + 'http request end...');
+            if (DEBUG) logger.info(FUNC + 'http request end...');
         });
     });
         
     req.on('error', function (e) {
-        if (ERROR) console.error(FUNC + 'problem with request: ' + e.message);
+        if (ERROR) logger.error(FUNC + 'problem with request: ' + e.message);
         cb(e);
     });
         
@@ -339,7 +339,7 @@ function _handleTencentApiGetMultiInfo(data, api, req_client, cb) {
 
     callHttp(api, data, function(err, chunk) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:", err);
+            if (ERROR) logger.error(FUNC + "err:", err);
             cb(err);
             return;
         }
@@ -379,7 +379,7 @@ function _handleTencentApiSendGamebarMsg(data, api, req_client, cb) {
         }, null);
     }
     else {
-        if (ERROR) console.error(FUNC + "客户端的frd_list参数长度为0");
+        if (ERROR) logger.error(FUNC + "客户端的frd_list参数长度为0");
         cb(new Error("客户端的frd_list参数长度为0"));
     }
 }
@@ -397,7 +397,7 @@ function callHttpRecurrence(api, data, condition, cb, chunk) {
         data[param] = list.shift();
         callHttp(api, data, function(err, chunk) {
             if (err) {
-                if (ERROR) console.error(FUNC + "err:", err);
+                if (ERROR) logger.error(FUNC + "err:", err);
             }
             callHttpRecurrence(api, data, condition, cb, chunk);
         });
@@ -414,7 +414,7 @@ function _checkOpenId(data, cb) {
     var openid = data.openid;
     
     var isMatch = openid.match(/^([0-9A-F]{32})$/);
-    console.log("isMatch:", isMatch);
+    logger.info("isMatch:", isMatch);
     
     if (isMatch == null) {
         cb("不合法的openid");
@@ -435,7 +435,7 @@ function _handleTencentApiFriends(data, api, req_client, cb) {
 
     callHttp(api, data, function(err, chunk) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:", err);
+            if (ERROR) logger.error(FUNC + "err:", err);
             cb(err);
             return;
         }
@@ -526,14 +526,14 @@ function callHttp(api, data, cb) {
 
         res.on('end', function (chunk) {
             chunk = ObjUtil.str2Data(responseString);
-            console.log(FUNC + "chunk:", chunk);
+            logger.info(FUNC + "chunk:", chunk);
             // chunk已经被转换为对象.
             if (cb != null) cb(null, chunk);
         });
     });
     
     req.on('error', function (e) {
-        console.error('problem with request: ' + e.message);
+        logger.error('problem with request: ' + e.message);
         cb(e);
     });
     req.write(content);
@@ -548,7 +548,7 @@ function _handleTencentApiBuy(data, api, req_client, cb) {
     data.userip = _getClientIp(req_client);
     
     var isMatch = openid.match(/^([0-9A-F]{32})$/);
-    console.log("isMatch:", isMatch);
+    logger.info("isMatch:", isMatch);
     
     if (isMatch == null) {
         cb("不合法的openid");
@@ -570,13 +570,13 @@ function _handleTencentApiBuy(data, api, req_client, cb) {
     };
     
     var req = http.request(options, function (res) {
-        console.log('STATUS: ' + res.statusCode);
-        console.log('HEADERS: ' + JSON.stringify(res.headers));
+        logger.info('STATUS: ' + res.statusCode);
+        logger.info('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             chunk = ObjUtil.str2Data(chunk);
             
-            console.log("chunk:", chunk);
+            logger.info("chunk:", chunk);
             
             if (chunk.ret != null) {
                 chunk.code = chunk.ret;
@@ -592,7 +592,7 @@ function _handleTencentApiBuy(data, api, req_client, cb) {
     });
     
     req.on('error', function (e) {
-        console.log('problem with request: ' + e.message);
+        logger.info('problem with request: ' + e.message);
         cb(e);
     });
     req.write(content);
@@ -602,7 +602,7 @@ function _handleTencentApiBuy(data, api, req_client, cb) {
 var crypto = require('crypto');
 function md5(text) {
     return crypto.createHash('md5').update(text).digest('hex');
-};
+}
 
 function sign(data) {
     var sign_data = "";
@@ -629,7 +629,7 @@ function sign(data) {
 // http://api.egret-labs.org/v2/user/getInfo
 function _egret_user_getinfo(data) {
     //var content = data;
-    if (DEBUG) console.log("ori content:", data);
+    if (DEBUG) logger.info("ori content:", data);
     
     data = ObjUtil.str2Data(data);
     
@@ -650,7 +650,7 @@ function _egret_user_getinfo(data) {
     content += '&token=' + data.token;
     content += '&sign=' + data.sign;
     
-    if (DEBUG) console.log("params content: " + content);
+    if (DEBUG) logger.info("params content: " + content);
 
     return content;
 }
@@ -676,11 +676,11 @@ function _friend_getlist(data) {
 function _tencent_user_getinfo(data) {
     const FUNC = TAG + "_tencent_user_getinfo() --- ";
 
-    if (DEBUG) console.log(FUNC + "ori content:", data);
+    if (DEBUG) logger.info(FUNC + "ori content:", data);
 
     data = _handleTencentRequestData(data);
     
-    if (DEBUG) console.log(FUNC + "data:", data);
+    if (DEBUG) logger.info(FUNC + "data:", data);
     
     // 为了区别android和ios, 客户端传入参数中带有zoneId, 此处进行签名需要去掉
     var sigData = ObjUtil.exclude(data, ['zoneId', 'action', 'channel', 'sig']);
@@ -696,7 +696,7 @@ function _tencent_user_getinfo(data) {
     content += '&userip=' + data.userip;
     content += '&sig=' + data.sig;
 
-    if (DEBUG) console.log(FUNC + "params content: " + content);
+    if (DEBUG) logger.info(FUNC + "params content: " + content);
     
     return content;
 }
@@ -704,15 +704,15 @@ function _tencent_user_getinfo(data) {
 function _tencent_user_isLogin(data) {
     const FUNC = TAG + "_tencent_user_isLogin() --- ";
 
-    if (DEBUG) console.log(FUNC + "ori content:\n", data);
+    if (DEBUG) logger.info(FUNC + "ori content:\n", data);
     
     data = _handleTencentRequestData(data);
     
-    if (DEBUG) console.log(FUNC + "data:\n", data);
+    if (DEBUG) logger.info(FUNC + "data:\n", data);
     
     // 为了区别android和ios, 客户端传入参数中带有zoneId, 此处进行签名需要去掉
     var sigData = ObjUtil.exclude(data, ["zoneId", "action", "channel", "sig"]);
-    if (DEBUG) console.log(FUNC + "sigData:\n", sigData);
+    if (DEBUG) logger.info(FUNC + "sigData:\n", sigData);
 
     data.sig = buzz_sdk_tencent.sig(sigData, "/v3/user/is_login");
     
@@ -725,7 +725,7 @@ function _tencent_user_isLogin(data) {
     content += '&userip=' + data.userip;
     content += '&sig=' + data.sig;
     
-    if (DEBUG) console.log(FUNC + "params content: " + content);
+    if (DEBUG) logger.info(FUNC + "params content: " + content);
     
     return content;
 }
@@ -733,11 +733,11 @@ function _tencent_user_isLogin(data) {
 function _tencent_user_buyPlayzoneItem(data) {
     const FUNC = TAG + "_tencent_user_buyPlayzoneItem() --- ";
 
-    if (DEBUG) console.log(FUNC + "ori content:", data);
+    if (DEBUG) logger.info(FUNC + "ori content:", data);
     
     data = _handleTencentRequestData(data);
     
-    if (DEBUG) console.log(FUNC + "data:", data);
+    if (DEBUG) logger.info(FUNC + "data:", data);
     
     var sigData = ObjUtil.exclude(data, ['zoneId', 'action', 'channel']);
     data.sig = buzz_sdk_tencent.sig(sigData, "/v3/user/buy_playzone_item");
@@ -753,7 +753,7 @@ function _tencent_user_buyPlayzoneItem(data) {
     content += '&userip=' + data.userip;
     content += '&sig=' + data.sig;
     
-    if (DEBUG) console.log(FUNC + "params content: " + content);
+    if (DEBUG) logger.info(FUNC + "params content: " + content);
     
     return content;
 }
@@ -761,11 +761,11 @@ function _tencent_user_buyPlayzoneItem(data) {
 function _tencent_relation_getAppFriends(data) {
     const FUNC = TAG + "_tencent_relation_getAppFriends() --- ";
 
-    if (DEBUG) console.log(FUNC + "ori content:\n", data);
+    if (DEBUG) logger.info(FUNC + "ori content:\n", data);
     
     data = _handleTencentRequestData(data);
     
-    if (DEBUG) console.log(FUNC + "data:\n", data);
+    if (DEBUG) logger.info(FUNC + "data:\n", data);
 
     var sigData = ObjUtil.exclude(data, ['zoneId', 'action', 'channel']);
     data.sig = buzz_sdk_tencent.sig(sigData, "/v3/relation/get_app_friends");
@@ -779,7 +779,7 @@ function _tencent_relation_getAppFriends(data) {
     content += '&sig=' + data.sig;
     content += '&userip=' + data.userip;
     
-    if (DEBUG) console.log(FUNC + "params content:\n" + content);
+    if (DEBUG) logger.info(FUNC + "params content:\n" + content);
     
     return content;
 }
@@ -787,11 +787,11 @@ function _tencent_relation_getAppFriends(data) {
 function _tencent_user_getMultiInfo(data) {
     const FUNC = TAG + "_tencent_user_getMultiInfo() --- ";
 
-    console.log(FUNC + "ori content:", data);
+    logger.info(FUNC + "ori content:", data);
     
     data = _handleTencentRequestData(data);
     
-    console.log(FUNC + "data:", data);
+    logger.info(FUNC + "data:", data);
 
     var sigData = ObjUtil.exclude(data, ['zoneId', 'action', 'channel']);
     data.sig = buzz_sdk_tencent.sig(sigData, "/v3/user/get_multi_info");
@@ -808,7 +808,7 @@ function _tencent_user_getMultiInfo(data) {
     // 08B9999CACFBE0D9F57CAB4E7D8BDBF0_83A390F6A8E66BA800829ECD6032A6DE
     content += '&fopenids=' + data.fopenids;
     
-    console.log(FUNC + "params content: " + content);
+    logger.info(FUNC + "params content: " + content);
     
     return content;
 }
@@ -816,7 +816,7 @@ function _tencent_user_getMultiInfo(data) {
 function _tencent_user_sendGamebarMsg(data) {
     const FUNC = TAG + "_tencent_user_sendGamebarMsg() --- ";
 
-    console.log(FUNC + "ori content:", data);
+    logger.info(FUNC + "ori content:", data);
     
     data = _handleTencentRequestData(data);
 
@@ -827,7 +827,7 @@ function _tencent_user_sendGamebarMsg(data) {
     data.msgtype = PARAM_msgtype;
     data.content = PARAM_content;
     // data.qua = PARAM_qua;
-    console.log(FUNC + "data:", data);
+    logger.info(FUNC + "data:", data);
 
     var sigData = ObjUtil.exclude(data, ['action', 'channel']);
     data.sig = buzz_sdk_tencent.sig(sigData, "/v3/user/send_gamebar_msg");
@@ -847,7 +847,7 @@ function _tencent_user_sendGamebarMsg(data) {
     content += '&content=' + data.content;// string
     content += '&qua=' + data.qua;// 这个参数如何得到
     
-    console.log(FUNC + "params content: " + content);
+    logger.info(FUNC + "params content: " + content);
     
     return content;
 }
@@ -879,8 +879,8 @@ function _handleTencentRequestData(data) {
 function _handleReturnData(channel, chunk, req_client, cb) {
     const FUNC = TAG + "_handleReturnData() --- ";
 
-    console.log(FUNC + 'channel: ', channel);
-    console.log(FUNC + 'BODY: ', chunk);
+    logger.info(FUNC + 'channel: ', channel);
+    logger.info(FUNC + 'BODY: ', chunk);
     try {
         chunk = ObjUtil.str2Data(chunk);
     }
@@ -891,17 +891,17 @@ function _handleReturnData(channel, chunk, req_client, cb) {
     if (channel == '1002') {
         chunk.code = chunk.ret;
     }
-    console.log(FUNC + 'code: ' + chunk.code);
+    logger.info(FUNC + 'code: ' + chunk.code);
     if (chunk.code == 0) {
 
         // 查询数据库, 看这个ID是否已经注册了游戏账号
         req_client.dao.checkChannelAccountSignupStatus(buzz_cst_sdk.CHANNEL[channel].PREFIX, chunk, function (err, result) {
             if (err) {
-                console.error(FUNC + "检测账户信息出错:", err);
+                logger.error(FUNC + "检测账户信息出错:", err);
                 cb(chunk);
                 return;
             }
-            if (DEBUG) console.log(FUNC + "result:", result);
+            if (DEBUG) logger.info(FUNC + "result:", result);
             if (chunk.figureurl) {
                 result.figureurl = chunk.figureurl;
             }
@@ -924,17 +924,17 @@ function _handleWanbaError(chunk, cb) {
 
     switch (chunk.ret) {
         case -5:
-            console.log(FUNC + "签名验证错误");
+            logger.info(FUNC + "签名验证错误");
             cb(new Error("签名验证错误"));
             // returnWanbaFake(chunk, req_client, cb);
             break;
         case -4:
-            console.log(FUNC + "玩家IP不正确，需要后端去主动获取");
+            logger.info(FUNC + "玩家IP不正确，需要后端去主动获取");
             cb(new Error("玩家IP不正确，需要后端去主动获取"));
             // returnWanbaFake(chunk, req_client, cb);
             break;
     }
-    console.log(FUNC + chunk.msg);
+    logger.info(FUNC + chunk.msg);
 }
 
 // 错误处理

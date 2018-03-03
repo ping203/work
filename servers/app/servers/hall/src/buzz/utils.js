@@ -25,7 +25,7 @@ exports.randomNum = randomNum;
 //------------------------------------------------------------------------------
 function createSalt() {
     return crypto.randomBytes(24).toString('hex');
-};
+}
 
 function encodePassword(salt, password) {
     var sha = crypto.createHash('sha512');
@@ -41,11 +41,11 @@ function encodePassword(salt, password) {
     }
 
     return hv.toString('base64');
-};
+}
 
 function generateSessionToken(userId) {
     return userId + '_' + crypto.randomBytes(24).toString('hex');
-};
+}
 
 function generateRandomKey() {
     var str="", i=0, min=33, max=126;
@@ -59,7 +59,7 @@ function generateRandomKey() {
         str += String.fromCharCode(r);
     }
     return str;
-};
+}
 
 /**
  * 锟斤拷锟斤拷一系锟叫的兑伙拷锟斤拷
@@ -95,7 +95,7 @@ function generateCdKey() {
         str += String.fromCharCode(r);
     }
     return str;
-};
+}
 
 function randomInt(maxNum) {
     return Math.floor(Math.random() * maxNum);

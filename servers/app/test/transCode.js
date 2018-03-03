@@ -11,7 +11,7 @@
 // }
 // tans(fishCode, 'sf_code_')
 
-// console.log(tcKey, tcDes);
+// logger.info(tcKey, tcDes);
 
 
 class A {
@@ -48,5 +48,5 @@ class B extends A {
 
 let a = new A();
 let b = new B();
-console.log('A = ', a.getBaseField());
-console.log('B = ', b.getBaseField());
+logger.info('A = ', a.getBaseField());
+logger.info('B = ', b.getBaseField());

@@ -71,8 +71,8 @@ function _updateRmbAndVip(req, dataObj, cb) {
                 curr_vip = value.vip_level;
             }
         }
-        if (DEBUG) console.log("-------------------------------------");
-        if (DEBUG) console.log(FUNC + "curr_vip: " + curr_vip);
+        if (DEBUG) logger.info("-------------------------------------");
+        if (DEBUG) logger.info(FUNC + "curr_vip: " + curr_vip);
 
         // 玩家VIP变化时重置vip_daily_reward
         if (curr_vip > prev_vip) {

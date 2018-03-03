@@ -51,9 +51,9 @@ function _getRealtimeData(pool, data, cb) {
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.log(FUNC + "err:\n", err);
-            if (ERROR) console.log(FUNC + "sql:\n", sql);
-            if (ERROR) console.log(FUNC + "sql_data:\n", sql_data);
+            if (ERROR) logger.info(FUNC + "err:\n", err);
+            if (ERROR) logger.info(FUNC + "sql:\n", sql);
+            if (ERROR) logger.info(FUNC + "sql_data:\n", sql_data);
             cb(err);
         } else {
             // TODO: 格式化日期数据

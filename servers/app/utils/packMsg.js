@@ -23,7 +23,7 @@ function packMsg(data, enc) {
     }else {
         msg.data = data;
     }
-    // console.log(msg.data.length);
+    // logger.info(msg.data.length);
     // console.timeEnd('packMsg');
     return msg;
 }

@@ -33,7 +33,7 @@ exports.update = _update;
  */
 function _update(pool, data, cb, my_account) {
     const FUNC = TAG + "_update() --- ";
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
     
     // var uid = my_account['id'];
     var token = my_account['token'];
@@ -41,9 +41,9 @@ function _update(pool, data, cb, my_account) {
     var uid = token.split("_")[0];
 
     if (my_account.achieve_point > achieve_point) {
-        if (ERROR) console.error(FUNC + "成就点只能增加不能减少");
-        if (DEBUG) console.log(FUNC + "当前值:", my_account.achieve_point);
-        if (DEBUG) console.log(FUNC + "更新值:", achieve_point);
+        if (ERROR) logger.error(FUNC + "成就点只能增加不能减少");
+        if (DEBUG) logger.info(FUNC + "当前值:", my_account.achieve_point);
+        if (DEBUG) logger.info(FUNC + "更新值:", achieve_point);
         achieve_point = my_account.achieve_point;
     }
     

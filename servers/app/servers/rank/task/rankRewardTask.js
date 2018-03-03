@@ -37,10 +37,10 @@ class RankRewardTask extends Task {
 
     async _handleGoddess(task) {
         let week = task.reset && task.reset();
-        // console.log("***************1******************");
+        // logger.info("***************1******************");
         await this._goddessReward.handle(task, week);
         if(week){
-            // console.log("************2*********************");
+            // logger.info("************2*********************");
             await this._rankReset.handle(task);
         }
     }

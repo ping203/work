@@ -87,7 +87,7 @@ class MatchingUser {
     static allocUser(data) {
         return new Promise((resolve, reject) => {
             redisAccountSync.getAccount(data.uid, MatchingUser.baseField, function (err, account) {
-                if (!!err) {
+                if (err) {
                     reject(CONSTS.SYS_CODE.DB_ERROR);
                     return;
                 }

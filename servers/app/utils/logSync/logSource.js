@@ -63,7 +63,7 @@ class LogSource{
      * @private
      */
     _checkLogType(type){
-        if(!!logTableDef.TYPE[type]){
+        if(logTableDef.TYPE[type]){
             return true;
         }
         return false;

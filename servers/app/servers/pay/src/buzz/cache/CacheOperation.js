@@ -61,8 +61,8 @@ exports.dailyReset = dailyReset;
 function init(data) {
     if(!data) return;
     for (let i = 0; i < data.length; i++) {
-        // console.log("data[i]:", data[i]);
-        // console.log("id:", data[i].id);
+        // logger.info("data[i]:", data[i]);
+        // logger.info("id:", data[i].id);
         gOperationCache.push(data[i]);
     }
 }

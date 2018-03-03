@@ -51,7 +51,7 @@ function init(pool) {
     const FUNC  = TAG + "init() --- ";
     // 查询配置表中的默认数据
     let drop_list = BuzzUtil.getDropServerLimit();
-    // if (DEBUG) console.log(FUNC + "drop_list:", drop_list);
+    // if (DEBUG) logger.info(FUNC + "drop_list:", drop_list);
     for (let drop_key in drop_list) {
         let drop_info = drop_list[drop_key];
         let limit_type = drop_info.limit_type;
@@ -62,27 +62,27 @@ function init(pool) {
         }
     }
 
-    // if (DEBUG) console.log(FUNC + "1-DropRecordList:", DropRecordList);
+    // if (DEBUG) logger.info(FUNC + "1-DropRecordList:", DropRecordList);
 
     // 使用数据库的存储值来进行重置
     dao_drop.loadAll(pool, function(err, results) {
-        // if (DEBUG) console.log(FUNC + "2-DropRecordList:", DropRecordList);
+        // if (DEBUG) logger.info(FUNC + "2-DropRecordList:", DropRecordList);
         if (err) {
-            if (ERROR) console.error(FUNC + "err:", err);
+            if (ERROR) logger.error(FUNC + "err:", err);
             return;
         }
         
-        // if (DEBUG) console.log(FUNC + "3-DropRecordList:", DropRecordList);
-        // if (DEBUG) console.log(FUNC + "results:", results);
+        // if (DEBUG) logger.info(FUNC + "3-DropRecordList:", DropRecordList);
+        // if (DEBUG) logger.info(FUNC + "results:", results);
         let list = getUnrecordList(results);
-        // if (DEBUG) console.log(FUNC + "list:", list);
+        // if (DEBUG) logger.info(FUNC + "list:", list);
         if (list.length > 0) {
             dao_drop.insertMassive(pool, list, function(err, results) {
                 if (err) {
-                    if (ERROR) console.error(FUNC + "err:", err);
+                    if (ERROR) logger.error(FUNC + "err:", err);
                     return;
                 }
-                if (DEBUG) console.log(FUNC + "results:", results);
+                if (DEBUG) logger.info(FUNC + "results:", results);
 
                 // TODO: 如果配置表中的limit_count值和数据库不符, 需要更新数据库的值为当前配置表的值
             });
@@ -116,8 +116,8 @@ function getCurrentValue(key) {
     const FUNC  = TAG + "getCurrentValue() --- ";
     let dropRecord = DropRecordList[key];
     if (!dropRecord) {
-        if (DEBUG) console.log(FUNC + "缓存中没有找到对应的key:", key);
-        if (DEBUG) console.log(FUNC + "DropRecordList:", DropRecordList);
+        if (DEBUG) logger.info(FUNC + "缓存中没有找到对应的key:", key);
+        if (DEBUG) logger.info(FUNC + "DropRecordList:", DropRecordList);
     }
     return dropRecord.current_value;
 }

@@ -14,7 +14,7 @@ class PlayerFactory{
             let baseField = classObj.sBaseField();
             logger.error('account data.uid= ', data.uid, baseField);
             redisAccountSync.getAccount(data.uid, baseField, function (err, account) {
-                if(!!err){
+                if(err){
                     reject(CONSTS.SYS_CODE.DB_ERROR);
                     return;
                 }

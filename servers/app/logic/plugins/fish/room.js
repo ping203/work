@@ -337,7 +337,7 @@ class Room {
     leave(uid) {
         let player = this.playerMap.get(uid);
         let data = null;
-        if (!!player) {
+        if (player) {
             data = {
                 gold: player.account.gold,
                 pearl: player.account.pearl,
@@ -386,7 +386,7 @@ class Room {
 
     setPlayerState(uid, state, sid) {
         let player = this.playerMap.get(uid);
-        if (!!player) {
+        if (player) {
             player.connectState = state;
             player.updateActiveTime();
 

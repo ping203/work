@@ -32,7 +32,7 @@ class RobotController {
 
     onCatchfish(data, cb) {
         let player = this._robotPlayerMap.get(data.robot_uid);
-        if (!!player) {
+        if (player) {
             player.c_catch_fish(data, cb);
         }
         else {

@@ -214,7 +214,7 @@ function getAccountByToken(pool, token, cb) {
             }
         }
     });
-};
+}
 
 /**
  * 根据用户ID获取token.
@@ -595,7 +595,7 @@ function _updateTempname(pool, id, cb) {
             _createSessionToken(pool, id, cb);
         }
     });
-};
+}
 
 // 创建会话Token
 function _createSessionToken(pool, id, cb) {
@@ -622,7 +622,7 @@ function _createSessionToken(pool, id, cb) {
             cb(null, [ret]);
         }
     });
-};
+}
 
 function updateLoginCount(account, cb, vip_fill_this_time) {
     const FUNC = TAG + "updateLoginCount() --- ";

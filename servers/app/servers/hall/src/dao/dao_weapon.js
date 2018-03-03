@@ -127,14 +127,14 @@ function insertMassive(pool, group, num, cb) {
             sql_data.push(record.nickname);
         }
         
-        if (DEBUG) console.log(FUNC + 'sql(' + sql.length + '):\n', sql);
-        if (DEBUG) console.log(FUNC + 'sql_data(' + sql_data.length + '):\n', sql_data);
+        if (DEBUG) logger.info(FUNC + 'sql(' + sql.length + '):\n', sql);
+        if (DEBUG) logger.info(FUNC + 'sql_data(' + sql_data.length + '):\n', sql_data);
         
         pool.query(sql, sql_data, function (err, result) {
             if (err) {
-                console.error(FUNC + 'err:\n', err);
-                console.error(FUNC + 'sql:\n', sql);
-                console.error(FUNC + 'sql_data:\n', sql_data);
+                logger.error(FUNC + 'err:\n', err);
+                logger.error(FUNC + 'sql:\n', sql);
+                logger.error(FUNC + 'sql_data:\n', sql_data);
                 if (cb) cb(err);
             }
             else {
@@ -144,7 +144,7 @@ function insertMassive(pool, group, num, cb) {
 
     }
     else {
-        console.log(FUNC + '缓存中的武器日志为空');
+        logger.info(FUNC + '缓存中的武器日志为空');
         if (cb != null) cb(ERROR_OBJ.CACHE_EMPTY);
     }
 }
@@ -168,14 +168,14 @@ function addWeaponLog(pool, data, cb) {
     // 玩家token验证
     AccountCommon.getAccountByToken(pool, token, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + '[ERROR] err:', err);
+            if (ERROR) logger.error(FUNC + '[ERROR] err:', err);
             cb(err);
         } else {
-            if (DEBUG) console.log('results: ', results);
+            if (DEBUG) logger.info('results: ', results);
             if (results.length == 0) {
-                if (ERROR) console.error('-----------------------------------------------------');
-                if (ERROR) console.error(FUNC + 'TOKEN_INVALID');
-                if (ERROR) console.error('-----------------------------------------------------');
+                if (ERROR) logger.error('-----------------------------------------------------');
+                if (ERROR) logger.error(FUNC + 'TOKEN_INVALID');
+                if (ERROR) logger.error('-----------------------------------------------------');
                 cb(CstError.ERROR_OBJ.TOKEN_INVALID);
                 return;
             }
@@ -191,14 +191,14 @@ function addWeaponLog(pool, data, cb) {
             }
             else {
                 var current_weapon_level = account_result.weapon;
-                if (DEBUG) console.log(FUNC + 'current_weapon_level:', current_weapon_level);
+                if (DEBUG) logger.info(FUNC + 'current_weapon_level:', current_weapon_level);
 
                 current_weapon_level = parseInt(current_weapon_level);
-                if (DEBUG) console.log(FUNC + 'level:', level);
+                if (DEBUG) logger.info(FUNC + 'level:', level);
 
                 if (current_weapon_level >= level) {
                     var err_info = '请输入大于当前等级的数值';
-                    if (ERROR) console.error(FUNC + '[ERROR] err_info:', err_info);
+                    if (ERROR) logger.error(FUNC + '[ERROR] err_info:', err_info);
                     cb(new Error(err_info));
                 }
                 else {
@@ -208,7 +208,7 @@ function addWeaponLog(pool, data, cb) {
             }
         }
     });
-};
+}
 
 //==============================================================================
 // private
@@ -247,7 +247,7 @@ function _isParamExist(param, err_info, cb) {
     const FUNC = TAG + "_isParamExist() --- ";
 
     if (param == null) {
-        if (ERROR) console.error(FUNC + "err_info:", err_info);
+        if (ERROR) logger.error(FUNC + "err_info:", err_info);
         var extraErrInfo = { debug_info: "dao_weapon.addWeaponLog()-" + err_info };
         cb && cb(ObjUtil.merge(extraErrInfo, ERROR_OBJ.PARAM_MISSING));
         return false;
@@ -283,17 +283,17 @@ function _didAddWeaponLog(pool, account, data, cb, nickname, old_vip_weapon, vip
         sql_data.push(vip_weapon_id);
     }
 
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + '[ERROR] err:\n', err);
-            if (ERROR) console.error(FUNC + '[ERROR] sql:\n', sql);
-            if (ERROR) console.error(FUNC + '[ERROR] sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + '[ERROR] err:\n', err);
+            if (ERROR) logger.error(FUNC + '[ERROR] sql:\n', sql);
+            if (ERROR) logger.error(FUNC + '[ERROR] sql_data:\n', sql_data);
             cb(err);
         } else {
-            if (DEBUG) console.log(FUNC + 'result: ', result);
+            if (DEBUG) logger.info(FUNC + 'result: ', result);
             _updateWeaponTable(pool, account, data, cb, old_vip_weapon, vip_weapon_id);
         }
     });
@@ -309,7 +309,7 @@ function _updateWeaponTable(pool, account, data, cb, old_vip_weapon, vip_weapon_
     
     // weapon字段的含义是玩家拥有的最大等级的炮台倍率, 不会将这个值改小
     if (old_weapon_level > new_weapon_level) {
-        console.log('客户端传入了错误的武器等级数据: old(' + old_weapon_level + '), new(' + new_weapon_level + ')');
+        logger.info('客户端传入了错误的武器等级数据: old(' + old_weapon_level + '), new(' + new_weapon_level + ')');
         cb(null);
         return;
     }
@@ -327,7 +327,7 @@ function _updateWeaponTable(pool, account, data, cb, old_vip_weapon, vip_weapon_
         sql += ', `vip_weapon_id`=? ';
     }
     sql += 'WHERE `id`=?';
-    console.log('sql: ', sql);
+    logger.info('sql: ', sql);
     
     var sql_data = [new_weapon_level];
     if (type == WEAPON_TYPE.VIP) {
@@ -337,11 +337,11 @@ function _updateWeaponTable(pool, account, data, cb, old_vip_weapon, vip_weapon_
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log('[ERROR] dao_weapon._updateWeaponTable(): ', err);
+            logger.info('[ERROR] dao_weapon._updateWeaponTable(): ', err);
             cb(err);
             return;
         }
-        console.log('result: ', result);
+        logger.info('result: ', result);
         cb(null);
         _setBroadcast(account, new_weapon_level);
     });
@@ -352,8 +352,8 @@ function _setBroadcast(account, level) {
     if (level >= 2000) {
         var player = ObjUtil.getPlayerName(account);
         var charm = account.charm_rank && parseInt(account.charm_rank) || 0;
-        if (DEBUG) console.log(FUNC + "**********************************");
-        if (DEBUG) console.log(FUNC + "charm_rank:", account.charm_rank);
+        if (DEBUG) logger.info(FUNC + "**********************************");
+        if (DEBUG) logger.info(FUNC + "charm_rank:", account.charm_rank);
         var content = {
             txt: player + ' 升级了' + level + '倍炮',
             times: 1,
@@ -369,7 +369,7 @@ function _setBroadcast(account, level) {
 // 合并原有的数据和新上传的数据
 function _getNewWeaponVipIds(old_ids, new_ids) {
     if (old_ids != null && old_ids != "") {
-        console.log("old_vip_weapon: ", old_ids);
+        logger.info("old_vip_weapon: ", old_ids);
         old_ids = JSON.parse(old_ids);
         new_ids = JSON.parse(new_ids);
         return JSON.stringify(_.union(old_ids, new_ids));
@@ -382,19 +382,19 @@ function _getNewWeaponVipIds(old_ids, new_ids) {
 // 从data中获取vip_weapon_id的字符串形式(最终会以数组样式的字符串进行存储)
 function _getWeaponVipIds(data) {
     var vip_weapon_id = data['vip_weapon_id'];
-    console.log("vip_weapon_id: ", vip_weapon_id);
+    logger.info("vip_weapon_id: ", vip_weapon_id);
     
     if (ArrayUtil.isArray(vip_weapon_id)) {
-        console.log("传入武器参数为数组");
+        logger.info("传入武器参数为数组");
         try {
             vip_weapon_id = JSON.stringify(vip_weapon_id);
         }
         catch (err_parse) {
-            console.log("[dao_weapon] _getWeaponVipIds()", err_parse);
+            logger.info("[dao_weapon] _getWeaponVipIds()", err_parse);
         }
     }
     else {
-        console.log("传入武器参数为字符串");
+        logger.info("传入武器参数为字符串");
         vip_weapon_id = "" + vip_weapon_id;
         // 如果不是"[xxx]"格式, 添加前后括号
         if (!StringUtil.startsWith(vip_weapon_id, "[")) {

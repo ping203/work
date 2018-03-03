@@ -38,15 +38,15 @@ function _getRoleList(pool, data, cb) {
     
     var sql_data = [];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });
@@ -66,7 +66,7 @@ function _addRole(pool, data, cb) {
         return;
     }
     _didAddRole(pool, data, cb);
-};
+}
 
 function _didAddRole(pool, data, cb) {
     
@@ -81,15 +81,15 @@ function _didAddRole(pool, data, cb) {
     
     var sql_data = [role_name, role_description, role_auth];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });
@@ -100,14 +100,14 @@ function _didAddRole(pool, data, cb) {
  */
 function _deleteRole(pool, data, cb) {
     _enableRole(pool, data, cb, false);
-};
+}
 
 /**
  * 激活角色(在角色管理中该角色可见)
  */
 function _validRole(pool, data, cb) {
     _enableRole(pool, data, cb, true);
-};
+}
 
 function _enableRole(pool, data, cb, isValid) {
     var param_name_list = [
@@ -131,15 +131,15 @@ function _didEnableRole(pool, data, cb, isValid) {
     
     var sql_data = [isValid, id];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });
@@ -160,7 +160,7 @@ function _editRole(pool, data, cb) {
         return;
     }
     _didEditRole(pool, data, cb);
-};
+}
 
 // 更新角色数据
 function _didEditRole(pool, data, cb) {
@@ -177,15 +177,15 @@ function _didEditRole(pool, data, cb) {
     
     var sql_data = [role_name, role_description, role_auth, role_id];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });

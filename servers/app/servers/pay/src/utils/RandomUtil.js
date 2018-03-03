@@ -63,8 +63,8 @@ function randomReward(reward) {
     }
     var random = randomInt(total);
 
-    // console.log("random:", random);
-    // console.log("box_random_list:", box_random_list);
+    // logger.info("random:", random);
+    // logger.info("box_random_list:", box_random_list);
 
     for (var i = 0; i < box_random_list.length; i++) {
         if (random <= box_random_list[i]) {
@@ -96,8 +96,8 @@ function randomDrop(drop_info) {
     total = box_random_list[box_random_list.length - 1];
     var random = randomInt(total);
 
-    // console.log("random:", random);
-    // console.log("box_random_list:", box_random_list);
+    // logger.info("random:", random);
+    // logger.info("box_random_list:", box_random_list);
 
     for (var i = 0; i < box_random_list.length; i++) {
         if (random <= box_random_list[i]) {

@@ -28,7 +28,7 @@ class Statistics {
     }
 
     async topupChart(data) {
-        console.log('-------------------------------------========================');
+        logger.info('-------------------------------------========================');
         ObjUtil.checkFields(data, 'topupChart');
         let ret = require("./temp/statistics/topupChart").fake1;
         return ask(ret);

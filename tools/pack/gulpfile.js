@@ -44,9 +44,9 @@ gulp.task('clean', function () {
 
 gulp.task('copy', function () {
   let task = null;
-  console.error('---------------config.input.plugins', config.input.plugins);
+  logger.error('---------------config.input.plugins', config.input.plugins);
   config.input.plugins.forEach(function (item) {
-    console.error('---------------item', item);
+    logger.error('---------------item', item);
     task = gulp.src(item[0])
       .pipe(gulp.dest(item[1]));
   });
@@ -61,7 +61,7 @@ gulp.task('watch', function () {
 gulp.task('zip', function () {
   let timeStamp = moment().format("YYYYMMDHHmmss");
   pkgName = `fishjoy${timeStamp}.zip`;
-  console.log('pkgName:', pkgName);
+  logger.info('pkgName:', pkgName);
   return gulp.src(config.input.zip)
     .pipe(zip(pkgName))
     .pipe(gulp.dest(config.output.zip));
@@ -76,7 +76,7 @@ gulp.task('scp', function () {
       dest: config.scp.remotePath
     }))
     .on('error', function (err) {
-      console.log(err);
+      logger.info(err);
     });
 });
 
@@ -86,7 +86,7 @@ gulp.task('eslint', function () {
     .pipe(eslint.format())
     .pipe(eslint.failAfterError())
     .on('error', function (err) {
-      console.log('eslint error:', err.stack);
+      logger.info('eslint error:', err.stack);
       gulp.emit('end');
     });
 });
@@ -111,7 +111,7 @@ gulp.task('mix', function () {
     // 3\. 另存压缩后的文件
     .pipe(gulp.dest(config.output.dist))
     .on('error', function (err) {
-      console.log(err.stack);
+      logger.info(err.stack);
       gulp.emit('end');
     });
 });
@@ -129,7 +129,7 @@ gulp.task('unmix', function () {
     }))
     .pipe(gulp.dest(config.output.dist))
     .on('error', function (err) {
-      console.log(err.stack);
+      logger.info(err.stack);
       gulp.emit('end');
     });
 });
@@ -149,7 +149,7 @@ gulp.task('file_scp', function () {
           dest: target.remotePath
         }))
         .on('error', function (err) {
-          console.log(err);
+          logger.info(err);
         });
     });
 
@@ -185,7 +185,7 @@ gulp.task('map', function () {
     }))
     .pipe(sourcemaps.write(config.output.sourcemap))
     .on('error', function (err) {
-      console.log('eslint error:', err.stack);
+      logger.info('eslint error:', err.stack);
       gulp.emit('end');
     });
 });

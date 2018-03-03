@@ -33,35 +33,35 @@ exports.update = _update;
  */
 function _update(pool, data, cb, my_account) {
     const FUNC = TAG + "_update() --- ";
-    if (DEBUG) console.log("CALL _updateLevelMission()");
+    if (DEBUG) logger.info("CALL _updateLevelMission()");
     
     var account_id = my_account['id'];
     var token = my_account['token'];
 
     var level_mission_old = my_account['level_mission'];
     var level_mission_new = data['level_mission'] || level_mission_old;
-    if (DEBUG) console.log("level_mission_old: ", level_mission_old);
-    if (DEBUG) console.log("level_mission_new: ", level_mission_new);
+    if (DEBUG) logger.info("level_mission_old: ", level_mission_old);
+    if (DEBUG) logger.info("level_mission_new: ", level_mission_new);
         
     var json_level_mission_old = {};
     var json_level_mission_new = {};
     try {
         json_level_mission_old = ObjUtil.str2Data(level_mission_old);
-        if (DEBUG) console.log("parse level_mission_old success");
+        if (DEBUG) logger.info("parse level_mission_old success");
         json_level_mission_new = ObjUtil.str2Data(level_mission_new);
-        if (DEBUG) console.log("parse level_mission_new success");
+        if (DEBUG) logger.info("parse level_mission_new success");
     }
     catch (err_parse) {
-        if (DEBUG) console.log(err_parse);
+        if (DEBUG) logger.info(err_parse);
     }
         
     // TODO: 验证关卡数据
     // 关卡的每日免费次数只能减少
     // 关卡的每日可购买次数只能减少
     if (!(level_mission_old == null || level_mission_old == "{}")) {
-        if (DEBUG) console.log("需要验证数据有效性");
+        if (DEBUG) logger.info("需要验证数据有效性");
         for (var key in json_level_mission_new) {
-            if (DEBUG) console.log("key:" + key);
+            if (DEBUG) logger.info("key:" + key);
             var old_value = json_level_mission_old[key];// 获取旧值
             var new_value = json_level_mission_new[key];// 获取新值
             if (old_value > new_value) {
@@ -86,14 +86,14 @@ function _update(pool, data, cb, my_account) {
         
     var sql_data = [ObjUtil.data2String(level_mission_new), account_id, token];
         
-    if (DEBUG) console.log('sql: ', sql);
-    if (DEBUG) console.log('sql_data: ', sql_data);
+    if (DEBUG) logger.info('sql: ', sql);
+    if (DEBUG) logger.info('sql_data: ', sql_data);
         
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.error(FUNC + "err:\n", err);
-    	    console.error(FUNC + "sql:\n", sql);
-    	    console.error(FUNC + "sql_data:\n", sql_data);
+            logger.error(FUNC + "err:\n", err);
+    	    logger.error(FUNC + "sql:\n", sql);
+    	    logger.error(FUNC + "sql_data:\n", sql_data);
             cb(err);
         } else {
             cb(null, "success");

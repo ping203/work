@@ -65,11 +65,11 @@ function addOnly(arr, add_item) {
     if (arr.indexOf(add_item) == -1) {
         arr.push(add_item);
     }
-};
+}
 
 function contain(arr, target) {
     return arr.indexOf(target) != -1;
-};
+}
 
 function inArray(arr, target, field) {
     for (var i = 0; i < arr.length; i++) {
@@ -79,7 +79,7 @@ function inArray(arr, target, field) {
         }
     }
     return false;
-};
+}
 
 function getItem(arr, target, field) {
     for (var i = 0; i < arr.length; i++) {
@@ -89,7 +89,7 @@ function getItem(arr, target, field) {
         }
     }
     return null;
-};
+}
 
 function isArray(obj) {
     if (!obj) {
@@ -99,7 +99,7 @@ function isArray(obj) {
         return true;
     }
     return false;
-};
+}
 
 function sum(arr) {
     var ret = 0;
@@ -109,7 +109,7 @@ function sum(arr) {
         }
     }
     return ret;
-};
+}
 
 function makeArrayString(str) {
     var ret = str;
@@ -120,7 +120,7 @@ function makeArrayString(str) {
         }
     }
     return ret;
-};
+}
 
 /**
  * 从一个数组样式的字符串获取一个数字数组

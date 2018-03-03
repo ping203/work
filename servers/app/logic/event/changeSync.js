@@ -1,4 +1,4 @@
-console.error('----changeSync load dbClient');
+logger.error('----changeSync load dbClient');
 const redisClient = require('../../utils/dbclients').redisClient;
 const redisKey = require('../../database').dbConsts.REDISKEY;
 const EventEmitter = require('events').EventEmitter;

@@ -64,7 +64,7 @@ class Account extends AccountCommit {
 
         if (fields.length === 0) {
             utils.invokeCallback(cb, null);
-        };
+        }
 
         let cmds = [];
         let fields_keys = [];
@@ -79,7 +79,7 @@ class Account extends AccountCommit {
         this.__update = [];
 
         redisConnector.cmd.multi(cmds).exec(function (err, result) {
-            if (!!err) {
+            if (err) {
                 utils.invokeCallback(cb, err);
                 return;
             }

@@ -146,11 +146,11 @@ class MonthCard {
             let everyday = 0;
 
             if (card[type]) {
-                console.log(FUNC + `${uid}的${type}月卡有效`);
+                logger.info(FUNC + `${uid}的${type}月卡有效`);
                 if (get_card[type]) {
                     let error = FUNC + `${uid}已经领取${type}月卡奖励, 请勿重复领取`;
                     data_util.handleReturn(res, aes, error, null, HINT);
-                    console.log(error);
+                    logger.info(error);
                     return;
                 }
                 else {
@@ -161,7 +161,7 @@ class MonthCard {
             else {
                 let error = FUNC + `${uid}没有购买${type}月卡`;
                 data_util.handleReturn(res, aes, error, null, HINT);
-                console.log(error);
+                logger.info(error);
                 return;
             }
 

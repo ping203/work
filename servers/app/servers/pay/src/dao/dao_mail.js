@@ -110,14 +110,14 @@ function readMail(pool, data, cb) {
     BuzzUtil.cacheLinkDataApi(data, "read_mail");
     // 数据验证
     _prepareReadMail(data, function (err, ret) {
-        console.log("err:", err);
-        console.log("ret:", ret);
+        logger.info("err:", err);
+        logger.info("ret:", ret);
         if (err) {
-            console.log("邮件无效");
+            logger.info("邮件无效");
             cb && cb(err);
             return;
         }
-        if(!!ret){
+        if(ret){
             _didReadMail(pool, data, cb);
         }
     });
@@ -479,7 +479,7 @@ function _prepareReadMail(data, cb) {
     let uid = token.split("_")[0];
     CacheAccount.hasMail(uid, id, function (err, ret) {
         if (err) {
-            console.log("发生了错误");
+            logger.info("发生了错误");
             cb && cb(err);
             return false;
         }
@@ -489,7 +489,7 @@ function _prepareReadMail(data, cb) {
                 return true;
             }
             else {
-                console.log("没有邮件");
+                logger.info("没有邮件");
                 cb && cb(ERROR_OBJ.MAIL_REWARD_INVALID);
                 return false;
             }

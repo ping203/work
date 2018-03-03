@@ -33,7 +33,7 @@ exports.detail = detail;
  * 产生一组CD-Key.
  */
 function generate(pool, data, cb) {
-    if (DEBUG) console.log('CALL dao_cdkey.generate');
+    if (DEBUG) logger.info('CALL dao_cdkey.generate');
     
     let action_id = data.action_id;
     let prefix = data.prefix;
@@ -50,8 +50,8 @@ function generate(pool, data, cb) {
         }
         sql += "('" + cdKeyList[i] + "', " + action_id + ")";
     }
-    if (DEBUG) console.log('sql:', sql);
-    if (DEBUG) console.log('sql.length:', sql.length);
+    if (DEBUG) logger.info('sql:', sql);
+    if (DEBUG) logger.info('sql.length:', sql.length);
     
     // 此为本地数据库限制
     if (sql.length > 4194304) {
@@ -67,7 +67,7 @@ function generate(pool, data, cb) {
 
     pool.query(sql, [], function (err, results) {
         if (err) {
-            if (ERROR) console.error("数据插入错误: ", err);
+            if (ERROR) logger.error("数据插入错误: ", err);
             cb(err);
             return;
         }
@@ -80,7 +80,7 @@ function generate(pool, data, cb) {
  * 获取对应活动下的所有CD-Key.
  */
 function list(pool, data, cb) {
-    console.log('CALL dao_cdkey.list');
+    logger.info('CALL dao_cdkey.list');
     
     let action_id = data.action_id;
     
@@ -91,7 +91,7 @@ function list(pool, data, cb) {
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error("数据查询错误: ", err);
+            if (ERROR) logger.error("数据查询错误: ", err);
             cb(err);
             return;
         }
@@ -135,7 +135,7 @@ function use(pool, data, cb) {
                 
                 DaoReward.getReward(pool, account, reward, function (err_get_reward, results_get_reward) {
                     if (err_get_reward) {
-                        console.log(JSON.stringify(err_get_reward));
+                        logger.info(JSON.stringify(err_get_reward));
                         return;
                     }
                     account.action_id = action_id;
@@ -153,7 +153,7 @@ function use(pool, data, cb) {
  * @param {*} cb 
  */
 function detail(pool, data, cb) {
-    console.log('CALL dao_cdkey.detail');
+    logger.info('CALL dao_cdkey.detail');
     
     let cdkey = data.cdkey;
 
@@ -170,7 +170,7 @@ function detail(pool, data, cb) {
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error("数据查询错误: ", err);
+            if (ERROR) logger.error("数据查询错误: ", err);
             cb(err);
             return;
         }
@@ -195,42 +195,42 @@ function _checkCdkey(pool, cdkey, account_id, cb) {
     sql += "WHERE cd_key=?";
     let sql_data = [cdkey];
     
-    if (DEBUG) console.log('sql:', sql);
-    if (DEBUG) console.log('sql_data:', sql_data);
+    if (DEBUG) logger.info('sql:', sql);
+    if (DEBUG) logger.info('sql_data:', sql_data);
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error("数据查询错误: ", err);
+            if (ERROR) logger.error("数据查询错误: ", err);
             cb(ERROR_OBJ.DB_ERR);
             return;
         }
         if (results.length == 0) {
-            console.error('-----------------------------------------------------');
-            console.error(FUNC + '没有找到对应的兑换码, 兑换码无效: dao_cdkey._checkCdkey()');
-            console.error('-----------------------------------------------------');
+            logger.error('-----------------------------------------------------');
+            logger.error(FUNC + '没有找到对应的兑换码, 兑换码无效: dao_cdkey._checkCdkey()');
+            logger.error('-----------------------------------------------------');
             cb(ERROR_OBJ.CDKEY_INVALID);
             return;
         }
         if (results.length > 1) {
-            console.error('-----------------------------------------------------');
-            console.error(FUNC + '同样的兑换码多余一条, 兑换码无效: dao_cdkey._checkCdkey()');
-            console.error('-----------------------------------------------------');
+            logger.error('-----------------------------------------------------');
+            logger.error(FUNC + '同样的兑换码多余一条, 兑换码无效: dao_cdkey._checkCdkey()');
+            logger.error('-----------------------------------------------------');
             cb(ERROR_OBJ.CDKEY_INVALID);
             return;
         }
         let cdkeyInfo = results[0];
         if (cdkeyInfo.use_time != null && cdkeyInfo.account_id != null) {
-            console.error('-----------------------------------------------------');
-            console.error(FUNC + '兑换码已经使用过, 兑换码无效: dao_cdkey._checkCdkey()');
-            console.error('-----------------------------------------------------');
+            logger.error('-----------------------------------------------------');
+            logger.error(FUNC + '兑换码已经使用过, 兑换码无效: dao_cdkey._checkCdkey()');
+            logger.error('-----------------------------------------------------');
             cb(ERROR_OBJ.CDKEY_USED);
             return;
         }
         let endtime = _getEndtimeByActionId(cdkeyInfo.action_id);
         if (expired(endtime)) {
-            console.error('-----------------------------------------------------');
-            console.error(FUNC + '兑换码已过期: dao_cdkey._checkCdkey()');
-            console.error('-----------------------------------------------------');
+            logger.error('-----------------------------------------------------');
+            logger.error(FUNC + '兑换码已过期: dao_cdkey._checkCdkey()');
+            logger.error('-----------------------------------------------------');
             cb(ERROR_OBJ.CDKEY_EXPIRED);
             return;
         }
@@ -251,19 +251,19 @@ function _checkRepeatGet(pool, action_id, account_id, cb) {
     sql += "WHERE action_id=? AND account_id=?";
     let sql_data = [action_id, account_id];
     
-    if (DEBUG) console.log('sql:', sql);
-    if (DEBUG) console.log('sql_data:', sql_data);
+    if (DEBUG) logger.info('sql:', sql);
+    if (DEBUG) logger.info('sql_data:', sql_data);
 
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error("数据查询错误: ", err);
+            if (ERROR) logger.error("数据查询错误: ", err);
             cb(ERROR_OBJ.DB_ERR);
             return;
         }
         if (results.length > 0) {
-            console.error('-----------------------------------------------------');
-            console.error(FUNC + '玩家已经领取过同一类型的奖励: dao_cdkey._checkRepeatGet()');
-            console.error('-----------------------------------------------------');
+            logger.error('-----------------------------------------------------');
+            logger.error(FUNC + '玩家已经领取过同一类型的奖励: dao_cdkey._checkRepeatGet()');
+            logger.error('-----------------------------------------------------');
             cb(ERROR_OBJ.CDKEY_REPEAT);
             return;
         }
@@ -274,8 +274,8 @@ function _checkRepeatGet(pool, action_id, account_id, cb) {
 function diff(endtime) {
     let curtime = new Date();
     let _endtime = new Date(endtime);
-    if (DEBUG) console.log("curtime: ", curtime);
-    if (DEBUG) console.log("endtime: ", _endtime);
+    if (DEBUG) logger.info("curtime: ", curtime);
+    if (DEBUG) logger.info("endtime: ", _endtime);
     return curtime.getTime() - _endtime.getTime();
 }
 
@@ -292,19 +292,19 @@ function _useCdKey(pool, account_id, cdkey, cb) {
     sql += "WHERE cd_key=?";
     let sql_data = [account_id, DateUtil.format(new Date(), "yyyy-MM-dd hh:mm:ss"), cdkey];
 
-    if (DEBUG) console.log('sql:', sql);
-    if (DEBUG) console.log('sql_data:', sql_data);
+    if (DEBUG) logger.info('sql:', sql);
+    if (DEBUG) logger.info('sql_data:', sql_data);
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error("数据更新错误: ", err);
+            if (ERROR) logger.error("数据更新错误: ", err);
             cb(ERROR_OBJ.DB_ERR);
             return;
         }
         if (results.affectedRows == 0) {
-            console.error('-----------------------------------------------------');
-            console.error(FUNC + '更新操作影响数据条数为0, 兑换码无效: dao_cdkey._useCdKey()');
-            console.error('-----------------------------------------------------');
+            logger.error('-----------------------------------------------------');
+            logger.error(FUNC + '更新操作影响数据条数为0, 兑换码无效: dao_cdkey._useCdKey()');
+            logger.error('-----------------------------------------------------');
             cb(ERROR_OBJ.CDKEY_INVALID);
             return;
         }
@@ -313,8 +313,8 @@ function _useCdKey(pool, account_id, cdkey, cb) {
 }
 
 function _getActionByActionId(id) {
-    if (DEBUG) console.log('active_cdkey_cfg: ', active_cdkey_cfg);
-    if (DEBUG) console.log('id: ', id);
+    if (DEBUG) logger.info('active_cdkey_cfg: ', active_cdkey_cfg);
+    if (DEBUG) logger.info('id: ', id);
     for (let i = 0; i < active_cdkey_cfg.length; i++) {
         let action = active_cdkey_cfg[i];
         if (action.id == id) {

@@ -218,7 +218,7 @@ class FishPlayer extends Player {
     _regetField() {
         let tfs = this.getBaseField();
         redisAccountSync.getAccount(this.uid, tfs, function (err, account) {
-            if (!!err) {
+            if (err) {
                 logger.error('err = ', err, ' code = ', CONSTS.SYS_CODE.DB_ERROR.code);
                 return;
             }

@@ -78,17 +78,17 @@ class PhoneVerification {
     async checkPhoneCodeValid(data) {
         let self = this;
                     
-        console.log('--------checkPhoneCodeValid:', data);
+        logger.info('--------checkPhoneCodeValid:', data);
         return new Promise(function (resolve, reject) {
             let code = self._codeMap.get(data.phone);
             if (!code || Date.now() - code.timestamp >= code.validTime) {
-                console.log('验证码过期');
+                logger.info('验证码过期');
                 reject(ERROR_OBJ.PHONE_CODE_EXPIRE.msg);
             }
             
-            console.log('--------checkPhoneCodeValid:', data);
+            logger.info('--------checkPhoneCodeValid:', data);
             if (data.verifyCode != code.verifyCode) {
-                console.log('验证码不正确');
+                logger.info('验证码不正确');
                 reject(ERROR_OBJ.PHONE_CODE_ERROR.msg);
             }
 

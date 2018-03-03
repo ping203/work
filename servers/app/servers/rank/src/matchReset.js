@@ -103,7 +103,7 @@ class MatchReset{
                 next();
 
             }, function (err) {
-                console.log(`执行${task.redisKey}重置完成`);
+                logger.info(`执行${task.redisKey}重置完成`);
                 resolve(recordUid);
             });
         });

@@ -102,35 +102,35 @@ exports.GODDESS_STATE = GODDESS_STATE;
 //------------------------------------------------------------------------------
 
 function upgradePetfish(req, data, cb) {
-    if (DEBUG) console.log("【CALL】 buzz_aquarium.upgradePetfish()");
+    if (DEBUG) logger.info("【CALL】 buzz_aquarium.upgradePetfish()");
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "upgrade_petfish");
     checkAccount(req, data, cb, _didUpgradePetfish);
 }
 
 function putPetfish(req, data, cb) {
-    if (DEBUG) console.log("【CALL】 buzz_aquarium.putPetfish()");
+    if (DEBUG) logger.info("【CALL】 buzz_aquarium.putPetfish()");
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "put_petfish");
     checkAccount(req, data, cb, _didPutPetfish);
 }
 
 function rewardPetfish(req, data, cb) {
-    if (DEBUG) console.log("【CALL】 buzz_aquarium.rewardPetfish()");
+    if (DEBUG) logger.info("【CALL】 buzz_aquarium.rewardPetfish()");
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "reward_petfish");
     checkAccount(req, data, cb, _didRewardPetfish);
 }
 
 function putGoddess(req, data, cb) {
-    if (DEBUG) console.log("【CALL】 buzz_aquarium.putGoddess()");
+    if (DEBUG) logger.info("【CALL】 buzz_aquarium.putGoddess()");
     if (!_prepare(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "put_goddess");
     checkAccount(req, data, cb, _didPutGoddess);
 }
 
 function getAquarium(req, data, cb) {
-    if (DEBUG) console.log("【CALL】 buzz_aquarium.getAquarium()");
+    if (DEBUG) logger.info("【CALL】 buzz_aquarium.getAquarium()");
     if (!_prepareGet(data, cb)) return;
     BuzzUtil.cacheLinkDataApi(data, "get_aquarium");
     checkAccount(req, data, cb, _didGetAquarium);
@@ -158,7 +158,7 @@ function _didGetAquarium(req, data, cb) {
     const FUNC = TAG + "_didGetAquarium() --- ";
     DEBUG = 0;
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
     
     var token = data['token'];
     var account_id = data['account_id'];
@@ -166,8 +166,8 @@ function _didGetAquarium(req, data, cb) {
     
     CacheAccount.getAccountById(account_id, function (err, account) {
 
-        if (DEBUG) console.log(FUNC + "玩家ID存在于内存:", account_id);
-        if (DEBUG) console.log(FUNC + "Aquarium:", _currentAquarium(account));
+        if (DEBUG) logger.info(FUNC + "玩家ID存在于内存:", account_id);
+        if (DEBUG) logger.info(FUNC + "Aquarium:", _currentAquarium(account));
 
         cb(null, _currentAquarium(account));
 
@@ -187,21 +187,21 @@ function _didPutGoddess(req, data, cb) {
 
     CacheAccount.getAccountById(account_id, function (err, account) {
         if(account){
-            if (DEBUG) console.log(FUNC + "call _getAquariumOrInit()");
+            if (DEBUG) logger.info(FUNC + "call _getAquariumOrInit()");
             var aquarium = _getAquariumOrInit(account);
 
             // 数据验证及操作.
             if (aquarium.goddess['' + id] == null) {
-                if (ERROR) console.error(FUNC + "放置的女神没有解锁");
+                if (ERROR) logger.error(FUNC + "放置的女神没有解锁");
                 cb(ERROR_OBJ.GODDESS_LOCKED);
                 return;
             }
             else {
-                if (DEBUG) console.log(FUNC + "放置的女神已解锁");
+                if (DEBUG) logger.info(FUNC + "放置的女神已解锁");
                 var goddess = aquarium.goddess['' + id];
-                if (DEBUG) console.log(FUNC + "goddess:", goddess);
+                if (DEBUG) logger.info(FUNC + "goddess:", goddess);
                 if (GODDESS_STATE.PLACED == goddess.state) {
-                    if (ERROR) console.error(FUNC + "女神已经处于放置状态，请勿重复放置");
+                    if (ERROR) logger.error(FUNC + "女神已经处于放置状态，请勿重复放置");
                     cb(ERROR_OBJ.GODDESS_PLACED);
                     return;
                 }
@@ -218,8 +218,8 @@ function _didPutGoddess(req, data, cb) {
                     cb(null, _currentAquarium(account));// 返回当前水族馆的所有数据
                     return;
                 }
-                if (ERROR) console.error(FUNC + "女神处于未知状态:" + goddess.state);
-                if (ERROR) console.error(FUNC + "goddess:", goddess);
+                if (ERROR) logger.error(FUNC + "女神处于未知状态:" + goddess.state);
+                if (ERROR) logger.error(FUNC + "goddess:", goddess);
                 cb(ERROR_OBJ.GODDESS_STATE_ERR);
                 return;
             }
@@ -239,7 +239,7 @@ function _didRewardPetfish(req, data, cb, account) {
     var account_id = data['account_id'];
 
     CacheAccount.getAccountById(account_id, function (err, account) {
-        if (DEBUG) console.log(FUNC + "call _getAquariumOrInit()");
+        if (DEBUG) logger.info(FUNC + "call _getAquariumOrInit()");
         var aquarium = _getAquariumOrInit(account);
 
         if (!_fishUnlocked(aquarium, id, cb)) return;
@@ -247,21 +247,21 @@ function _didRewardPetfish(req, data, cb, account) {
         var petfish = aquarium.petfish['' + id];
 
         if (!_fishPlaced(petfish)) {
-            if (ERROR) console.error(FUNC + "宠物鱼未放养，无法收取");
+            if (ERROR) logger.error(FUNC + "宠物鱼未放养，无法收取");
             cb(ERROR_OBJ.PETFISH_REWARD_ERR_NOTPLACED);
             return;
         }
 
         // 引导没有完成跳过时间判断
         var guideWeak = account.guide_weak;//CacheAccount.getGuideWeak(account_id);
-        if (DEBUG) console.log(FUNC + "guideWeak:", guideWeak);
+        if (DEBUG) logger.info(FUNC + "guideWeak:", guideWeak);
         if (guideWeak.petfish == null || !guideWeak.petfish) {
             // Do nothing.
-            if (DEBUG) console.log(FUNC + "没有完成引导, 需要跳过倒计时");
+            if (DEBUG) logger.info(FUNC + "没有完成引导, 需要跳过倒计时");
         }
         else {
             if (!_PetfishCanReward(petfish,aquarium)) {
-                if (ERROR) console.error(FUNC + "宠物鱼没有到时间");
+                if (ERROR) logger.error(FUNC + "宠物鱼没有到时间");
                 cb(ERROR_OBJ.PETFISH_REWARD_ERR_TIME_NOT_UP);
                 return;
             }
@@ -307,7 +307,7 @@ function _didRewardPetfish(req, data, cb, account) {
         function getItemlistFromFish(petfish, goddess) {
             var petfish_info = BuzzUtil.getPetfishFromId(petfish.id);
             var tid = petfish_info.treasureid;
-            console.log(FUNC + "tid:", tid);
+            logger.info(FUNC + "tid:", tid);
             var goddess_id = 0;
             var goddess_lv = 0;
             if (goddess) {
@@ -343,20 +343,20 @@ function _didPutPetfish(req, data, cb) {
 function _checkFish(account, id, cb) {
     const FUNC = TAG + "_checkFish() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var aquarium = _getAquariumOrInit(account);
     let count = 0;
     
     for (var i in id) {
         var fish_id = id[i];
-        //console.log("fish_id:", fish_id);
+        //logger.info("fish_id:", fish_id);
         if (!_fishUnlocked(aquarium, fish_id, cb)) return;
         
-        if (DEBUG) console.log(FUNC + "用户放养的鱼在水族馆中");
+        if (DEBUG) logger.info(FUNC + "用户放养的鱼在水族馆中");
         var petfish = aquarium.petfish['' + fish_id];
         if (_fishPlaced(petfish)) {
-            if (ERROR) console.error(FUNC + "用户放养的鱼已经处于放养状态，请勿重复放养");
+            if (ERROR) logger.error(FUNC + "用户放养的鱼已经处于放养状态，请勿重复放养");
             cb(ERROR_OBJ.PETFISH_PLACED);
             return;
         }
@@ -368,11 +368,11 @@ function _checkFish(account, id, cb) {
             continue;
         }
         else if (petfish.state == PET_STATE.ALREADY_REWARD) {
-            if (ERROR) console.error(FUNC + "宠物鱼今日已放养并领取奖励");
+            if (ERROR) logger.error(FUNC + "宠物鱼今日已放养并领取奖励");
             continue;
         }
 
-        if (ERROR) console.error(FUNC + "宠物鱼处于未知状态:" + petfish.state);
+        if (ERROR) logger.error(FUNC + "宠物鱼处于未知状态:" + petfish.state);
         cb(ERROR_OBJ.PETFISH_STATE_ERR);
         return;
     }
@@ -395,7 +395,7 @@ function _fishUnlocked(aquarium, id, cb) {
     const FUNC = TAG + "_fishUnlocked() --- ";
 
     if (aquarium.petfish['' + id] == null) {
-        if (ERROR) console.error(FUNC + "用户放养的鱼并没有在水族馆中");
+        if (ERROR) logger.error(FUNC + "用户放养的鱼并没有在水族馆中");
         if (cb) cb(ERROR_OBJ.PETFISH_LOCKED);
         return false;
     }
@@ -424,7 +424,7 @@ function _didUpgradePetfish(req, data, cb) {
     var id = data['id'];
     var uid = data['account_id'];
     
-    if (DEBUG) console.log(FUNC + "fish_id:", id);
+    if (DEBUG) logger.info(FUNC + "fish_id:", id);
 
     var chip_id = _getChipFromId(id);
 
@@ -448,7 +448,7 @@ function _didUpgradePetfish(req, data, cb) {
                 level = account.aquarium.petfish["" + id].level;
             }
             var need = _getCost(level);// 获取消耗品种类和数量
-            if (DEBUG) console.log(FUNC + "解锁或升级需要消耗的碎片 --- need:", need);
+            if (DEBUG) logger.info(FUNC + "解锁或升级需要消耗的碎片 --- need:", need);
 
             // 查看当前玩家水族馆中这个鱼是否解锁或达到了目标等级
             if (_alreadyHave(account, id, level, cb)) return;
@@ -474,7 +474,7 @@ function _didUpgradePetfish(req, data, cb) {
                     // 在水族馆中放入一条鱼(数据字段为aquarium)
                     // 或升级已经解锁的鱼
                     if (level == 0) {
-                        if (DEBUG) console.log(FUNC + "解锁！");
+                        if (DEBUG) logger.info(FUNC + "解锁！");
                         aquarium.petfish["" + id] = {
                             id: id,
                             level: level + 1,
@@ -483,7 +483,7 @@ function _didUpgradePetfish(req, data, cb) {
                         };
                     }
                     else {
-                        if (DEBUG) console.log(FUNC + "升级！");
+                        if (DEBUG) logger.info(FUNC + "升级！");
                         aquarium.petfish["" + id].level++;
                     }
 
@@ -510,9 +510,9 @@ function _didUpgradePetfish(req, data, cb) {
                 const FUNC = TAG + "_isGoldEnough() --- ";
 
                 var ownCoin = account[coinType];
-                if (DEBUG) console.log(FUNC + "ownCoin:", ownCoin);
+                if (DEBUG) logger.info(FUNC + "ownCoin:", ownCoin);
                 if (ownCoin < needCoin) {
-                    if (ERROR) console.error("金币不足:", ERROR_OBJ.GOLD_NOT_ENOUGH);
+                    if (ERROR) logger.error("金币不足:", ERROR_OBJ.GOLD_NOT_ENOUGH);
                     cb(ERROR_OBJ.GOLD_NOT_ENOUGH);
                     return false;
                 }
@@ -538,18 +538,18 @@ function _isChipEnough(account, fish_id, need_chip, cb) {
     var pack = account.package;
     var chip = pack[ItemTypeC.DEBRIS];
     var chip_id = _getChipFromId(fish_id);
-    if (DEBUG) console.log(FUNC + "chip:", chip);
-    if (DEBUG) console.log(FUNC + "chip_id:", chip_id);
+    if (DEBUG) logger.info(FUNC + "chip:", chip);
+    if (DEBUG) logger.info(FUNC + "chip_id:", chip_id);
     if (chip) {
         if (chip[chip_id] == null || chip[chip_id] < need_chip) {
-            if (ERROR) console.error(FUNC + "碎片不足:", ERROR_OBJ.CHIP_NOT_ENOUGH);
+            if (ERROR) logger.error(FUNC + "碎片不足:", ERROR_OBJ.CHIP_NOT_ENOUGH);
             cb(ERROR_OBJ.CHIP_NOT_ENOUGH);
             return false;
         }
         return true;
     }
     else {
-        if (ERROR) console.error(FUNC + "碎片不足:", ERROR_OBJ.CHIP_NOT_ENOUGH);
+        if (ERROR) logger.error(FUNC + "碎片不足:", ERROR_OBJ.CHIP_NOT_ENOUGH);
         cb(ERROR_OBJ.CHIP_NOT_ENOUGH);
         return false;
     }
@@ -586,7 +586,7 @@ function _prepareGet(data, cb) {
     const FUNC = TAG + "_prepareGet() --- ";
     
     var token = data['token'];
-    if (DEBUG) console.log(FUNC + "token:", token);
+    if (DEBUG) logger.info(FUNC + "token:", token);
     if (!CommonUtil.isParamExist("aquarium", token, "接口调用请传参数token", cb)) return false;
     var account_id = token.split("_")[0];
     data['account_id'] = account_id;
@@ -600,8 +600,8 @@ function _prepare(data, cb) {
     var token = data['token'];
     var id = data['id'];
     
-    if (DEBUG) console.log(FUNC + "token:", token);
-    if (DEBUG) console.log(FUNC + "id:", id);
+    if (DEBUG) logger.info(FUNC + "token:", token);
+    if (DEBUG) logger.info(FUNC + "id:", id);
 
     if (!CommonUtil.isParamExist("aquarium", token, "接口调用请传参数token", cb)) return false;
     if (!CommonUtil.isParamExist("aquarium", id, "接口调用请传参数id(玩家需要解锁的鱼的ID)", cb)) return false;
@@ -642,7 +642,7 @@ function _getChipFromId(id) {
         return fishInfo.chip;
     }
     else {
-        console.error(FUNC + "获取鱼的信息失败, 鱼的id:", id);
+        logger.error(FUNC + "获取鱼的信息失败, 鱼的id:", id);
         return null;
     }
     // return _petfishInfo(id).chip;
@@ -651,8 +651,8 @@ function _getChipFromId(id) {
 function _realProtime(id, level) {
     const FUNC = TAG + "_realProtime() --- ";
     
-    if (DEBUG) console.log(FUNC + "id:", id);
-    if (DEBUG) console.log(FUNC + "level:", level);
+    if (DEBUG) logger.info(FUNC + "id:", id);
+    if (DEBUG) logger.info(FUNC + "level:", level);
     var protime = _petfishInfo(id).protime;
     var protimecut = _petupInfo(level).protimecut;
     return protime * (1 - protimecut);
@@ -662,7 +662,7 @@ function _realProtime(id, level) {
 function _currentAquarium(account) {
     const FUNC = TAG + "_currentAquarium() --- ";
 
-    if (DEBUG) console.log(FUNC + "call _getAquariumOrInit()");
+    if (DEBUG) logger.info(FUNC + "call _getAquariumOrInit()");
     var aquarium = _getAquariumOrInit(account);
     
     for (var idx in aquarium.petfish) {
@@ -730,12 +730,12 @@ function _getAquariumOrInit(account, cb) {
 
     // 宠物鱼初始化
     if (aquarium.petfish == null) {
-        if (DEBUG) console.log(FUNC + "aquarium.petfish == null, 宠物鱼重新设置");
+        if (DEBUG) logger.info(FUNC + "aquarium.petfish == null, 宠物鱼重新设置");
         aquarium.petfish = {};
     }
 
     // 女神初始化
-    if (DEBUG) console.log(FUNC + "aquarium.goddess:", aquarium.goddess);
+    if (DEBUG) logger.info(FUNC + "aquarium.goddess:", aquarium.goddess);
     if (aquarium.goddess == null || _.keys(aquarium.goddess).length == 0) {
         aquarium.goddess = buzz_goddess.getUnlocked(account);
         // 默认第一个女神状态为1

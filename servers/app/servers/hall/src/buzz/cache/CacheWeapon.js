@@ -73,7 +73,7 @@ function getLogListByAccountId(account_id) {
     var ret = [];
     for (var i = 0; i < gWeaponLogCache.length; i++) {
         // TODO: 添加与用户ID相关的条件
-        // console.log("record[" + i + "]:", gWeaponLogCache[i]);
+        // logger.info("record[" + i + "]:", gWeaponLogCache[i]);
         if (gWeaponLogCache[i].account_id == account_id) {
             ret.push(gWeaponLogCache[i]);
         }

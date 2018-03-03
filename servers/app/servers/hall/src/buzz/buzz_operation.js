@@ -195,7 +195,7 @@ function _queryPlayer(req, dataObj, cb) {
     ];
     redisAccountSync.getAccount(uid, fields, function (err, account) {
         account = account.toJSON();
-        console.log(account);
+        logger.info(account);
         if (!account.playerCatchRate) {
             account.playerCatchRate = 1;
         }
@@ -266,7 +266,7 @@ function _getOperationCfgs(req, dataObj, cb) {
 
     let type = dataObj.type;
 
-    console.log(FUNC + "type:", type);
+    logger.info(FUNC + "type:", type);
 
     // TODO: 改变内存中数据, 需要时才写入数据库
     switch (type) {
@@ -320,11 +320,11 @@ function _modifyCfgs(req, dataObj, cb) {
     let change = dataObj.change;
     let cfg_id = dataObj.cfg_id;
 
-    console.log(FUNC + "oid:", oid);
-    console.log(FUNC + "value:", value);
-    console.log(FUNC + "desc:", desc);
-    console.log(FUNC + "change:", change);
-    console.log(FUNC + "cfg_id:", cfg_id);
+    logger.info(FUNC + "oid:", oid);
+    logger.info(FUNC + "value:", value);
+    logger.info(FUNC + "desc:", desc);
+    logger.info(FUNC + "change:", change);
+    logger.info(FUNC + "cfg_id:", cfg_id);
 
     if (!_.isUndefined(desc)) {
         CacheOperation.updateDesc(oid, desc);
@@ -333,8 +333,8 @@ function _modifyCfgs(req, dataObj, cb) {
     if (!_.isUndefined(value)) {
         CacheOperation.updateValue(oid, value);
         // 实物兑换开关切换
-        console.log(FUNC + "oid:", oid);
-        console.log(FUNC + "value:", value);
+        logger.info(FUNC + "oid:", oid);
+        logger.info(FUNC + "value:", value);
         if (oid == 101) {
             RedisUtil.set(redisKeys.SWITCH.CIK, value);
         }
@@ -365,21 +365,21 @@ function _buyCard(req, dataObj, cb) {
     let changeInfo = getChangeInfo(cid);
     let business = changeInfo.business;
 
-    console.log(FUNC + 'orderid:', orderid);
-    console.log(FUNC + 'uid:', uid);
-    console.log(FUNC + 'cid:', cid);
-    console.log(FUNC + 'changeInfo:', changeInfo);
+    logger.info(FUNC + 'orderid:', orderid);
+    logger.info(FUNC + 'uid:', uid);
+    logger.info(FUNC + 'cid:', cid);
+    logger.info(FUNC + 'changeInfo:', changeInfo);
 
     let account = {
         id: uid,
     };
-    console.log(FUNC + 'account:', account);
+    logger.info(FUNC + 'account:', account);
     // let result = await buzz_recieve.buyCard(changeInfo, account);
     let result = {
         card_num: '123456',
         card_pwd: '654321',
     };
-    console.log(FUNC + 'result:', result);
+    logger.info(FUNC + 'result:', result);
 
     cb(null, result);
 }
@@ -400,9 +400,9 @@ function _getChangeOrder(req, dataObj, cb) {
     let end_date = dataObj.end_date;
     let filter = dataObj.filter;
 
-    console.log(FUNC + "start_date:", start_date);
-    console.log(FUNC + "end_date:", end_date);
-    console.log(FUNC + "filter:", filter);
+    logger.info(FUNC + "start_date:", start_date);
+    logger.info(FUNC + "end_date:", end_date);
+    logger.info(FUNC + "filter:", filter);
 
     // let ret = CacheChange.findOrdersByTimeRange(start_date, end_date);
 
@@ -417,8 +417,8 @@ function _addHuafeiquan(req, dataObj, cb) {
     let uid = dataObj.uid;
     let num = dataObj.num;
 
-    console.log(FUNC + "uid:", uid);
-    console.log(FUNC + "num:", num);
+    logger.info(FUNC + "uid:", uid);
+    logger.info(FUNC + "num:", num);
 
     let ret = CacheAccount.addHuafeiquan(uid, num);
 

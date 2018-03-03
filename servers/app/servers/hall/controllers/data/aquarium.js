@@ -131,7 +131,7 @@ function _getDataObj(req, res) {
     if (!(dataObj = data_util.get_dao_data(req, res))) {
         return;
     }
-    if (DEBUG) console.log(FUNC + 'dataObj:\n', dataObj);
+    if (DEBUG) logger.info(FUNC + 'dataObj:\n', dataObj);
     return dataObj;
 }
 
@@ -141,9 +141,9 @@ function _resultHandler(res, err, account, msg, aes) {
     if (err) {
         res.success({ type: 1, msg: msg + '失败', err: err });
     } else {
-        if (DEBUG) console.log(FUNC + 'account:\n', account);
+        if (DEBUG) logger.info(FUNC + 'account:\n', account);
         var res_data = buzz_cst_game.getResData(account, aes);
-        if (DEBUG) console.log(FUNC + 'res_data:\n', res_data);
+        if (DEBUG) logger.info(FUNC + 'res_data:\n', res_data);
         res.success({ type: 1, msg: msg + '成功', data: res_data, aes: aes });
     }
 }

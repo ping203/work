@@ -58,8 +58,8 @@ class Util {
                 }
             });
         });
-    };
-};
+    }
+}
 
 /**
  * 判断用户是否存在于redis中
@@ -69,7 +69,7 @@ class Util {
  */
 function _exist(uid, cb) {
     redisConnector.cmd.hget(REDISKEY.PLATFORM, uid, function (err, result) {
-        if (!!err) {
+        if (err) {
             utils.invokeCallback(cb, ERROR_OBJ.DB_ERR);
             return;
         }
@@ -121,7 +121,7 @@ function _setAccount(id, data, cb) {
     });
 
     redisConnector.cmd.multi(cmds).exec(function (err, result) {
-        if (!!err) {
+        if (err) {
             logger.error('SET REDIS OPERATE ERROR:', err);
             utils.invokeCallback(cb, ERROR_OBJ.DB_ERR);
             return;
@@ -189,7 +189,7 @@ function _getAccount(uid, fields, cb) {
             });
 
             redisConnector.cmd.multi(cmds).exec(function (err, docs) {
-                if (!!err) {
+                if (err) {
                     logger.error('GET MULTI REDIS OPERATE ERROR:', err);
                     utils.invokeCallback(cb, ERROR_OBJ.DB_ERR);
                     return;
@@ -203,7 +203,7 @@ function _getAccount(uid, fields, cb) {
             });
         } else {
             redisConnector.cmd.hget(REDISKEY.getKey(fields[0]), uid, function (err, doc) {
-                if (!!err) {
+                if (err) {
                     logger.error('GET REDIS OPERATE ERROR:', err);
                     utils.invokeCallback(cb, ERROR_OBJ.DB_ERR);
                     return;
@@ -283,7 +283,7 @@ function _remSetValues(redisKey, members, cb) {
 
     let promise = new Promise(function (resolve, reject) {
         redisConnector.cmd.multi(cmds).exec(function (err, results) {
-            if (!!err) {
+            if (err) {
                 utils.invokeCallback(cb, err);
                 resolve(results);
                 return;
@@ -312,7 +312,7 @@ function _delAccount(uids, cb) {
     });
 
     redisConnector.cmd.multi(cmds).exec(function (err, result) {
-        if (!!err) {
+        if (err) {
             utils.invokeCallback(cb, err);
             return;
         }

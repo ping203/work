@@ -60,7 +60,7 @@ function addSkillLogEx(account, data, cb) {
     var nickname = (account.nickname != null);
 
     _didAddSkillLog(mysqlPool, data, cb, account, nickname);
-};
+}
 
 
 /**
@@ -75,16 +75,16 @@ function addSkillLog(pool, data, cb) {
 
     AccountCommon.getAccountByToken(pool, token, function (err1, results1) {
         if (err1) {
-            console.log("err1：", err1);
+            logger.info("err1：", err1);
             var extraErrInfo = {debug_info: "dao_skill.addSkillLog()-使用token查询玩家账户", err_obj: err1};
-            console.error(extraErrInfo.debug_info);
+            logger.error(extraErrInfo.debug_info);
             cb(ObjUtil.merge(extraErrInfo, ERROR_OBJ.DB_ERR));
             return;
         }
         if (results1.length == 0) {
-            console.error('-----------------------------------------------------');
-            console.error('TOKEN_INVALID: dao_skill.addSkillLog()');
-            console.error('-----------------------------------------------------');
+            logger.error('-----------------------------------------------------');
+            logger.error('TOKEN_INVALID: dao_skill.addSkillLog()');
+            logger.error('-----------------------------------------------------');
             cb(CstError.ERROR_OBJ.TOKEN_INVALID);
             return;
         }
@@ -93,7 +93,7 @@ function addSkillLog(pool, data, cb) {
         
         _didAddSkillLog(pool, data, cb, account_result, nickname);
     });
-};
+}
 
 
 //==============================================================================
@@ -129,16 +129,16 @@ function _didWrite(pool, skill_list, cb) {
         sql_data.push(one_link.comment || '无');
     }
 
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
         } else {
-            if (DEBUG) console.log(FUNC + 'result: ', result);
+            if (DEBUG) logger.info(FUNC + 'result: ', result);
         }
         cb(err, result);
         DEBUG = 0;
@@ -169,7 +169,7 @@ function _prepare(data, cb) {
     }
     
     if (skill_data.length == 0) {
-        console.log("更新的技能数据为空，数据库无需做出修改");
+        logger.info("更新的技能数据为空，数据库无需做出修改");
         cb(null, "更新的技能数据为空，数据库无需做出修改");
         return false;
     }
@@ -183,7 +183,7 @@ function _prepare(data, cb) {
  */
 function _isParamExist(param, err_info, cb) {
     if (param == null) {
-        console.error(err_info);
+        logger.error(err_info);
         var extraErrInfo = { debug_info: "dao_skill.addSkillLog()-" + err_info };
         cb && cb(ObjUtil.merge(extraErrInfo, ERROR_OBJ.PARAM_MISSING));
         return false;
@@ -199,7 +199,7 @@ function _didAddSkillLog(pool, data, cb, account, nickname) {
     var account_id = data['account_id'];
     var skill_data = data['skill_data'];
 
-    if (DEBUG) console.log(FUNC + "skill_data: ", skill_data);
+    if (DEBUG) logger.info(FUNC + "skill_data: ", skill_data);
     if (typeof skill_data == "string") {
         try {
             skill_data = JSON.parse(skill_data);
@@ -210,7 +210,7 @@ function _didAddSkillLog(pool, data, cb, account, nickname) {
     }
 
     if (skill_data.length == 0) {
-        if (ERROR) console.error(FUNC + '插入的技能日志为0条, 不做数据库操作');
+        if (ERROR) logger.error(FUNC + '插入的技能日志为0条, 不做数据库操作');
         cb(new Error('插入的技能日志为0条, 不做数据库操作'));
         return;
     }
@@ -239,27 +239,27 @@ function _didAddSkillLog(pool, data, cb, account, nickname) {
         sql_data.push(nickname);
     }
 
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
 
     if (sql_data.length == 0) {
-        if (ERROR) console.error(FUNC + '---插入的技能日志为0条, 不做数据库操作');
+        if (ERROR) logger.error(FUNC + '---插入的技能日志为0条, 不做数据库操作');
         cb(new Error('插入的技能日志为0条, 不做数据库操作'));
         return;
     }
 
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:", err);
-            if (ERROR) console.error(FUNC + 'sql:\n', sql);
-            if (ERROR) console.error(FUNC + 'sql_data:\n', sql_data);
+            if (ERROR) logger.error(FUNC + "err:", err);
+            if (ERROR) logger.error(FUNC + 'sql:\n', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data:\n', sql_data);
             cb(err);
         } else {
-             if (DEBUG) console.log(FUNC + 'result:\n', result);
+             if (DEBUG) logger.info(FUNC + 'result:\n', result);
             _updateSkillField(pool, data, account, cb, account_skill);
         }
     });
-};
+}
 
 // 更新tbl_account表中的skill字段
 function _updateSkillField(pool, data, account, cb, account_skill) {
@@ -275,7 +275,7 @@ function _updateSkillField(pool, data, account, cb, account_skill) {
         try {
             skill_data = JSON.parse(skill_data);
         } catch (e) {
-            if (ERROR) console.error(FUNC + "parse error(1):\n", e);
+            if (ERROR) logger.error(FUNC + "parse error(1):\n", e);
             cb(e);
             return;
         }
@@ -283,7 +283,7 @@ function _updateSkillField(pool, data, account, cb, account_skill) {
 
     //校验售出道具时的合法性
     let failOperation = function () {
-        console.log('account.skill = 售卖技能失败');
+        logger.info('account.skill = 售卖技能失败');
         let ret1= {
             pearl: account.pearl,
             skill: account.skill,
@@ -313,7 +313,7 @@ function _updateSkillField(pool, data, account, cb, account_skill) {
     }
     var ret = {};
     if (account_skill == null) {
-        if (DEBUG) console.log(FUNC + 'account_skill == null');
+        if (DEBUG) logger.info(FUNC + 'account_skill == null');
         for (var i = 0; i < skill_data.length; i++) {
             var key = '' + skill_data[i].id;
             var value = skill_data[i].total;
@@ -321,20 +321,20 @@ function _updateSkillField(pool, data, account, cb, account_skill) {
         }
     }
     else {
-        if (DEBUG) console.log(FUNC + 'account_skill != null');
+        if (DEBUG) logger.info(FUNC + 'account_skill != null');
         try {
             if (StringUtil.isString(account_skill)) {
-                if (DEBUG) console.log(FUNC + "account_skill是一个字符串");
+                if (DEBUG) logger.info(FUNC + "account_skill是一个字符串");
                 ret = JSON.parse(account_skill);
             }
             else {
-                if (DEBUG) console.log(FUNC + "account_skill不是一个字符串");
+                if (DEBUG) logger.info(FUNC + "account_skill不是一个字符串");
                 ret = account_skill;
             }
             //ret = JSON.parse(account_skill);
         } catch (e) {
-            if (ERROR) console.error(FUNC + "错误的玩家技能字符串---account_skill", account_skill);// BUG
-            if (ERROR) console.error(FUNC + "_updateSkillField()----parse error(2):\n", e);// BUG
+            if (ERROR) logger.error(FUNC + "错误的玩家技能字符串---account_skill", account_skill);// BUG
+            if (ERROR) logger.error(FUNC + "_updateSkillField()----parse error(2):\n", e);// BUG
             cb(e);
             return;
         }

@@ -27,17 +27,17 @@ exports.rewardProbabilityItems = _rewardProbabilityItems;
 function update(pool, data, cb, account) {
     const FUNC = TAG + "update() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     let package_param = data['package'];
         
     // 使用物品
     if (package_param.use) {
-        if (DEBUG) console.log("使用物品");
+        if (DEBUG) logger.info("使用物品");
         _use(pool,package_param, account, cb);
     }
     else {
-        if (DEBUG) console.log("替换背包的全部数据");
+        if (DEBUG) logger.info("替换背包的全部数据");
         _replace(pool,package_param, account, cb);
     }
 }
@@ -75,24 +75,24 @@ function _use(pool,used_item, account, cb) {
 
     let pack = account.package;
 
-    console.log(pack);
+    logger.info(pack);
 
     
-    // if (DEBUG) console.log(FUNC + 'pack:', pack);
-    if (DEBUG) console.log(FUNC + 'used_item:', used_item);
-    if (DEBUG) console.log(FUNC + 'item_id:', item_id);
-    if (DEBUG) console.log(FUNC + 'total:', total);
+    // if (DEBUG) logger.info(FUNC + 'pack:', pack);
+    if (DEBUG) logger.info(FUNC + 'used_item:', used_item);
+    if (DEBUG) logger.info(FUNC + 'item_id:', item_id);
+    if (DEBUG) logger.info(FUNC + 'total:', total);
 
     if (!pack) {
         let err_info = "服务器记录的背包数据为空";
-        if (ERROR) console.error(err_info);
+        if (ERROR) logger.error(err_info);
         cb(new Error(err_info));
         return;
     }
 
     let item_info = item_item_cfg[item_id];
     if (item_info && item_info.saleprice > 0) {
-        console.log(FUNC + "item_info:", item_info);
+        logger.info(FUNC + "item_info:", item_info);
         // 出售物品(技能除外, 技能出售在dao_skill中进行处理)
         sellItem(pool, cost, item_id, item_info, account, cb);
     }
@@ -116,7 +116,7 @@ function _use(pool,used_item, account, cb) {
                 let skin_info = newweapon_weapons_cfg[skin_id];
                 let piece_info = skin_info.piece;
 
-                console.log(FUNC + "--------------------1.piece_info:", piece_info);
+                logger.info(FUNC + "--------------------1.piece_info:", piece_info);
                 if (!pack[ItemTypeC.SKIN_DEBRIS]) {
                     pack[ItemTypeC.SKIN_DEBRIS] = {};
                 }
@@ -128,10 +128,10 @@ function _use(pool,used_item, account, cb) {
             }
             else {
                 //如果不存在,则增加一款皮肤，扣除相应道具数量
-                // console.log(FUNC + "skin_id:", skin_id);
-                // console.log(FUNC + "--------------------1.mySkin:", mySkin);
+                // logger.info(FUNC + "skin_id:", skin_id);
+                // logger.info(FUNC + "--------------------1.mySkin:", mySkin);
                 mySkin.own.push(parseInt(skin_id));
-                // console.log(FUNC + "--------------------2.mySkin:", mySkin);
+                // logger.info(FUNC + "--------------------2.mySkin:", mySkin);
                 CacheAccount.setWeaponSkin(account, mySkin);
             }
 
@@ -139,7 +139,7 @@ function _use(pool,used_item, account, cb) {
 
             account.package = pack;
             account.commit();
-            console.log(FUNC + "返回客户端用户数据");
+            logger.info(FUNC + "返回客户端用户数据");
             cb && cb(null, [account]);
             return;
         }
@@ -161,7 +161,7 @@ function _use(pool,used_item, account, cb) {
                 }
                 if (count - cost != total) {
                     let err_info = "物品数据不匹配：" + count + " - " + cost + " != " + total;
-                    if (ERROR) console.error(err_info);
+                    if (ERROR) logger.error(err_info);
                 }
                 // 以count - cost为准
                 itemList[itemKey] = count - cost;
@@ -170,8 +170,8 @@ function _use(pool,used_item, account, cb) {
                 let doneFunc = function () {
                     _afterUse(pool, account, item_id, cost, function (err, results) {
                         if (err) {
-                            if (DEBUG) console.log('[ERROR] package._afterUse()');
-                            if (DEBUG) console.log(JSON.stringify(err));
+                            if (DEBUG) logger.info('[ERROR] package._afterUse()');
+                            if (DEBUG) logger.info(JSON.stringify(err));
                             cb(err);
                         } else {
                             account.package = pack;
@@ -216,10 +216,10 @@ function sellItem(pool, cost, item_id, item_info, account, cb) {
     }
 
     let total_sell_price = item_info.saleprice * cost;
-    if (DEBUG) console.log(FUNC + "总售价——total_sell_price:", total_sell_price);
-    if (DEBUG) console.log(FUNC + "当前玩家拥有金币数量——current account gold:", account.gold);
+    if (DEBUG) logger.info(FUNC + "总售价——total_sell_price:", total_sell_price);
+    if (DEBUG) logger.info(FUNC + "当前玩家拥有金币数量——current account gold:", account.gold);
     
-    if (DEBUG) console.log(FUNC + "使用前package:", account.package);
+    if (DEBUG) logger.info(FUNC + "使用前package:", account.package);
 
     account.package['' + item_type][item_id] -= cost;
     account.package = account.package;
@@ -238,7 +238,7 @@ function sellItem(pool, cost, item_id, item_info, account, cb) {
         level: account.level,
     });
 
-    if (DEBUG) console.log(FUNC + "使用后package:", account.package);
+    if (DEBUG) logger.info(FUNC + "使用后package:", account.package);
 
     account.commit();
     cb(null, [account]);
@@ -246,7 +246,7 @@ function sellItem(pool, cost, item_id, item_info, account, cb) {
 
 function errNotEnough(cost, count, cb) {
     let err_info = "物品数量不够，需要使用" + cost + "个，实际拥有" + count + "个";
-    if (ERROR) console.error(err_info);
+    if (ERROR) logger.error(err_info);
     cb(new Error(err_info));
 }
 // pool, account, item_id, cost,
@@ -270,14 +270,14 @@ function _afterUse(pool, account, item_id, cost, cb) {
             let drop_key = drop_reward[i];
             let drop_info = BuzzUtil.getDropInfoFromDropKey(drop_key);
             
-            if (DEBUG) console.log(FUNC + "drop_key:", drop_key);
-            if (DEBUG) console.log(FUNC + "drop_info:", drop_info);
+            if (DEBUG) logger.info(FUNC + "drop_key:", drop_key);
+            if (DEBUG) logger.info(FUNC + "drop_info:", drop_info);
 
             // 需要处理有概率掉落的物品使用
             if (drop_info.item_probability.length > 1) {
                 let drop_list = [[drop_key]];
                 let ret = BuzzUtil.checkDrop(account, drop_list);
-                if (DEBUG) console.log(FUNC + "ret:", ret);
+                if (DEBUG) logger.info(FUNC + "ret:", ret);
 
                 if (ret != 0 && ret.length > 0) {
                     reward.push([drop_info.item_id, drop_info.item_num]);
@@ -289,11 +289,11 @@ function _afterUse(pool, account, item_id, cost, cb) {
         }
     }
     reward = _sortReward(reward);
-    if (DEBUG) console.log(FUNC + "reward:", reward);
+    if (DEBUG) logger.info(FUNC + "reward:", reward);
     
     DaoReward.getReward(pool, account, reward, function (err, results) {
-        if (DEBUG) console.log(FUNC + "err:", err);
-        if (DEBUG) console.log(FUNC + "results:", results);
+        if (DEBUG) logger.info(FUNC + "err:", err);
+        if (DEBUG) logger.info(FUNC + "results:", results);
         cb(err, results);
 
         // yDONE: 金币数据记录(使用某些特殊物品后获得金币)
@@ -353,10 +353,10 @@ function _rewardProbabilityItems(droplist, probability) {
     for (let i = 0; i < probability.length; i++) {
         total += probability[i];
     }
-    if (DEBUG) console.log(FUNC + "total:", total);
+    if (DEBUG) logger.info(FUNC + "total:", total);
 
     let random = utils.randomInt(total);
-    if (DEBUG) console.log(FUNC + "random:", random);
+    if (DEBUG) logger.info(FUNC + "random:", random);
     
     total = 0;
     let idx = 0;
@@ -367,7 +367,7 @@ function _rewardProbabilityItems(droplist, probability) {
             break;
         }
     }
-    if (DEBUG) console.log(FUNC + "reward:", droplist[idx]);
+    if (DEBUG) logger.info(FUNC + "reward:", droplist[idx]);
     return droplist[idx];
 }
 

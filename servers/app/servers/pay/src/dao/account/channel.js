@@ -22,9 +22,9 @@ function getUserInfoByChannelId(pool, field, channel, channel_account_id, cb) {
 
     pool.query(sql, sql_data, function (err, rows) {
         if (err) {
-            console.error(FUNC + 'err:\n', err);
-            console.error(FUNC + 'sql:\n', sql);
-            console.error(FUNC + 'sql_data:\n', sql_data);
+            logger.error(FUNC + 'err:\n', err);
+            logger.error(FUNC + 'sql:\n', sql);
+            logger.error(FUNC + 'sql_data:\n', sql_data);
             cb(err);
             return;
         }
@@ -42,7 +42,7 @@ function _getNickname(channel_account_info) {
             channel_account_name = channel_account_info['name'];
         }
     }
-    console.log(FUNC + "channel_account_name: ", channel_account_name);
+    logger.info(FUNC + "channel_account_name: ", channel_account_name);
     return channel_account_name;
 }
 

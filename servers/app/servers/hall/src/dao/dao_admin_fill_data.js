@@ -29,7 +29,7 @@ function fillDayData(pool, data, cb) {
     
     _getDayData(pool, data, function (err_r, results) {
         if (err_r) {
-            console.log(JSON.stringify(err_r));
+            logger.info(JSON.stringify(err_r));
             cb(err_r);
             return;
         }
@@ -67,7 +67,7 @@ function fillDayData(pool, data, cb) {
             }
             sql += "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         }
-        console.log('sql: ', sql);
+        logger.info('sql: ', sql);
         
         var sql_data = [];
         for (var i = 0; i < results.length; i++) {
@@ -95,7 +95,7 @@ function fillDayData(pool, data, cb) {
         
         pool.query(sql, sql_data, function (err, rows) {
             if (err) {
-                console.log(JSON.stringify(err));
+                logger.info(JSON.stringify(err));
                 cb(err);
             } else {
                 // myDao.sumUpLastDay参数中的cb没有第二个参数造成异常
@@ -108,7 +108,7 @@ function fillDayData(pool, data, cb) {
 function _getDayData(pool, data, cb) {
     const FUNC = TAG + "_getDayData() --- ";
 
-    console.log(FUNC + "data:", data);
+    logger.info(FUNC + "data:", data);
 
     var start_date = data.start_date;
     var end_date = data.end_date;
@@ -154,7 +154,7 @@ function _getDayData(pool, data, cb) {
 //==============================================================================
 
 function _fillDefaultData(day_count, start_date) {
-    console.log("day_count: " + day_count);
+    logger.info("day_count: " + day_count);
     var results = [];
     for (var i = 0; i < day_count; i++) {
         // DONE: 计算插入的日期数据
@@ -186,11 +186,11 @@ function _fillDefaultData(day_count, start_date) {
 }
 
 function _fillNewTempAccount(results, results_t) {
-    //console.log("results_t: ", results_t);
+    //logger.info("results_t: ", results_t);
     for (var i = 0; i < results_t.length; i++) {
         var result_t = results_t[i];
         var patternDate = DateUtil.pattern(result_t.regist_date, "yyyy-MM-dd");
-        console.log(i + ")patternDate: ", patternDate);
+        logger.info(i + ")patternDate: ", patternDate);
         for (var j = 0; j < results.length; j++) {
             var result = results[j];
             if (result.log_date == patternDate) {
@@ -202,11 +202,11 @@ function _fillNewTempAccount(results, results_t) {
 }
 
 function _fillNewNicknameAccount(results, results_n) {
-    //console.log("results_n: ", results_n);
+    //logger.info("results_n: ", results_n);
     for (var i = 0; i < results_n.length; i++) {
         var result_n = results_n[i];
         var patternDate = DateUtil.pattern(result_n.regist_date, "yyyy-MM-dd");
-        console.log(i + ")patternDate: ", patternDate);
+        logger.info(i + ")patternDate: ", patternDate);
         for (var j = 0; j < results.length; j++) {
             var result = results[j];
             if (result.log_date == patternDate) {
@@ -218,11 +218,11 @@ function _fillNewNicknameAccount(results, results_n) {
 }
 
 function _fillNewBindAccount(results, results_b) {
-    //console.log("results_b: ", results_b);
+    //logger.info("results_b: ", results_b);
     for (var i = 0; i < results_b.length; i++) {
         var result_b = results_b[i];
         var patternDate = DateUtil.pattern(result_b.log_date, "yyyy-MM-dd");
-        console.log(i + ")patternDate: ", patternDate);
+        logger.info(i + ")patternDate: ", patternDate);
         for (var j = 0; j < results.length; j++) {
             var result = results[j];
             if (result.log_date == patternDate) {
@@ -234,11 +234,11 @@ function _fillNewBindAccount(results, results_b) {
 }
 
 function _fillLoginData(results, results_l) {
-    //console.log("results_l: ", results_l);
+    //logger.info("results_l: ", results_l);
     for (var i = 0; i < results_l.length; i++) {
         var result_l = results_l[i];
         var patternDate = DateUtil.pattern(result_l.log_date, "yyyy-MM-dd");
-        console.log(i + ")patternDate: ", patternDate);
+        logger.info(i + ")patternDate: ", patternDate);
         for (var j = 0; j < results.length; j++) {
             var result = results[j];
             if (result.log_date == patternDate) {
@@ -254,13 +254,13 @@ function _fillLoginData(results, results_l) {
 
 function _fillRetentionData(results, results_r) {
     // 完成次日留存数据的填充
-    console.log("results_r: ", results_r);
+    logger.info("results_r: ", results_r);
     for (var i = 0; i < results_r.length; i++) {
         var result_r = results_r[i];
         if (result_r != null && result_r.log_date != null) {
             //var patternDate = DateUtil.pattern(result_r.log_date, "yyyy-MM-dd");
             var patternDate = result_r.log_date;
-            console.log(i + ")patternDate: ", patternDate);
+            logger.info(i + ")patternDate: ", patternDate);
             for (var j = 0; j < results.length; j++) {
                 var result = results[j];
                 if (result.log_date == patternDate) {
@@ -276,13 +276,13 @@ function _fillRetentionData(results, results_r) {
 
 function _fillShopData(results, results_s) {
     // 完成每日商城数据的填充
-    console.log("results_s: ", results_s);
+    logger.info("results_s: ", results_s);
     for (var i = 0; i < results_s.length; i++) {
         var result_s = results_s[i];
         if (result_s != null && result_s.count_date != null) {
             //var patternDate = DateUtil.pattern(result_r.log_date, "yyyy-MM-dd");
             var patternDate = DateUtil.pattern(result_s.count_date, "yyyy-MM-dd");
-            console.log(i + ")patternDate: ", patternDate);
+            logger.info(i + ")patternDate: ", patternDate);
             for (var j = 0; j < results.length; j++) {
                 var result = results[j];
                 if (result.log_date == patternDate) {
@@ -347,13 +347,13 @@ function _getRegistData(pool, data, isTemp, cb) {
     sql += "AND STR_TO_DATE('" + end_date + "','%Y-%m-%d') ";
     sql += "GROUP BY DATE(created_at) ";
     sql += "ORDER BY DATE(created_at) ASC";
-    console.log('sql: ', sql);
+    logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -377,13 +377,13 @@ function _getBindData(pool, data, cb) {
     sql += "AND STR_TO_DATE('" + end_date + "','%Y-%m-%d') ";
     sql += "GROUP BY DATE(log_at) ";
     sql += "ORDER BY DATE(log_at) ASC";
-    console.log('sql: ', sql);
+    logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -419,13 +419,13 @@ function _getActiveData(pool, data, cb) {
     sql += "AND STR_TO_DATE('" + end_date + "','%Y-%m-%d') ";
     sql += "GROUP BY DATE(log_at) ";
     sql += "ORDER BY DATE(log_at) ASC";
-    console.log('sql: ', sql);
+    logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -476,11 +476,11 @@ function _fillDefaultRetention(day_count, start_date) {
 }
 
 function _fillRetention(results, results_t, field) {
-    //console.log("results_t: ", results_t);
+    //logger.info("results_t: ", results_t);
     for (var i = 0; i < results_t.length; i++) {
         var result_t = results_t[i];
         var patternDate = DateUtil.pattern(result_t.count_date, "yyyy-MM-dd");
-        console.log(i + ")patternDate: ", patternDate);
+        logger.info(i + ")patternDate: ", patternDate);
         for (var j = 0; j < results.length; j++) {
             var result = results[j];
             if (result.log_date == patternDate) {
@@ -493,21 +493,21 @@ function _fillRetention(results, results_t, field) {
 
 function _getRetentionDrr(pool, data, cb) {
     _getRetention(pool, data, 1, function (err, results) {
-        //console.log("DRR: ", results);
+        //logger.info("DRR: ", results);
         cb(err, results);
     });
 }
 
 function _getRetentionWrr(pool, data, cb) {
     _getRetention(pool, data, 7, function (err, results) {
-        //console.log("WRR: ", results);
+        //logger.info("WRR: ", results);
         cb(err, results);
     });
 }
 
 function _getRetentionMrr(pool, data, cb) {
     _getRetention(pool, data, 30, function (err, results) {
-        //console.log("MRR: ", results);
+        //logger.info("MRR: ", results);
         cb(err, results);
     });
 }
@@ -558,22 +558,22 @@ function _getRetention(pool, data, day_count, cb) {
     sql += ") login_tbl ";
     sql += "WHERE login_tbl.count_date = regist_tbl.count_date  ";
 
-    console.log('-----------------------------------------------------------');
-    console.log('start_date: ', start_date);
-    console.log('end_date: ', end_date);
-    console.log('end_date: ', login_check_start_date);
-    console.log('end_date: ', login_check_end_date);
-    console.log('sql: ', sql);
-    console.log('-----------------------------------------------------------');
+    logger.info('-----------------------------------------------------------');
+    logger.info('start_date: ', start_date);
+    logger.info('end_date: ', end_date);
+    logger.info('end_date: ', login_check_start_date);
+    logger.info('end_date: ', login_check_end_date);
+    logger.info('sql: ', sql);
+    logger.info('-----------------------------------------------------------');
     
     var sql_data = [day_count];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('sql: ', result);
+            logger.info('sql: ', result);
             cb(null, result);
         }
     });
@@ -614,31 +614,31 @@ function _getShopData(pool, data, cb) {
 
     var sql_data = [];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('shop result1: ', result);
+            logger.info('shop result1: ', result);
             
             _get_paffd(pool, data, function (err_paffd, result_paffd) {
                 if (err_paffd) {
-                    console.log(JSON.stringify(err_paffd));
+                    logger.info(JSON.stringify(err_paffd));
                     cb(err_paffd);
                 } else {
                     result = _fill_paffd_data(result, result_paffd);
-                    console.log('shop result2: ', result);
+                    logger.info('shop result2: ', result);
 
                     _get_pafft(pool, data, function (err_pafft, result_pafft) {
                         if (err_pafft) {
-                            console.log(JSON.stringify(err_pafft));
+                            logger.info(JSON.stringify(err_pafft));
                             cb(err_pafft);
                         } else {
                             result = _fill_pafft_data(result, result_pafft);
-                            console.log('shop result3: ', result);
+                            logger.info('shop result3: ', result);
                             
                             cb(null, result);
                         }
@@ -687,12 +687,12 @@ function _get_pafft(pool, data, cb) {
 
     var sql_data = [];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -706,11 +706,11 @@ function _fill_pafft_data(results, results_pafft) {
         results[i]['shop_pafft'] = 0;
         var result = results[i];
         var patternDate = DateUtil.pattern(result.count_date, "yyyy-MM-dd");
-        console.log(i + ")patternDate: ", patternDate);
+        logger.info(i + ")patternDate: ", patternDate);
         for (var j = 0; j < results_pafft.length; j++) {
             var result_pafft = results_pafft[j];
             var pd_pafft = DateUtil.pattern(result_pafft.count_date, "yyyy-MM-dd");
-            console.log(j + ")pd_pafft: ", pd_pafft);
+            logger.info(j + ")pd_pafft: ", pd_pafft);
             if (pd_pafft == patternDate) {
                 results[i]['shop_pafft'] = result_pafft.shop_pafft;
                 break;
@@ -758,12 +758,12 @@ function _get_paffd(pool, data, cb) {
 
     var sql_data = [];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, result);
@@ -777,11 +777,11 @@ function _fill_paffd_data(results, results_paffd) {
         results[i]['shop_paffd'] = 0;
         var result = results[i];
         var patternDate = DateUtil.pattern(result.count_date, "yyyy-MM-dd");
-        console.log(i + ")patternDate: ", patternDate);
+        logger.info(i + ")patternDate: ", patternDate);
         for (var j = 0; j < results_paffd.length; j++) {
             var result_paffd = results_paffd[j];
             var pd_paffd = DateUtil.pattern(result_paffd.count_date, "yyyy-MM-dd");
-            console.log(j + ")pd_paffd: ", pd_paffd);
+            logger.info(j + ")pd_paffd: ", pd_paffd);
             if (pd_paffd == patternDate) {
                 results[i]['shop_paffd'] = result_paffd.shop_paffd;
                 break;

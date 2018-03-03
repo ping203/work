@@ -111,7 +111,7 @@ function loadAll(rows) {
             gUserInfoCache[uid] = userinfo;
         }
     }
-    // console.log(FUNC + "共加载玩家信息:", rows.length);
+    // logger.info(FUNC + "共加载玩家信息:", rows.length);
 }
 
 /**

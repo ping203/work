@@ -33,33 +33,33 @@ exports.update = _update;
  */
 function _update(pool, data, cb, my_account) {
     const FUNC = TAG + "_update() --- ";
-    if (DEBUG) console.log("CALL activity_gift.update()");
+    if (DEBUG) logger.info("CALL activity_gift.update()");
     
     var account_id = my_account['id'];
     var token = my_account['token'];
     
     var activity_gift_old = my_account['activity_gift'];
     var activity_gift_new = data['activity_gift'] || activity_gift_old;
-    if (DEBUG) console.log("activity_gift_old: ", activity_gift_old);
-    if (DEBUG) console.log("activity_gift_new: ", activity_gift_new);
+    if (DEBUG) logger.info("activity_gift_old: ", activity_gift_old);
+    if (DEBUG) logger.info("activity_gift_new: ", activity_gift_new);
         
     var json_activity_gift_old = {};
     var json_activity_gift_new = {};
     try {
         json_activity_gift_old = ObjUtil.str2Data(activity_gift_old);
-        if (DEBUG) console.log("parse activity_gift_old success");
+        if (DEBUG) logger.info("parse activity_gift_old success");
         json_activity_gift_new = ObjUtil.str2Data(activity_gift_new);
-        if (DEBUG) console.log("parse activity_gift_new success");
+        if (DEBUG) logger.info("parse activity_gift_new success");
     }
     catch (err_parse) {
-        if (DEBUG) console.log(err_parse);
+        if (DEBUG) logger.info(err_parse);
     }
         
     // TODO: 验证活动礼包数据
     if (!(activity_gift_old == null || activity_gift_old == "{}")) {
-        if (DEBUG) console.log("需要验证数据有效性");
+        if (DEBUG) logger.info("需要验证数据有效性");
         for (var key in json_activity_gift_new) {
-            if (DEBUG) console.log("key:" + key);
+            if (DEBUG) logger.info("key:" + key);
             var old_value = json_activity_gift_old[key];// 获取旧值
             var new_value = json_activity_gift_new[key];// 获取新值
             if (old_value == null) {
@@ -91,15 +91,15 @@ function _update(pool, data, cb, my_account) {
         
     var sql_data = [activity_gift_new, account_id, token];
         
-    if (DEBUG) console.log('sql: ', sql);
-    if (DEBUG) console.log('sql_data: ', sql_data);
+    if (DEBUG) logger.info('sql: ', sql);
+    if (DEBUG) logger.info('sql_data: ', sql_data);
         
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            // if (DEBUG) console.log('[ERROR] activity_gift.update()');
-            console.error(FUNC + "err:\n", err);
-    	    console.error(FUNC + "sql:\n", sql);
-    	    console.error(FUNC + "sql_data:\n", sql_data);
+            // if (DEBUG) logger.info('[ERROR] activity_gift.update()');
+            logger.error(FUNC + "err:\n", err);
+    	    logger.error(FUNC + "sql:\n", sql);
+    	    logger.error(FUNC + "sql_data:\n", sql_data);
             cb(err);
         } else {
             cb(null, "success");

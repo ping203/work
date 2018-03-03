@@ -14,7 +14,7 @@ const TAG = "【RedisUtil】";
 event.on(EVENT.REDIS, function(data) {
     const FUNC = TAG + "eventOn() --- ";
 
-	if (DEBUG) console.log(FUNC + EVENT.REDIS + '事件触发');
+	if (DEBUG) logger.info(FUNC + EVENT.REDIS + '事件触发');
     handleChannelMessage(data);
 });
 

@@ -128,7 +128,7 @@ class Instance {
   
         try {
             let player = await PlayerFactory.createPlayer(data);
-            if (!!player) {
+            if (player) {
                 let [err, roomId] = scene. joinGame(data.roomType, player);
                 if (err) {
                     utils.invokeCallback(cb, err);   

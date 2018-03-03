@@ -13,24 +13,24 @@ var StringUtil = require('../utils/StringUtil');
 //     // 读文件
 //     fs.readFile(settings_file, "utf8", function (error, data) {
 //         if (error) {
-//             console.log(error);
+//             logger.info(error);
 //             return;
 //         }
-//         // console.log(data);
+//         // logger.info(data);
 //         if (StringUtil.contain(data, module_export_txt)) {
-//             console.log("已经有模块导出语句");
+//             logger.info("已经有模块导出语句");
 //             _didMakeResMap();
 //         }
 //         else {
-//             console.log("还没有模块导出语句，需要复写文件");
+//             logger.info("还没有模块导出语句，需要复写文件");
 //             // 写文件
 //             var txt = data + '\n' + module_export_txt;
 //             fs.writeFile(settings_file, txt, function (err) {
 //                 if (error) {
-//                     console.log(error);
+//                     logger.info(error);
 //                     return;
 //                 }
-//                 console.log("settings.js Saved !");
+//                 logger.info("settings.js Saved !");
 //                 _didMakeResMap();
 //             });
 //         }
@@ -55,7 +55,7 @@ var StringUtil = require('../utils/StringUtil');
 //         var file_name = assets[uuid][0];
 //         res_map_assets[file_name] = uuid;
 //     }
-//     //console.log("res_map_assets: ", res_map_assets);
+//     //logger.info("res_map_assets: ", res_map_assets);
     
 //     // (3)
 //     // 读取settings.settings.rawAssets.internal
@@ -69,7 +69,7 @@ var StringUtil = require('../utils/StringUtil');
 //         var file_name = internal[uuid][0];
 //         res_map_internal[file_name] = uuid;
 //     }
-//     //console.log("res_map_internal: ", res_map_internal);
+//     //logger.info("res_map_internal: ", res_map_internal);
     
 //     // 将res_map_settings写入文件res_map.js中
 //     var txt = '';
@@ -85,6 +85,6 @@ var StringUtil = require('../utils/StringUtil');
 //     // 写入文件
 //     fs.writeFile("./routes/admin/res_map.js", txt, function (err) {
 //         if (err) throw err;
-//         console.log("File Saved !"); //文件被保存
+//         logger.info("File Saved !"); //文件被保存
 //     });
 // }

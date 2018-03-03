@@ -83,14 +83,14 @@ function init(data) {
     if(!data) return;
     const FUNC = TAG + "init() --- ";
     for (var i = 0; i < data.length; i++) {
-        // if (DEBUG) console.log(FUNC + "data[i]:", data[i]);
+        // if (DEBUG) logger.info(FUNC + "data[i]:", data[i]);
         gChangeLogCache.push(data[i]);
     }
     // 初始化sn
     for (var i = 0; i < gChangeLogCache.length; i++) {
         var change = gChangeLogCache[i];
-        if (DEBUG) console.log(FUNC + "today DateString:", new Date().toDateString());
-        if (DEBUG) console.log(FUNC + "change DateString:", new Date(change.created_at).toDateString());
+        if (DEBUG) logger.info(FUNC + "today DateString:", new Date().toDateString());
+        if (DEBUG) logger.info(FUNC + "change DateString:", new Date(change.created_at).toDateString());
         if (new Date(change.created_at).toDateString() == new Date().toDateString()) {
             if (sn < change.sn) {
                 sn = change.sn;
@@ -98,7 +98,7 @@ function init(data) {
         }
     }
     sn++;
-    if (DEBUG) console.log(FUNC + "init sn:", sn);
+    if (DEBUG) logger.info(FUNC + "init sn:", sn);
 }
 
 /**
@@ -170,8 +170,8 @@ function findChangeLogByUid(uid) {
             });
         }
     }
-    if (DEBUG) console.log(FUNC + "gChangeLogCache:", gChangeLogCache);
-    if (DEBUG) console.log(FUNC + "uid:" + uid + " - ret:", ret);
+    if (DEBUG) logger.info(FUNC + "gChangeLogCache:", gChangeLogCache);
+    if (DEBUG) logger.info(FUNC + "uid:" + uid + " - ret:", ret);
     return ret;
 }
 
@@ -199,12 +199,12 @@ function cancelCik(uid, orderid) {
         var change = gChangeLogCache[i];
         if (orderid == change.orderid) {
             if (uid != change.uid) {
-                if (ERROR) console.error(FUNC + "这不是玩家的兑换订单ID");
+                if (ERROR) logger.error(FUNC + "这不是玩家的兑换订单ID");
                 return false;
             }
             if (ORDER_STATUS.ISOK != change.status) {
-                if (ERROR) console.error(FUNC + "玩家的订单状态不是发放中:", change.status);
-                if (ERROR) console.error(FUNC + "兑换订单ID:", orderid);
+                if (ERROR) logger.error(FUNC + "玩家的订单状态不是发放中:", change.status);
+                if (ERROR) logger.error(FUNC + "兑换订单ID:", orderid);
                 return false;
             }
             if (uid == change.uid) {
@@ -213,7 +213,7 @@ function cancelCik(uid, orderid) {
             }
         }
     }
-    if (ERROR) console.error(FUNC + "没有找到兑换订单ID:", orderid);
+    if (ERROR) logger.error(FUNC + "没有找到兑换订单ID:", orderid);
     return false;
 }
 
@@ -285,12 +285,12 @@ function updateStatus(req, orderid, status) {
             });
         }
         if (order.status == ORDER_STATUS.CANCEL) {
-            console.log(FUNC + "需要修改用户数据返还对应的话费券");
+            logger.info(FUNC + "需要修改用户数据返还对应的话费券");
             var uid = order.uid;
             var num = order.cost;
             var success = CacheAccount.addHuafeiquan(uid, num);
             if (!success) {
-                console.log(FUNC + "！！！数据库修改！！！");
+                logger.info(FUNC + "！！！数据库修改！！！");
             }
         }
     });

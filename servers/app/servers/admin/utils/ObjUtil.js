@@ -10,11 +10,11 @@ exports.query = query;
 exports.encodePwd = encodePwd;
 
 function isUndefined(data, fields) {
-    console.log('params:', fields);
-    console.log('data:', data);
+    logger.info('params:', fields);
+    logger.info('data:', data);
     for (let i = 0; i < fields.length; i++) {
         if (undefined == data[fields[i]]) {
-            console.error('undefined param:', data[fields[i]]);
+            logger.error('undefined param:', data[fields[i]]);
             return true;
         }
     }
@@ -22,7 +22,7 @@ function isUndefined(data, fields) {
 }
 
 function checkFields(data, api) {
-    console.log('api:', api);
+    logger.info('api:', api);
     const API_PARAMS = API_CFGs[api].params;
     if (isUndefined(data, API_PARAMS)) {
         throw ERROR_OBJ.PARAM_MISSING;
@@ -35,9 +35,9 @@ function routes(setRoute) {
 		let method = api;
 		let menu = API_CFGs[api].menu;
 
-		// console.log('route:', route);
-		// console.log('method:', method);
-		// console.log('menu:', menu);
+		// logger.info('route:', route);
+		// logger.info('method:', method);
+		// logger.info('menu:', menu);
 		setRoute(route, menu, method);
 	}
 }

@@ -201,7 +201,7 @@ function recordGold(uid, cost, gain, total, scene) {
 
     // yDONE: 限制玩家等级在15级以上才进行统计
     RedisUtil.hget(PAIR.UID_LEVEL, uid, function (err, res) {
-        if (err) return console.error(FUNC + "查询玩家等级数据失败！");
+        if (err) return logger.error(FUNC + "查询玩家等级数据失败！");
         if (res) {
             var level = parseInt(res);
             if (level > 15) {
@@ -216,7 +216,7 @@ function recordGold(uid, cost, gain, total, scene) {
         scene = parseInt(scene);
         scene = scene % 100;
         var map_data = GOLD_MAP[scene];
-        // console.log(FUNC + "map_data:", map_data);
+        // logger.info(FUNC + "map_data:", map_data);
         if (!map_data) map_data = {
             gain: BIG_DATA.GOLD_GAIN_OTHER,
             cost: BIG_DATA.GOLD_COST_OTHER,
@@ -246,13 +246,13 @@ function recordGold(uid, cost, gain, total, scene) {
 function genGoldLeftToday() {
     const FUNC = TAG + "genGoldLeftToday()---";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var sum = 0;
     var count = 0;
     RedisUtil.repeatHscan(BIG_DATA.GOLD_LEFT_TOTAL, 0, 100,
         function op(res, nextCursor) {
-            if (DEBUG) console.log(FUNC + "res:", res);
+            if (DEBUG) logger.info(FUNC + "res:", res);
             for (var i = 0; i < res[1].length; i += 2) {
                 sum += parseInt(res[1][i + 1]);
                 count++;
@@ -260,7 +260,7 @@ function genGoldLeftToday() {
             nextCursor();
         },
         function next() {
-            if (DEBUG) console.log(FUNC + "设置剩余总量-sum:", sum);
+            if (DEBUG) logger.info(FUNC + "设置剩余总量-sum:", sum);
             RedisUtil.set(BIG_DATA.GOLD_LEFT_TOTAL + ":today", sum);
             RedisUtil.set(BIG_DATA.GOLD_LEFT_NUM + ":today", count);
         }
@@ -273,7 +273,7 @@ function genGoldLeftToday() {
 function genGoldHistory(cb) {
     const FUNC = TAG + "genGoldHistory()---";
 
-    console.log(FUNC + "CALL...");
+    logger.info(FUNC + "CALL...");
 
     var data = [];
     for (var idx = 0; idx < QUERY_MAP.length; idx++) {
@@ -293,7 +293,7 @@ function genGoldHistory(cb) {
             RedisUtil.hset(hashkey, date, res[i]);
         }
 
-        console.log(FUNC + "产生历史的金币数据成功");
+        logger.info(FUNC + "产生历史的金币数据成功");
 
         cb && cb(null, "产生历史的金币数据成功");
 
@@ -319,7 +319,7 @@ function clearGoldData(cb) {
 
     RedisUtil.multi(data, function (err, res) {
         if (err) return cb && cb(err);
-        console.log(FUNC + "清空缓存数据成功");
+        logger.info(FUNC + "清空缓存数据成功");
     });
 }
 
@@ -332,7 +332,7 @@ function queryGold(start_date, end_date, cb) {
     var query_num = DateUtil.dateDiff(start_date, end_date);
     var date_list = DateUtil.getDateList(start_date, end_date);
 
-    console.log(FUNC + "query_num:", date_list.length);
+    logger.info(FUNC + "query_num:", date_list.length);
 
     var data = [];
 
@@ -391,7 +391,7 @@ function queryLog(data, start_date, end_date, cb) {
     let type = data.type;
     let where = data.where;
     let db_table = DB_TABLE[type];
-    console.log(FUNC + "查询用户(%s)的%s日志, 查询类型为%s", uid, db_table, type);
+    logger.info(FUNC + "查询用户(%s)的%s日志, 查询类型为%s", uid, db_table, type);
 
     if (!where) {
         where = [];

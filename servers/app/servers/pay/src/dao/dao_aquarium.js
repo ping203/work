@@ -36,9 +36,9 @@ exports.updateTableAquarium = updateTableAquarium;
 function updateTableAquarium(pool, account_id, aquarium, cb) {
     const FUNC = TAG + "updateTableAquarium() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
-    if (DEBUG) console.log(FUNC + "aquarium", aquarium);
+    if (DEBUG) logger.info(FUNC + "aquarium", aquarium);
     
     var sql = "";
     sql += "SELECT id, total_level ";
@@ -48,7 +48,7 @@ function updateTableAquarium(pool, account_id, aquarium, cb) {
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (DEBUG) console.error(FUNC + 'err:\n', err);
+            if (DEBUG) logger.error(FUNC + 'err:\n', err);
             cb(err);
             return;
         }
@@ -74,7 +74,7 @@ function updateTableAquarium(pool, account_id, aquarium, cb) {
 function _insertAquarium(pool, account_id, cb) {
     const FUNC = TAG + "_insertAquarium() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
     
     var sql = "";
     sql += "INSERT INTO `tbl_aquarium` ";
@@ -84,7 +84,7 @@ function _insertAquarium(pool, account_id, cb) {
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + 'err:\n', err);
+            if (ERROR) logger.error(FUNC + 'err:\n', err);
             cb(err);
             return;
         }
@@ -95,7 +95,7 @@ function _insertAquarium(pool, account_id, cb) {
 function _didUpdateAquarium(pool, petfish_list, old_aquariun) {
     const FUNC = TAG + "_didUpdateAquarium() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var temp_level = 0;
     for (var idx in petfish_list) {
@@ -113,7 +113,7 @@ function _didUpdateAquarium(pool, petfish_list, old_aquariun) {
         
         pool.query(sql, sql_data, function (err, result) {
             if (err) {
-                if (ERROR) console.error(FUNC + 'err:\n', err);
+                if (ERROR) logger.error(FUNC + 'err:\n', err);
                 return;
             }
         });

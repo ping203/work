@@ -136,14 +136,14 @@ Date.prototype.format = function (fmt) { //author: meizz
  */
 function _pattern(date, fmt) {
     return date.pattern(fmt);
-};
+}
 
 /**
  * 格式化日期，以string的形式输出
  */
 function _format(date, fmt) {
     return date.format(fmt);
-};
+}
 
 /**
  * 返回两个日期之间相差的天数
@@ -169,31 +169,31 @@ function _getDateOffset(add_day_count, base_date) {
     }
     base_date.setDate(base_date.getDate() + add_day_count);
     return base_date.pattern("yyyy-MM-dd");
-};
+}
 
 ////////////////////////////////////////////////////////////
 
 function diff2(targettime, endtime) {
     var _targettime = new Date(targettime);
     var _endtime = new Date(endtime);
-    if (DEBUG) console.log("targettime: ", targettime);
-    if (DEBUG) console.log("endtime: ", endtime);
+    if (DEBUG) logger.info("targettime: ", targettime);
+    if (DEBUG) logger.info("endtime: ", endtime);
     return _targettime.getTime() - _endtime.getTime();
 }
 
 function diff(endtime) {
     var curtime = new Date();
     var _endtime = new Date(endtime);
-    if (DEBUG) console.log("curtime: ", curtime);
-    if (DEBUG) console.log("endtime: ", endtime);
+    if (DEBUG) logger.info("curtime: ", curtime);
+    if (DEBUG) logger.info("endtime: ", endtime);
     return curtime.getTime() - _endtime.getTime();
 }
 
 function leftDays(starttime) {
     var curtime = new Date();
     var _starttime = new Date(starttime);
-    if (DEBUG) console.log("curtime: ", curtime);
-    if (DEBUG) console.log("starttime: ", starttime);
+    if (DEBUG) logger.info("curtime: ", curtime);
+    if (DEBUG) logger.info("starttime: ", starttime);
 
     var leftMillionSeconds = _starttime.getTime() - curtime.getTime();
     if (leftMillionSeconds < 0) {
@@ -209,8 +209,8 @@ function expired(endtime) {
 function between(curtime, starttime, endtime) {
     var start = diff2(curtime, starttime);
     var end = diff2(curtime, endtime);
-    if (DEBUG) console.log("start: ", start);
-    if (DEBUG) console.log("end: ", end);
+    if (DEBUG) logger.info("start: ", start);
+    if (DEBUG) logger.info("end: ", end);
     return start > 0 && end < 0;
 }
 
@@ -378,7 +378,7 @@ function getDateList(start_date, end_date) {
     st = new Date(yyyy, mm, dd++);
     // 循环
     while (st.getTime() < et.getTime()) {
-        // console.log('st:', st.getTime());
+        // logger.info('st:', st.getTime());
         retArr.push(_format(st, 'yyyy-MM-dd'));
           
         // 使用dd++进行天数的自增

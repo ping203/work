@@ -7,17 +7,17 @@ exports.getFieldsWhere = _getFieldsWhere;
 
 // exports.errorLog = errorLog;
 // function errorLog(ERROR, FUNC, err, sql, sql_data, cb) {
-//     if (ERROR) console.error(FUNC + '[ERROR] err:\n', err);
-//     if (ERROR) console.error(FUNC + '[ERROR] sql:\n', sql);
-//     if (ERROR) console.error(FUNC + '[ERROR] sql_data:\n', sql_data);
+//     if (ERROR) logger.error(FUNC + '[ERROR] err:\n', err);
+//     if (ERROR) logger.error(FUNC + '[ERROR] sql:\n', sql);
+//     if (ERROR) logger.error(FUNC + '[ERROR] sql_data:\n', sql_data);
 //     if (cb) cb(err);
 // }
 
 function setField(pool, data, cb) {
 
 
-    console.log('pool:\n', pool);
-    console.log('data:\n', data);
+    logger.info('pool:\n', pool);
+    logger.info('data:\n', data);
 
     var table = data.table;
     var field = data.field;
@@ -29,15 +29,15 @@ function setField(pool, data, cb) {
     sql += "SET " + field + "=? ";
     sql += "WHERE id=?";
     var sql_data = [value, id];
-    console.log('sql:\n', sql);
-    console.log('sql_data:\n', sql_data);
+    logger.info('sql:\n', sql);
+    logger.info('sql_data:\n', sql_data);
 
     pool.query(sql, sql_data, function (err, rows) {
         if (err) {
             cb(err);
             return;
         }
-        console.log('rows:\n', rows);
+        logger.info('rows:\n', rows);
         
         cb(null, rows);
     });
@@ -46,7 +46,7 @@ function setField(pool, data, cb) {
 // 获取表中符合条件的某几个字段值
 function _getFieldsWhere(pool, cb, table_name, where_clause, fields_list) {
     var sql = 'SELECT ' + fields_list + ' FROM ' + table_name + ' where ' + where_clause;
-    console.log('sql: ' + sql);
+    logger.info('sql: ' + sql);
     pool.query(sql, function (err, rows) {
         if (err) {
             cb(err);
@@ -82,7 +82,7 @@ exports.getTableList = function (pool, cb, table_name, err_info) {
 // field_replacement = '?,?';
 exports.addTableRecord = function (pool, cb, table_name, data, field_list) {
     
-    //console.log('data: ', data);
+    //logger.info('data: ', data);
     var field_list_in_sql = '';
     var field_list_data = [];
     var field_replacement = '';
@@ -98,13 +98,13 @@ exports.addTableRecord = function (pool, cb, table_name, data, field_list) {
     }
     // 获取query函数中的字段值
     for (var i = 0; i < field_list.length; i++) {
-        //console.log('data[' + i + ']: ', data[field_list[i]]);
+        //logger.info('data[' + i + ']: ', data[field_list[i]]);
         field_list_data[i] = data[field_list[i]];
     }
     
     var sql = 'INSERT INTO `' + table_name + '` (' + field_list_in_sql + ') VALUES (' + field_replacement + ')';
-    console.log('sql: ', sql);
-    //console.log('field_list_data: ', field_list_data);
+    logger.info('sql: ', sql);
+    //logger.info('field_list_data: ', field_list_data);
     pool.query(sql, field_list_data, function (err, result) {
         if (err) {
             cb(err);
@@ -122,8 +122,8 @@ exports.deleteTableRecord = function (pool, cb, data, table_name) {
     var id = data['id'];
     
     var sql = 'DELETE FROM `' + table_name + '` WHERE `id`=?';
-    console.log('id: ', id);
-    console.log('sql: ', sql);
+    logger.info('id: ', id);
+    logger.info('sql: ', sql);
     pool.query(sql, [id], function (err, result) {
         if (err) {
             cb(err);
@@ -156,7 +156,7 @@ exports.updateTableRecord = function (pool, cb, table_name, data, field_list) {
     field_list_data[field_list_data.length] = id;
     
     var sql = 'UPDATE `' + table_name + '` SET ' + field_list_in_sql + ' WHERE `id`=?';
-    console.log('EXECUTE SQL - ' + sql);
+    logger.info('EXECUTE SQL - ' + sql);
     pool.query(sql, field_list_data, function (err, result) {
         if (err) {
             cb(err);
@@ -209,7 +209,7 @@ function _updateData(pool, cb, data) {
     sql += 'END ';
     sql += 'WHERE id IN(' + ids + ')';
     
-    console.log('sql', sql);
+    logger.info('sql', sql);
     
     pool.query(sql, function (err, result) {
         if (err) {
@@ -233,7 +233,7 @@ function _getData(pool, cb, data) {
     
     var sql = 'SELECT ' + target_field + ' FROM ' + table_name + ' WHERE ' + ref_field + '=' + ref_value;
     
-    console.log('sql', sql);
+    logger.info('sql', sql);
     
     pool.query(sql, function (err, result) {
         if (err) {

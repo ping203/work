@@ -28,7 +28,7 @@ class AccountSync extends Task {
         let self = this;
         let synced = syncCount + this.taskConf.writeLimit;
         // console.time('----------------redis');
-        // console.log('-------------subUids', subSyncDatas.length);
+        // logger.info('-------------subUids', subSyncDatas.length);
         async.mapSeries(subSyncDatas, function (syncData, cb) {
             redisAccountSync.getAccount(syncData.uid, syncData.fields, function (err, account) {
                 cb(err, account);
@@ -42,7 +42,7 @@ class AccountSync extends Task {
             // console.time('----------------mysql');
             let account_filter = redisAccountSync.Util.filterInvalidAccount(accounts);
             if (account_filter.length > 0) {
-                // console.log('-------------account_filter', account_filter.length);
+                // logger.info('-------------account_filter', account_filter.length);
                 mysqlAccountSync.setAccount(account_filter, function (err, results) {
                     if (err) {
                         logger.error('redis数据同步到mysql存在异常，请注意检查数据', err);

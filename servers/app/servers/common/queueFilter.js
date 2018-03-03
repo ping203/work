@@ -16,8 +16,8 @@ class QueueFilter {
 
   _printf(){
     for(let [k,v] of this.routeMap){
-        console.log(k,' in qps:', v.inMsg/((Date.now() - v.beginTime)/1000), '次每秒');
-        console.log(k,' out qps:', v.outMsg/((Date.now() - v.beginTime)/1000), '次每秒');
+        logger.info(k,' in qps:', v.inMsg/((Date.now() - v.beginTime)/1000), '次每秒');
+        logger.info(k,' out qps:', v.outMsg/((Date.now() - v.beginTime)/1000), '次每秒');
     }
   }
 

@@ -39,7 +39,7 @@ exports.update = _update;
  */
 function _update(pool, data, cb, my_account) {
     const FUNC = TAG + "_update() --- ";
-    if (DEBUG) console.log("CALL guide.update()");
+    if (DEBUG) logger.info("CALL guide.update()");
     
     var uid = my_account['id'];
     var token = my_account['token'];
@@ -47,7 +47,7 @@ function _update(pool, data, cb, my_account) {
     var guide = data['guide'] ? 1 : 0;
     var guide_weak = ObjUtil.data2String(data['weak']);
 
-    if (DEBUG) console.log('guide_weak:\n', data['weak']);
+    if (DEBUG) logger.info('guide_weak:\n', data['weak']);
 
     // 需要在强引导结束时强制设置武器等级为5(客户端没有显式通知过服务器)
     var guide_complete = 0;
@@ -78,14 +78,14 @@ function _update(pool, data, cb, my_account) {
         sql_data.push(uid);
         sql_data.push(token);
         
-        if (DEBUG) console.log('sql: ', sql);
-        if (DEBUG) console.log('sql_data: ', sql_data);
+        if (DEBUG) logger.info('sql: ', sql);
+        if (DEBUG) logger.info('sql_data: ', sql_data);
         
         pool.query(sql, sql_data, function (err, result) {
             if (err) {
-                console.error(FUNC + "err:\n", err);
-                console.error(FUNC + "sql:\n", sql);
-                console.error(FUNC + "sql_data:\n", sql_data);
+                logger.error(FUNC + "err:\n", err);
+                logger.error(FUNC + "sql:\n", sql);
+                logger.error(FUNC + "sql_data:\n", sql_data);
                 cb(err);
             } else {
                 var ret = {};

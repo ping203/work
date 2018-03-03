@@ -31,7 +31,7 @@ exports.update = _update;
  * 账户数据更新(经验和等级).
  */
 function _update(pool, data, cb, my_account) {
-    if (DEBUG) console.log("CALL _updateExpAndLevel()");
+    if (DEBUG) logger.info("CALL _updateExpAndLevel()");
     
     var account_id = my_account['id'];
     var token = my_account['token'];

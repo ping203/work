@@ -61,7 +61,7 @@ class Scene {
     leaveGame(uid) {
         let data = null;
         let room = this._getRoom(uid);
-        if (!!room) {
+        if (room) {
             data = room.leave(uid);
             if (room.isDestroy()) {
                 room.stop();
@@ -110,7 +110,7 @@ class Scene {
             return null;
         }
         let room = this.roomMap.get(roomId);
-        if (!!room) {
+        if (room) {
             return room.getPlayer(uid);
         }
 
@@ -155,7 +155,7 @@ class Scene {
             err = FishCode.NOT_SUPPORT_ROOMMODE;
                 break;
         }
-        return [err, !!room ? room.roomId : null];
+        return [err, room ? room.roomId : null];
     }
 
     _createRoom(mode, className, playerMax) {

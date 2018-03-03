@@ -280,7 +280,7 @@ exports.login_channel = function (data, cb) {
             }
         }
         , function (account, cb) {
-            if (!!_mysqlId) {
+            if (_mysqlId) {
                 common.getAccountById(mysqlPool, _mysqlId, cb);
             } else {
                 cb(null, account);

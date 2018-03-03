@@ -20,5 +20,5 @@ function _sumUpLastDay(pool, cb) {
         end_date: last_date,
     };
     DaoAdminFillData.fillDayData(pool, data, cb);
-};
+}
 exports.sumUpLastDay = _sumUpLastDay;

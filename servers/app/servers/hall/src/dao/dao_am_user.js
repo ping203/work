@@ -64,30 +64,30 @@ function _getUserDetail(pool, data, cb) {
     
     var sql_data = [token];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             if (result.length == 0) {
                 var not_found_err = "查询的管理账户不存在";
-                console.log(not_found_err);
+                logger.info(not_found_err);
                 cb(new Error(not_found_err));
                 return;
             }
             var role = result[0]["role"];
-            console.log("用户角色: " + role);
+            logger.info("用户角色: " + role);
             
             _didGetUserInfo(pool, result[0], function (err_user_info, result_user_info) {
                 if (err_user_info) {
-                    console.log(JSON.stringify(err_user_info));
+                    logger.info(JSON.stringify(err_user_info));
                     cb(err_user_info);
                 } else {
-                    console.log('result_user_info: ', result_user_info);
+                    logger.info('result_user_info: ', result_user_info);
                     cb(null, _.extend(result[0], result_user_info));
                 }
             });
@@ -109,26 +109,26 @@ function _didGetUserInfo(pool, data, cb) {
     
     var sql_data = [token];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(FUNC + "err:", err);
+            logger.info(FUNC + "err:", err);
         } else {
-            console.log(FUNC + 'result: ', result);
+            logger.info(FUNC + 'result: ', result);
             var auth_id_str = result[0]["auth_ids"];
             var rname = result[0]["rname"];
             var auth_id_array = StringUtil.split(auth_id_str, ",");
             
             _getAuthNames(pool, auth_id_str, function (err_auth_name, result_auth_name) {
                 if (err_auth_name) {
-                    console.log(JSON.stringify(err_auth_name));
+                    logger.info(JSON.stringify(err_auth_name));
                     cb(err_auth_name);
                 } else {
-                    console.log(FUNC + 'result_auth_name:', result_auth_name);
+                    logger.info(FUNC + 'result_auth_name:', result_auth_name);
                     result_auth_name = _.map(result_auth_name, _.iteratee('page'));
-                    console.log(FUNC + 'result_auth_name:', result_auth_name);
+                    logger.info(FUNC + 'result_auth_name:', result_auth_name);
                     cb(null, { auth_list: result_auth_name, role_name: rname });
                 }
             });
@@ -162,26 +162,26 @@ function _didGetUserAuth(pool, data, cb) {
     
     var sql_data = [token];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             var auth_id_str = result[0]["auth_ids"];
             var auth_id_array = StringUtil.split(auth_id_str, ",");
             
             _getAuthNames(pool, auth_id_str, function (err1, result1) {
                 if (err1) {
-                    console.log(JSON.stringify(err1));
+                    logger.info(JSON.stringify(err1));
                     cb(err1);
                 } else {
-                    console.log('result1: ', result1);
+                    logger.info('result1: ', result1);
                     result1 = _.map(result1, _.iteratee('page'));
-                    console.log('result1: ', result1);
+                    logger.info('result1: ', result1);
                     cb(null, result1);
                 }
             });
@@ -199,8 +199,8 @@ function _getAuthNames(pool, auth_id_str, cb) {
     
     var sql_data = [];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         cb(err, result);
@@ -217,15 +217,15 @@ function _getUserList(pool, data, cb) {
     
     var sql_data = [];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });
@@ -245,7 +245,7 @@ function _addUser(pool, data, cb) {
         return;
     }
     _didAddUser(pool, data, cb);
-};
+}
 
 function _didAddUser(pool, data, cb) {
     
@@ -265,19 +265,19 @@ function _didAddUser(pool, data, cb) {
     
     var sql_data = [user_name, salt, password, user_role];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             var id = result.insertId;
             _createSessionToken(pool, id, function (err2, result2) {
                 if (err2) {
-                    console.log(JSON.stringify(err2));
+                    logger.info(JSON.stringify(err2));
                     cb(err2);
                 } else {
                     cb(null, result2);
@@ -296,21 +296,21 @@ function _createSessionToken(pool, id, cb) {
             cb(null, result);
         }
     });
-};
+}
 
 /**
  * 禁止用户(在用户管理中该用户不可见)
  */
 function _deleteUser(pool, data, cb) {
     _enableUser(pool, data, cb, false);
-};
+}
 
 /**
  * 激活用户(在用户管理中该用户可见)
  */
 function _validUser(pool, data, cb) {
     _enableUser(pool, data, cb, true);
-};
+}
 
 function _enableUser(pool, data, cb, isValid) {
     var param_name_list = [
@@ -334,15 +334,15 @@ function _didEnableUser(pool, data, cb, isValid) {
     
     var sql_data = [isValid, id];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });
@@ -363,7 +363,7 @@ function _editUser(pool, data, cb) {
         return;
     }
     _didEditUser(pool, data, cb);
-};
+}
 
 // 更新用户数据
 function _didEditUser(pool, data, cb) {
@@ -380,15 +380,15 @@ function _didEditUser(pool, data, cb) {
     
     var sql_data = [user_name, user_description, user_auth, user_id];
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
-            console.log('result: ', result);
+            logger.info('result: ', result);
             cb(null, result);
         }
     });
@@ -429,18 +429,18 @@ function _didSignin(pool, data, cb) {
     
     var sql_data = [username];
     
-    console.log(FUNC + 'sql: ', sql);
-    console.log(FUNC + 'sql_data: ', sql_data);
+    logger.info(FUNC + 'sql: ', sql);
+    logger.info(FUNC + 'sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, rows) {
         if (err) {
-            console.log(FUNC + 'err: ', err);
+            logger.info(FUNC + 'err: ', err);
             cb(err);
             return;
         }
         
         if (rows.length <= 0) {
-            console.log(FUNC + '用户不存在: ', username);
+            logger.info(FUNC + '用户不存在: ', username);
             cb(new Error('用户不存在'));
             return;
         }
@@ -452,10 +452,10 @@ function _didSignin(pool, data, cb) {
         var encrypted = utils.encodePassword(salt, password);
         
         if (encrypted === account.password) {
-            console.log(FUNC + '密码正确，返回用户数据');
+            logger.info(FUNC + '密码正确，返回用户数据');
             cb(null, account);
         } else {
-            console.log(FUNC + '密码错误');
+            logger.info(FUNC + '密码错误');
             cb(new Error('密码错误'));
         }
     });

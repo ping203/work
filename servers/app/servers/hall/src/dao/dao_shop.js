@@ -542,7 +542,7 @@ function _didAddShopLog(pool, data, account, cb) {
             });
         }
     });
-};
+}
 
 /**
  * 当我充值成功时, 向我的邀请者发送一封奖励邮件(10%我充值的钻石数).

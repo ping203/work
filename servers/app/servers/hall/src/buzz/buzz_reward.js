@@ -174,8 +174,8 @@ function dao_resetMonthSign(pool, monthSignInitStr, cb) {
     let sql_data = [monthSignInitStr];
 
     pool.query(sql, sql_data, function (err, result) {
-        if (ERROR) console.error(FUNC + "err:", err);
-        if (DEBUG) console.log(FUNC + "result:", result);
+        if (ERROR) logger.error(FUNC + "err:", err);
+        if (DEBUG) logger.info(FUNC + "result:", result);
         cb();
     });
 }
@@ -411,9 +411,9 @@ function _getDayReward(req, dataObj, cb) {
                             "scene": common_log_const_cfg.MONTH_SIGN_REWARD,
                         }],
                     };
-                    console.log(FUNC + "签到领取到金币:", data);
+                    logger.info(FUNC + "签到领取到金币:", data);
                     dao_gold.addGoldLogCache(pool, data, function (err, res) {
-                        if (err) return console.error(FUNC + "err:", err);
+                        if (err) return logger.error(FUNC + "err:", err);
                     });
                 }
 
@@ -438,8 +438,8 @@ function _getDayReward(req, dataObj, cb) {
                     }
                 }
                 if (diamondGain > 0 || diamondCost > 0) {
-                    console.log(FUNC + uid + "签到领取到钻石:", diamondGain);
-                    console.log(FUNC + uid + "补签消耗钻石:", diamondCost);
+                    logger.info(FUNC + uid + "签到领取到钻石:", diamondGain);
+                    logger.info(FUNC + uid + "补签消耗钻石:", diamondCost);
                     logDiamond.push({
                         account_id: uid,
                         log_at: new Date(),
@@ -741,7 +741,7 @@ function _missionReward(req, dataObj, cb) {
                 }
             }
             if (gain > 0) {
-                console.log(FUNC + uid + ":在任务中获得金币");
+                logger.info(FUNC + uid + ":在任务中获得金币");
                 let data = {
                     account_id: uid,
                     token: token,
@@ -754,7 +754,7 @@ function _missionReward(req, dataObj, cb) {
                     }],
                 };
                 dao_gold.addGoldLogCache(pool, data, function (err, res) {
-                    if (err) return console.error(FUNC + "err:", err);
+                    if (err) return logger.error(FUNC + "err:", err);
                 });
             }
 
@@ -769,7 +769,7 @@ function _missionReward(req, dataObj, cb) {
                 }
             }
             if (diamondGain > 0) {
-                console.log(FUNC + uid + ":在任务中获得钻石");
+                logger.info(FUNC + uid + ":在任务中获得钻石");
                 logDiamond.push({
                     account_id: uid,
                     log_at: new Date(),
@@ -978,11 +978,11 @@ function _onekeyReward(req, dataObj, cb) {
         }
 
         function handleResult(item_list) {
-            if (DEBUG) console.log(FUNC + "item_list:\n", item_list);
+            if (DEBUG) logger.info(FUNC + "item_list:\n", item_list);
             BuzzUtil.putIntoPack(req, account, item_list, function (reward_info) {
                 let change = BuzzUtil.getChange(account, reward_info);
                 account.mission_only_once.achievePoint = account.achieve_point;
-                if (DEBUG) console.log(FUNC + "mission_daily_reset:", account.mission_daily_reset);
+                if (DEBUG) logger.info(FUNC + "mission_daily_reset:", account.mission_daily_reset);
                 let ret = {
                     item_list: item_list,
                     change: change,
@@ -992,14 +992,14 @@ function _onekeyReward(req, dataObj, cb) {
                     case ONE_KEY_REWARD_TYPE.DAILY:
                         ret.mission_only_once = account.mission_only_once;
                         ret.mission_daily_reset = account.mission_daily_reset;
-                        if (DEBUG) console.log(FUNC + "mission_only_once:", ret.mission_only_once);
+                        if (DEBUG) logger.info(FUNC + "mission_only_once:", ret.mission_only_once);
                         break;
                     case ONE_KEY_REWARD_TYPE.MAIL:
                         ret.mail_box = account.mail_box;
                         // TODO:改是否有邮件的值
                         break;
                 }
-                if (DEBUG) console.log(FUNC + "ret:", ret);
+                if (DEBUG) logger.info(FUNC + "ret:", ret);
                 cb(null, ret);
                 addGameLogForOneKeyReward(item_list, account, type);
             });
@@ -1017,7 +1017,7 @@ function _onekeyReward(req, dataObj, cb) {
                     break;
             }
 
-            console.log(FUNC + "000mailReward:", item_list);
+            logger.info(FUNC + "000mailReward:", item_list);
             let goldGain = 0;
             let diamondGain = 0;
             let huafeiGain = 0;
@@ -1038,7 +1038,7 @@ function _onekeyReward(req, dataObj, cb) {
             let uid = account.id;
             if (goldGain > 0) {
                 // yDONE: 金币记录日志
-                console.log(FUNC + uid + "领取邮件发放的金币");
+                logger.info(FUNC + uid + "领取邮件发放的金币");
                 logGold.push({
                     account_id: uid,
                     log_at: new Date(),
@@ -1053,7 +1053,7 @@ function _onekeyReward(req, dataObj, cb) {
             }
             if (diamondGain > 0) {
                 // yDONE: 钻石记录日志
-                console.log(FUNC + uid + "领取邮件发放的钻石");
+                logger.info(FUNC + uid + "领取邮件发放的钻石");
                 logDiamond.push({
                     account_id: uid,
                     log_at: new Date(),
@@ -1066,7 +1066,7 @@ function _onekeyReward(req, dataObj, cb) {
             }
             if (huafeiGain > 0) {
                 // yDONE: 话费券记录日志
-                console.log(FUNC + uid + "领取邮件发放的话费券");
+                logger.info(FUNC + uid + "领取邮件发放的话费券");
                 let total = account.package['9']['i003'];
                 logHuafei.push({
                     uid: uid,
@@ -1111,8 +1111,8 @@ function _onekeyReward(req, dataObj, cb) {
                         let gold_acc = BuzzUtil.getGoldRewardFromItemList(temp_item_list);
                         let achieve_acc = BuzzUtil.getAchieveRewardFromItemList(temp_item_list);
                         item_list = ObjUtil.mergeItemList(item_list, temp_item_list);
-                        if (DEBUG) console.log(FUNC + "quest_id:", idx);
-                        if (DEBUG) console.log(FUNC + "temp_item_list:\n", temp_item_list);
+                        if (DEBUG) logger.info(FUNC + "quest_id:", idx);
+                        if (DEBUG) logger.info(FUNC + "temp_item_list:\n", temp_item_list);
                         has_more = true;
                         let precondition = quest.precondition;
                         if (0 != precondition) {
@@ -1128,13 +1128,13 @@ function _onekeyReward(req, dataObj, cb) {
                                 account.mission_only_once[gold_quest_id] += gold_acc;
                             }
                         }
-                        if (DEBUG) console.log(FUNC + "achieve_acc:", achieve_acc);
+                        if (DEBUG) logger.info(FUNC + "achieve_acc:", achieve_acc);
                         if (achieve_acc > 0) {
                             let achieve_quest_id = BuzzUtil.getAchieveQuestIdByMission(account.mission_only_once);
-                            if (DEBUG) console.log(FUNC + "achieve_quest_id:", achieve_quest_id);
+                            if (DEBUG) logger.info(FUNC + "achieve_quest_id:", achieve_quest_id);
                             if (achieve_quest_id != null) {
                                 account.mission_only_once[achieve_quest_id] += achieve_acc;
-                                if (DEBUG) console.log(FUNC + "achieve_quest_step:", account.mission_only_once[achieve_quest_id]);
+                                if (DEBUG) logger.info(FUNC + "achieve_quest_step:", account.mission_only_once[achieve_quest_id]);
                             }
                         }
                     }
@@ -1165,14 +1165,14 @@ function _onekeyReward(req, dataObj, cb) {
         function rewardAllDaily(item_list, cb) {
             const FUNC = TAG + "rewardAllDaily() --- ";
             let mission_daily_reset = account.mission_daily_reset;
-            if (DEBUG) console.log(FUNC + "mission_daily_reset:", JSON.stringify(mission_daily_reset));
+            if (DEBUG) logger.info(FUNC + "mission_daily_reset:", JSON.stringify(mission_daily_reset));
             for (let idx in mission_daily_reset) {
                 let mission = mission_daily_reset[idx];
                 let cur_value = mission_daily_reset[idx];
                 let quest = BuzzUtil.getQuestById(idx);
-                if (DEBUG) console.log(FUNC + "queat idx:", idx);
-                if (DEBUG) console.log(FUNC + "当前值:", cur_value);
-                if (quest) console.log(FUNC + "目标值:", quest.value2);
+                if (DEBUG) logger.info(FUNC + "queat idx:", idx);
+                if (DEBUG) logger.info(FUNC + "当前值:", cur_value);
+                if (quest) logger.info(FUNC + "目标值:", quest.value2);
                 if (quest && cur_value >= quest.value2) {
                     let temp_item_list = BuzzUtil.getItemList(quest.reward);
                     item_list = ObjUtil.mergeItemList(item_list, temp_item_list);
@@ -1199,14 +1199,14 @@ function _onekeyReward(req, dataObj, cb) {
                 mail_box.forEach(function (id) {
                     let mail = mails[id];
                     if (mail.reward != null) {
-                        if (DEBUG) console.log(FUNC + "字符串 reward:", mail.reward);
+                        if (DEBUG) logger.info(FUNC + "字符串 reward:", mail.reward);
                         let reward = ObjUtil.str2Data(mail.reward);
-                        if (DEBUG) console.log(FUNC + "对象 reward:", reward);
+                        if (DEBUG) logger.info(FUNC + "对象 reward:", reward);
                         let temp_item_list = BuzzUtil.getItemList(reward);
                         item_list = ObjUtil.mergeItemList(item_list, temp_item_list);
 
                         // yDONE: 增加一条玩家领取邮件奖励的记录
-                        console.log(FUNC + "增加一条玩家领取邮件奖励的记录");
+                        logger.info(FUNC + "增加一条玩家领取邮件奖励的记录");
                         let mailReward = {
                             uid: uid,
                             mid: id,
@@ -1220,7 +1220,7 @@ function _onekeyReward(req, dataObj, cb) {
                 account.mail_box = [];
                 account.commit();
 
-                if (DEBUG) console.log(FUNC + "item_list:", item_list);
+                if (DEBUG) logger.info(FUNC + "item_list:", item_list);
                 cb(item_list);
             });
         }
@@ -1321,7 +1321,7 @@ function resetReward(req, token, redis_key, hash, account, cb) {
                                     }],
                                 };
                                 dao_gold.addGoldLogCache(req.pool, data, function (err, res) {
-                                    if (err) return console.error("err:", err);
+                                    if (err) return logger.error("err:", err);
                                 });
                             }
                             if ('i002' == item_info.item_id) {
@@ -1353,7 +1353,7 @@ function resetReward(req, token, redis_key, hash, account, cb) {
                     });
                 }
                 else {
-                    // console.log("*****************3*******************");
+                    // logger.info("*****************3*******************");
                     RedisUtil.hdel(hash, uid, function (err, res) {
                         if (err) {
                             cb(err);
@@ -1378,7 +1378,7 @@ function getRewardInfo(account, redis_key, cb) {
             cb(err);
             return;
         }
-        // console.log("============>",redis_key,uid,res);
+        // logger.info("============>",redis_key,uid,res);
         if (res) {
             res = JSON.parse(res);
         }

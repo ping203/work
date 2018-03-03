@@ -71,7 +71,7 @@ exports.getFriendsCharts = getFriendsCharts;
 function getFriendsCharts(pool, data, cb) {
     const FUNC = TAG + "getFriendsCharts() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     if (!_prepare(data, cb)) return;
 
@@ -85,17 +85,17 @@ function getFriendsCharts(pool, data, cb) {
 
     AccountCommon.getAccountByToken(pool, token, function (err_account, results_account) {
         
-        // console.log(FUNC + "err_account:", err_account);
-        // console.log(FUNC + "results_account:", results_account);
+        // logger.info(FUNC + "err_account:", err_account);
+        // logger.info(FUNC + "results_account:", results_account);
         // 查询数据库中是否存在此账户
         if (err_account) {
             cb(err_account);
             return;
         }
         if (results_account.length == 0) {
-            if (ERROR) console.error('-----------------------------------------------------');
-            if (ERROR) console.error(FUNC + 'TOKEN_INVALID');
-            if (ERROR) console.error('-----------------------------------------------------');
+            if (ERROR) logger.error('-----------------------------------------------------');
+            if (ERROR) logger.error(FUNC + 'TOKEN_INVALID');
+            if (ERROR) logger.error('-----------------------------------------------------');
             cb(ERROR_OBJ.TOKEN_INVALID);
             return;
         }
@@ -109,7 +109,7 @@ function getFriendsCharts(pool, data, cb) {
         if (openid) {
             fopenids.push(StringUtil.subString(openid, 0, openid.length - 2));
         }
-        if (DEBUG) console.log(FUNC + "fopenids:", fopenids);
+        if (DEBUG) logger.info(FUNC + "fopenids:", fopenids);
 
         var uid = record.id;
         var rank_in_friends = record.rank_in_friends;
@@ -124,16 +124,16 @@ function getFriendsCharts(pool, data, cb) {
 
         _didGetFriendsCharts(pool, fopenids, offset, ranking_count, platform, function(err, results) {
 
-            // console.log(FUNC + "results:\n", results);
+            // logger.info(FUNC + "results:\n", results);
 
             var current_rank = _getCurrentRank(results, uid);
             var under_me_friends = _getUnderMeFriends(results, current_rank);
             var new_over_me_friends = _getOverMeFriends(results, current_rank);
             // 检测over_me_friends中每一个玩家, under_me_friends中存在就插入notify_friends
-            if (DEBUG) console.log(FUNC + "over_me_friends:", over_me_friends);
-            if (DEBUG) console.log(FUNC + "under_me_friends:", under_me_friends);
+            if (DEBUG) logger.info(FUNC + "over_me_friends:", over_me_friends);
+            if (DEBUG) logger.info(FUNC + "under_me_friends:", under_me_friends);
             var notify_friends = _.intersection(over_me_friends, under_me_friends);
-            if (DEBUG) console.log(FUNC + "notify_friends:", notify_friends);
+            if (DEBUG) logger.info(FUNC + "notify_friends:", notify_friends);
 
             // 更新rank_in_friends字段.
             _updateRankInFriends(pool, current_rank, new_over_me_friends, uid, function(err, result) {
@@ -195,8 +195,8 @@ function _getCurrentRank(results, uid) {
  */
 function _getUnderMeFriends(results, my_rank) {
     const FUNC = TAG + "_getUnderMeFriends() --- ";
-    if (DEBUG) console.log(FUNC + "CALL...");
-    if (DEBUG) console.log(FUNC + "my_rank:", my_rank);
+    if (DEBUG) logger.info(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "my_rank:", my_rank);
 
     if (results == null || results.length == 0) {
         return [];
@@ -210,20 +210,20 @@ function _getUnderMeFriends(results, my_rank) {
  */
 function _getOverMeFriends(results, my_rank) {
     const FUNC = TAG + "_getOverMeFriends() --- ";
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
     
     return _getFriendsPart(results, 0, my_rank);
 }
 
 function _getFriendsPart(results, start, end) {
     const FUNC = TAG + "_getFriendsPart() --- ";
-    if (DEBUG) console.log(FUNC + "CALL...");
-    if (DEBUG) console.log(FUNC + "start:", start);
-    if (DEBUG) console.log(FUNC + "end:", end);
+    if (DEBUG) logger.info(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "start:", start);
+    if (DEBUG) logger.info(FUNC + "end:", end);
     
     var ret = [];
     for (var i = start; i < end; i++) {
-        if (DEBUG) console.log(i + ")openid", results[i].openid);
+        if (DEBUG) logger.info(i + ")openid", results[i].openid);
         ret.push(results[i].openid);
     }
     return ret;
@@ -241,7 +241,7 @@ function _didGetFriendsCharts(pool, fopenids, offset, ranking_count, platform, c
     for (var i = 0; i < fopenids.length; i++) {
         fopenids[i] += "_" + platform;
     }
-    console.log(FUNC + "fopenids:", fopenids);
+    logger.info(FUNC + "fopenids:", fopenids);
 
 /**
  * 按金币排行
@@ -263,13 +263,13 @@ LIMIT 0,3
  */
     function getOpenIdList(input) {
         var ret = "";
-        if (DEBUG) console.log(FUNC + "input.length:", input.length);
+        if (DEBUG) logger.info(FUNC + "input.length:", input.length);
         for (var i = 0; i < input.length; i++) {
-            if (DEBUG) console.log(FUNC + "i:", i);
+            if (DEBUG) logger.info(FUNC + "i:", i);
             if (i > 0) ret += "," ;
             ret += "'" + input[i] + "'";
         }
-        if (DEBUG) console.log(FUNC + "ret:", ret);
+        if (DEBUG) logger.info(FUNC + "ret:", ret);
         return ret;
     }
     var openIdList = getOpenIdList(fopenids);
@@ -287,21 +287,21 @@ LIMIT 0,3
 
     var sql_data = [offset, ranking_count];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.log(FUNC + "err:\n", err);
+            if (ERROR) logger.info(FUNC + "err:\n", err);
             cb(ERROR_OBJ.DATA_NULL_ERROR);
             return;
         }
         if (!results) {
-            if (ERROR) console.log(FUNC + "results为空");
+            if (ERROR) logger.info(FUNC + "results为空");
             cb(ERROR_OBJ.DATA_NULL_ERROR);
             return;
         }
-        if (DEBUG) console.log(FUNC + "results:\n", results);
+        if (DEBUG) logger.info(FUNC + "results:\n", results);
 
         _getFriendsList(pool, openIdList, function (friends_info_list) {
             // 为玩家好友段位列表添加无段位好友
@@ -340,15 +340,15 @@ function _getFriendsList(pool, openIdList, cb) {
 
     var sql_data = [];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
         }
         else {
-            if (DEBUG) console.log(FUNC + "results:\n", results);
+            if (DEBUG) logger.info(FUNC + "results:\n", results);
         }
         
         cb(results);
@@ -409,7 +409,7 @@ function genCharts(pool, cb) {
 function getCharts(pool, data, cb) {
     const FUNC = TAG + "getCharts() --- ";
 
-    if (DEBUG) console.log(FUNC + "data:", data);
+    if (DEBUG) logger.info(FUNC + "data:", data);
 
     var account_id = data['account_id'];
     var token = data['token'];
@@ -432,7 +432,7 @@ function getCharts(pool, data, cb) {
 
     // 只能请求到前100个玩家的排行
     if (ranking_count > 100) {
-        console.error(FUNC + "[ERROR] 请求的排名数超过了限制: 最大排名:100, 请求参数:" + ranking_count);
+        logger.error(FUNC + "[ERROR] 请求的排名数超过了限制: 最大排名:100, 请求参数:" + ranking_count);
         cb(ERROR_OBJ.RANK_COUNT_TOO_LARGE);
         return;
     }
@@ -444,9 +444,9 @@ function getCharts(pool, data, cb) {
             return;
         }
         if (results_account.length == 0) {
-            if (ERROR) console.error('-----------------------------------------------------');
-            if (ERROR) console.error(FUNC + 'TOKEN_INVALID');
-            if (ERROR) console.error('-----------------------------------------------------');
+            if (ERROR) logger.error('-----------------------------------------------------');
+            if (ERROR) logger.error(FUNC + 'TOKEN_INVALID');
+            if (ERROR) logger.error('-----------------------------------------------------');
             cb(ERROR_OBJ.TOKEN_INVALID);
             return;
         }
@@ -460,7 +460,7 @@ function getCharts(pool, data, cb) {
 
         data['platform'] = platform;
 
-        if (DEBUG) console.log(FUNC + "platform:", platform);
+        if (DEBUG) logger.info(FUNC + "platform:", platform);
         
         _getGoldCharts(pool, data, test, function (err_gold, result_gold) {
             
@@ -499,11 +499,11 @@ function _setShareTopGold(pool, result_gold) {
 
     if (result_gold != null) {
         var top_gold = result_gold.rank[0];
-        if (DEBUG) console.log(FUNC + "top_gold:", top_gold);
+        if (DEBUG) logger.info(FUNC + "top_gold:", top_gold);
 
         if (top_gold.gold >= 5000000) {
-            if (DEBUG) console.log(FUNC + "设置social表中的share_top_gold");
-            if (DEBUG) console.log(FUNC + "uid:", top_gold.id);
+            if (DEBUG) logger.info(FUNC + "设置social表中的share_top_gold");
+            if (DEBUG) logger.info(FUNC + "uid:", top_gold.id);
             dao_social.setShareTopGold(pool, top_gold.id);
         }
     }
@@ -521,7 +521,7 @@ function getAllMyRanking(pool, data, test, cb) {
 
             _getMyMatchRanking(pool, data, test, function (err_match, result_match) {
                 
-                if (DEBUG) console.log(FUNC + 'result_match:', result_match);
+                if (DEBUG) logger.info(FUNC + 'result_match:', result_match);
                 if (!result_gold) {
                     var ret = {
                         code: ERROR_OBJ.DATA_NULL_ERROR.code,
@@ -604,8 +604,8 @@ function makeChartsMail(pool, next) {
 function _sendMail(pool, mail_list, insertId, cb) {
     const FUNC = TAG + "_sendMail() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
-    console.log(FUNC + "mail_list:", mail_list);
+    if (DEBUG) logger.info(FUNC + "CALL...");
+    logger.info(FUNC + "mail_list:", mail_list);
 
     // 计算每种排名有几个等级的奖励
     var level = rank_ranklist_cfg.length / _.keys(RANK_DEBUG).length;
@@ -614,37 +614,37 @@ function _sendMail(pool, mail_list, insertId, cb) {
     for (var i = 0; i < mail_list.length; i++) {
         mail_list[i].id = insertId + i;// 设置邮件id
     }
-    //console.log("mail_list:", mail_list);
+    //logger.info("mail_list:", mail_list);
 
     var idx_count = 0;
 
     // _sendMailGold(pool, mail_list, level * idx_count, level * (idx_count + 1), function () {
-    //     if (DEBUG) console.log(FUNC + "金币奖励邮件添加完毕");
+    //     if (DEBUG) logger.info(FUNC + "金币奖励邮件添加完毕");
     //     idx_count += 1;
 
         _sendMailAchieve(pool, mail_list, level * idx_count, level * (idx_count + 1), function () {
-            if (DEBUG) console.log(FUNC + "成就点奖励邮件添加完毕");
+            if (DEBUG) logger.info(FUNC + "成就点奖励邮件添加完毕");
             idx_count += 1;
 
             _sendMailRankgame(pool, mail_list, level * idx_count, level * (idx_count + 1), function () {
-                if (DEBUG) console.log(FUNC + "排位赛奖励邮件添加完毕");
+                if (DEBUG) logger.info(FUNC + "排位赛奖励邮件添加完毕");
                 idx_count += 1;
             
                 // _sendMailGoddess(pool, mail_list, level * 3, level * 4, function () {
                 _sendMailGoddess(pool, mail_list, level * idx_count, level * (idx_count + 1), function () {
-                    if (DEBUG) console.log(FUNC + "保卫女神奖励邮件添加完毕");
+                    if (DEBUG) logger.info(FUNC + "保卫女神奖励邮件添加完毕");
                     idx_count += 1;
                     
                     _sendMailAquarium(pool, mail_list, level * idx_count, level * (idx_count + 1), function () {
-                        if (DEBUG) console.log(FUNC + "水族馆奖励邮件添加完毕");
+                        if (DEBUG) logger.info(FUNC + "水族馆奖励邮件添加完毕");
                         idx_count += 1;
 
-                        console.log(FUNC + "所有奖励邮件添加完毕");
+                        logger.info(FUNC + "所有奖励邮件添加完毕");
 
                         // TODO: 加载数据库数据到缓存中
                         var cache_ids = CacheAccount.getAllIds();
-                        if (DEBUG) console.log(FUNC + "cache_ids:\n", cache_ids);
-                        if (DEBUG) console.log(FUNC + "cache_ids:\n", cache_ids.toString());
+                        if (DEBUG) logger.info(FUNC + "cache_ids:\n", cache_ids);
+                        if (DEBUG) logger.info(FUNC + "cache_ids:\n", cache_ids.toString());
                         // _updateCache(pool, cache_ids.toString(), cb);
 
                         // 告诉其他服务器重新加载数据库中的邮件
@@ -680,12 +680,12 @@ function _sendMail(pool, mail_list, insertId, cb) {
     
 //     var sql_data = [];
     
-//     if (DEBUG) console.log(FUNC + "sql:\n", sql);
-//     if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+//     if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+//     if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
     
 //     pool.query(sql, sql_data, function (err, results) {
-//         if (DEBUG) console.log(FUNC + "err:\n", err);
-//         if (DEBUG) console.log(FUNC + "results:\n", results);
+//         if (DEBUG) logger.info(FUNC + "err:\n", err);
+//         if (DEBUG) logger.info(FUNC + "results:\n", results);
         
 //         for (var i = 0; i < results.length; i++) {
 //             var id = results[i].id;
@@ -729,7 +729,7 @@ function _sendMailRankgame(pool, mail_list, start, end, next) {
 
 function _sendMailInAccount(pool, type, mail_list, start, end, next) {
     const FUNC = TAG + "_sendMailInAccount() --- ";
-    if (DEBUG) console.log(FUNC + "type:", type);
+    if (DEBUG) logger.info(FUNC + "type:", type);
     var level_info = [];
     var data = {
         offset: 0,
@@ -741,7 +741,7 @@ function _sendMailInAccount(pool, type, mail_list, start, end, next) {
     data.platform = PLATFORM.ANDROID;
     _getRank(pool, data, type, false, test, function (err, results) {
         let rank = _.pluck(results.rank, 'id');
-        // console.log(FUNC + "rank:", rank);
+        // logger.info(FUNC + "rank:", rank);
         _executeSql(pool, rank, level_info, type, data.platform, function () {
 
             // 2. iOS发奖励
@@ -758,8 +758,8 @@ function _sendMailInAccount(pool, type, mail_list, start, end, next) {
 
 function _sendMailSingle(pool, table, field, mail_list, start, end, next) {
     const FUNC = TAG + "_sendMailInAccount() --- ";
-    if (DEBUG) console.log(FUNC + "table:", table);
-    // if (DEBUG) console.log("【CALL】 ranking._sendMailSingle:", table);
+    if (DEBUG) logger.info(FUNC + "table:", table);
+    // if (DEBUG) logger.info("【CALL】 ranking._sendMailSingle:", table);
     var level_info = [];
     var data = { 
         offset: 0,
@@ -771,7 +771,7 @@ function _sendMailSingle(pool, table, field, mail_list, start, end, next) {
     data.platform = PLATFORM.ANDROID;
     _getNewRank(pool, data, table, field, false, test, function (err, results) {
         let rank = _.pluck(results.rank, 'id');
-        // console.log(FUNC + "rank:", rank);
+        // logger.info(FUNC + "rank:", rank);
         _executeSql(pool, rank, level_info, table, data.platform, function () {
             
             // 2. iOS发奖励
@@ -793,7 +793,7 @@ function _getLevelInfo(level_info, mail_list, start, end) {
     for (var i = start; i < end; i++) {
         var mail_info = mail_list[i];
         if (mail_info != null) {
-            // console.log(FUNC + "interval: min-" + mail_info.min_interval + ", max-" + mail_info.max_interval);
+            // logger.info(FUNC + "interval: min-" + mail_info.min_interval + ", max-" + mail_info.max_interval);
             if (i == end - 2) {
                 ranking_count = mail_info.max_interval;
             }
@@ -802,7 +802,7 @@ function _getLevelInfo(level_info, mail_list, start, end) {
                     ranking_count = mail_info.max_interval;
                 }
             }
-            // console.log(FUNC + "ranking_count:" + ranking_count);
+            // logger.info(FUNC + "ranking_count:" + ranking_count);
             level_info.push(
                 {
                     id: mail_info.id,
@@ -827,8 +827,8 @@ function _executeSql(pool, rank, level_info, type, platform, next) {
         var min = mail_interval.min;
         var max = mail_interval.max;
 
-        // console.log(FUNC + "min:", min);
-        // console.log(FUNC + "max:", max);
+        // logger.info(FUNC + "min:", min);
+        // logger.info(FUNC + "max:", max);
         
         var isLastLevel = i == level_info.length - 1;
         var func = isLastLevel ? dao_mail.addMailsNotIn : dao_mail.addMailsIn;
@@ -906,8 +906,8 @@ function getMyRankgameRanking(pool, data, cb) {
             cb(10);
         }
         else {
-            // console.log("result_rankgame:\n", result_rankgame);
-            if (DEBUG) console.log("my_rank:\n", result_rankgame.my_rank);
+            // logger.info("result_rankgame:\n", result_rankgame);
+            if (DEBUG) logger.info("my_rank:\n", result_rankgame.my_rank);
             cb(null, result_rankgame.my_rank);
         }
     });
@@ -942,11 +942,11 @@ function _getGoldCharts(pool, data, test, cb) {
     //------------------------------------------------------
 
     if (typeof(data.type) == "undefined" || data.type == -1 || data.type == CHARTS_TYPE.GOLD) {
-        if (DEBUG) console.log(FUNC + "客户端没有type字段, 或type类型为CHARTS_TYPE.GOLD");
+        if (DEBUG) logger.info(FUNC + "客户端没有type字段, 或type类型为CHARTS_TYPE.GOLD");
         _getRank(pool, data, "gold", true, test, cb);
     }
     else {
-        if (DEBUG) console.log(FUNC + "客户端有type字段, 且type类型不为CHARTS_TYPE.GOLD");
+        if (DEBUG) logger.info(FUNC + "客户端有type字段, 且type类型不为CHARTS_TYPE.GOLD");
         cb(null, null);
     }
     
@@ -985,8 +985,8 @@ function _getGoddessCharts(pool, data, test, cb) {
         _getNewRank(pool, data, 'tbl_goddess', 'max_wave', true, test, cb);
     }
     else {
-        console.error(FUNC + "获取女神排行榜类型错误——type:", data.type);
-        console.error(FUNC + "CHARTS_TYPE.GODDESS:", CHARTS_TYPE.GODDESS);
+        logger.error(FUNC + "获取女神排行榜类型错误——type:", data.type);
+        logger.error(FUNC + "CHARTS_TYPE.GODDESS:", CHARTS_TYPE.GODDESS);
         cb({code: 10000, msg: "获取女神排行榜类型错误——type:" + data.type}, null);
     }
 }
@@ -997,8 +997,8 @@ function _getAquariumCahrts(pool, data, test, cb) {
         _getNewRank(pool, data, 'tbl_aquarium', 'total_level', true, test, cb);
     }
     else {
-        console.error(FUNC + "获取水族馆排行榜类型错误——type:", data.type);
-        console.error(FUNC + "CHARTS_TYPE.PETFISH:", CHARTS_TYPE.PETFISH);
+        logger.error(FUNC + "获取水族馆排行榜类型错误——type:", data.type);
+        logger.error(FUNC + "CHARTS_TYPE.PETFISH:", CHARTS_TYPE.PETFISH);
         cb({code: 10000, msg: "获取水族馆排行榜类型错误——type:" + data.type}, null);
     }
 }
@@ -1010,8 +1010,8 @@ function _getRankgameCharts(pool, data, test, cb) {
         _getNewRank(pool, data, 'tbl_rankgame', 'points', true, test, cb);
     }
     else {
-        console.error(FUNC + "获取排位赛排行榜类型错误——type:", data.type);
-        console.error(FUNC + "CHARTS_TYPE.RANKING:", CHARTS_TYPE.RANKING);
+        logger.error(FUNC + "获取排位赛排行榜类型错误——type:", data.type);
+        logger.error(FUNC + "CHARTS_TYPE.RANKING:", CHARTS_TYPE.RANKING);
         cb({code: 10000, msg: "获取排位赛排行榜类型错误——type:" + data.type}, null);
     }
 }
@@ -1051,18 +1051,18 @@ function _getNewRank(pool, data, table, field, getNewMyRank, test, cb) {
     
     var sql_data = [platform, parseInt(offset), parseInt(ranking_count)];
     
-    if (DEBUG) console.log(FUNC + "sql:", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:", sql_data);
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + table + " - err:", err);
+            if (ERROR) logger.error(FUNC + table + " - err:", err);
             cb(err);
         } else {
             if (getNewMyRank) {
                 _getNewMyRank(pool, data, table, field, test, function (err_my_rank, result_my_rank) {
                     if (err_my_rank) {
-                        if (ERROR) console.error(FUNC + table + " - err_my_rank:", err_my_rank);
+                        if (ERROR) logger.error(FUNC + table + " - err_my_rank:", err_my_rank);
                         cb(err_my_rank);
                     }
                     else {
@@ -1098,7 +1098,7 @@ function _getNewMyRank(pool, data, table, field, test, cb) {
 
     const QUERY_ONCE = true;
 
-    if (DEBUG) console.log(FUNC + "test: ", test);
+    if (DEBUG) logger.info(FUNC + "test: ", test);
 
     // 特别注意: 时间比较的条件编程.
     // (r.max_wave < r1.max_wave OR (r.max_wave = r1.max_wave AND r.updated_at >= r1.updated_at))
@@ -1124,14 +1124,14 @@ function _getNewMyRank(pool, data, table, field, test, cb) {
         
         var sql_data = [platform, platform, uid, uid];
 
-        // if (DEBUG) console.log(FUNC + "sql:", sql);
-        // if (DEBUG) console.log(FUNC + "sql_data:", sql_data);
+        // if (DEBUG) logger.info(FUNC + "sql:", sql);
+        // if (DEBUG) logger.info(FUNC + "sql_data:", sql_data);
         
         pool.query(sql, sql_data, function (err, results) {
             if (err) {
-                if (ERROR) console.error(FUNC + "err:\n", err);
-                if (ERROR) console.error(FUNC + "sql:\n", sql);
-                if (ERROR) console.error(FUNC + "sql_data:\n", sql_data);
+                if (ERROR) logger.error(FUNC + "err:\n", err);
+                if (ERROR) logger.error(FUNC + "sql:\n", sql);
+                if (ERROR) logger.error(FUNC + "sql_data:\n", sql_data);
                 cb(err);
             } else {
                 cb(null, results[0]);
@@ -1174,12 +1174,12 @@ function _queryRankData(pool, table, field, uid, platform, cb) {
     
     var sql_data = [platform, uid, uid];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + "[ERROR] err:", err);
+            if (ERROR) logger.error(FUNC + "[ERROR] err:", err);
             cb(err);
             return;
         }
@@ -1208,16 +1208,16 @@ function _getRankData(pool, rank_data, table, field, uid, platform, cb) {
 
     var sql_data = [platform, rank_data.max_wave, rank_data.max_wave, rank_data.updated_at];
 
-    if (DEBUG) console.log(FUNC + "sql:\n", sql);
-    if (DEBUG) console.log(FUNC + "sql_data:\n", sql_data);
+    if (DEBUG) logger.info(FUNC + "sql:\n", sql);
+    if (DEBUG) logger.info(FUNC + "sql_data:\n", sql_data);
 
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + "[ERROR] err:", err);
+            if (ERROR) logger.error(FUNC + "[ERROR] err:", err);
             cb(err);
             return;
         }
-        if (DEBUG) console.log(FUNC + "results:", results);
+        if (DEBUG) logger.info(FUNC + "results:", results);
         cb(null, results[0].my_rank);
     });
 }
@@ -1266,22 +1266,22 @@ function _getRank(pool, data, type, getMyRank, test, cb) {
     var sql_data = [platform, parseInt(offset), parseInt(ranking_count)];
     
     DEBUG = 0;
-    if (DEBUG) console.log(FUNC + 'sql: ', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data: ', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql: ', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data: ', sql_data);
     DEBUG = 0;
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + 'type: ' + type + ',err:\n', err);
-            if (ERROR) console.error(FUNC + 'sql: ', sql);
-            if (ERROR) console.error(FUNC + 'sql_data: ', sql_data);
+            if (ERROR) logger.error(FUNC + 'type: ' + type + ',err:\n', err);
+            if (ERROR) logger.error(FUNC + 'sql: ', sql);
+            if (ERROR) logger.error(FUNC + 'sql_data: ', sql_data);
             cb(err);
         } else {
-            if (DEBUG) console.log("金币|成就排行榜:\n", results);
+            if (DEBUG) logger.info("金币|成就排行榜:\n", results);
             if (getMyRank) {
                 _getMyRank(pool, data, type, test, function (err_my_rank, results_my_rank) {
                     if (err_my_rank) {
-                        if (ERROR) console.error(FUNC + 'type: ' + type + ',err:\n', err_my_rank);
+                        if (ERROR) logger.error(FUNC + 'type: ' + type + ',err:\n', err_my_rank);
                         cb(err_my_rank);
                     }
                     else {
@@ -1343,14 +1343,14 @@ function _getMyRank(pool, data, type, test, cb) {
     
     var sql_data = [platform, platform, account_id];
     
-    // if (DEBUG) console.log(FUNC + 'sql: ', sql);
-    // if (DEBUG) console.log(FUNC + 'sql_data: ', sql_data);
+    // if (DEBUG) logger.info(FUNC + 'sql: ', sql);
+    // if (DEBUG) logger.info(FUNC + 'sql_data: ', sql_data);
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + "sql:\n", sql);
-            if (ERROR) console.error(FUNC + "sql_data:\n", sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + "sql:\n", sql);
+            if (ERROR) logger.error(FUNC + "sql_data:\n", sql_data);
             cb(err);
         } else {
             cb(null, results);

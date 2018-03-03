@@ -273,7 +273,7 @@ function resetCharmPoint(account, cb) {
     } else {
         cb && cb(-1);//非法标记  
     }
-};
+}
 
 function setCharmRank(uid, cur) {
     setField(uid, cur, 'charm_rank');

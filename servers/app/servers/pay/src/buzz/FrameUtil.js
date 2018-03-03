@@ -16,7 +16,7 @@ function _getClientIp(req) {
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress;
-};
+}
 exports.getClientIp = _getClientIp;
 
 function _getRoleName (userrole) {
@@ -52,8 +52,8 @@ function _getMemberRoleId(cookies) {
 exports.getMemberRoleId = _getMemberRoleId;
 
 function _getMemberInfo(cookies) {
-    //console.log(FrameUtil.getClientIp(req));
-    console.log(cookies);
+    //logger.info(FrameUtil.getClientIp(req));
+    logger.info(cookies);
 
     // 从cookie中获取用户名和角色编号
     var username = '';
@@ -71,11 +71,11 @@ function _getMemberInfo(cookies) {
         username: username,
         userrole: userRoleName
     };
-};
+}
 exports.getMemberInfo = _getMemberInfo;
 
 function _findParent(tree, parent_id) {
-    //console.log('tree: ', tree);
+    //logger.info('tree: ', tree);
     if (tree.item.id == parent_id) {
         return tree;
     }
@@ -88,7 +88,7 @@ function _findParent(tree, parent_id) {
         }
     }
     return null;
-};
+}
 exports.findParent = _findParent;
 
 
@@ -100,15 +100,15 @@ exports.findParent = _findParent;
 function _getAuthPage(req, res, page_lan, cb) {
     // 根据cookie中的role值查询对应角色的auth_ids字段
     var memberRoleId = _getMemberRoleId(req.cookies);
-    console.log('memberRoleId: ' + memberRoleId);
+    logger.info('memberRoleId: ' + memberRoleId);
     
     // 查询数据库role获取角色信息
     myDao.getRoleInfo(memberRoleId, function (err, result) {
         if (err) {
-            console.log('[ERROR] getRoleInfo: ' + err);
+            logger.info('[ERROR] getRoleInfo: ' + err);
             return;
         }
-        console.log('result: ' + JSON.stringify(result));
+        logger.info('result: ' + JSON.stringify(result));
         _mergeMemberInfo(req, res, page_lan, result, cb);
     });
 }
@@ -134,20 +134,20 @@ function _getRoleAuthPages(req, res, page_lan, result, cb) {
     var auth_ids = result.auth_ids;
     myDao.getAuthPages(auth_ids, function (err, pages) {
         if (err) {
-            console.log('[ERROR] getAuthPages: ' + err);
+            logger.info('[ERROR] getAuthPages: ' + err);
             return;
         }
-        console.log('pages: ' + JSON.stringify(pages));
+        logger.info('pages: ' + JSON.stringify(pages));
         var auth_pages = {};
         for (var i = 0; i < pages.length; i++) {
             var page = pages[i];
             var key = page.replace('/', 'auth_').replace(new RegExp('-', "gm"), '_');
             auth_pages[key] = 1;
         }
-        console.log('[FrameUtil]_getRoleAuthPages() - auth_pages: ' + JSON.stringify(auth_pages));
-        console.log('----------------------------------------------');
-        console.log('[FrameUtil]_getRoleAuthPages() - page_lan: ' + JSON.stringify(page_lan));
-        console.log('----------------------------------------------');
+        logger.info('[FrameUtil]_getRoleAuthPages() - auth_pages: ' + JSON.stringify(auth_pages));
+        logger.info('----------------------------------------------');
+        logger.info('[FrameUtil]_getRoleAuthPages() - page_lan: ' + JSON.stringify(page_lan));
+        logger.info('----------------------------------------------');
         page_lan = ObjUtil.merge(page_lan, auth_pages);
 
         cb(page_lan);
@@ -157,8 +157,8 @@ function _getRoleAuthPages(req, res, page_lan, result, cb) {
 // page_lan: 页面相关的变量
 // cb: callback回调函数, 进行下一步的处理
 function _handleAuth(req, res, page_lan, cb) {
-    console.log('[FrameUtil]_handleAuth() - page_lan: ' + JSON.stringify(page_lan));
-    console.log('----------------------------------------------');
+    logger.info('[FrameUtil]_handleAuth() - page_lan: ' + JSON.stringify(page_lan));
+    logger.info('----------------------------------------------');
     _getAuthPage(req, res, page_lan, cb);
 }
 exports.handleAuth = _handleAuth;

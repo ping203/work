@@ -140,7 +140,7 @@ class GameApp {
 
         async.waterfall([
             function (cb) {
-                if (!!msg.roomId) {
+                if (msg.roomId) {
                     logger.error('onEnterGame 玩家重连游戏', msg.roomId);
                     self._reconnectGame(msg, session, cb);
                 } else {
@@ -224,7 +224,7 @@ class GameApp {
         }
 
         let serverId = session.get('gameSid');
-        if (!!serverId) {
+        if (serverId) {
             this._updatePlayerConnectState({
                 uid: uid,
                 state: constsDef.PALYER_STATE.OFFLINE,

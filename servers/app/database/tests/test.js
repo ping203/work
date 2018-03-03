@@ -4,7 +4,7 @@ const fs = require('fs');
 
 let data = tbl_id_arr[2].data;
 
-console.log(data);
+logger.info(data);
 
 let ids = {};
 for(let i = 0; i< data.length; i++){
@@ -15,14 +15,14 @@ for(let i = 0; i< data.length; i++){
 
 fs.appendFileSync('test_ids_4.json', JSON.stringify(ids));
 
-console.log('写入完成');
+logger.info('写入完成');
 
 // const moment = require('moment')
 //
-// console.log(moment().format('YYYY-MM-DD HH:MM:SS'));
+// logger.info(moment().format('YYYY-MM-DD HH:MM:SS'));
 //
 // setTimeout(function () {
-//     console.log(moment().format('YYYY-MM-DD HH:MM:SS'));
+//     logger.info(moment().format('YYYY-MM-DD HH:MM:SS'));
 // },10000)
 
 
@@ -46,7 +46,7 @@ console.log('写入完成');
 // });
 //
 // fs.appendFileSync('rediskey.json', JSON.stringify(obj));
-// console.log('写入完成')
+// logger.info('写入完成')
 
 
 // let obj = {};
@@ -66,7 +66,7 @@ console.log('写入完成');
 // });
 //
 // fs.appendFileSync('msyqlkey.json', JSON.stringify(obj));
-// console.log('写入完成')
+// logger.info('写入完成')
 
 
 // const RANK_SCORE_OFFSET = Math.pow(10, 7); //排位权重偏移
@@ -105,20 +105,20 @@ console.log('写入完成');
 //
 //
 // let A = getTimeWeightScore(999999998);
-// console.log('AA:', A);
+// logger.info('AA:', A);
 // setTimeout(function () {
 //
 //     let B = getTimeWeightScore(999999999);
-//     console.log('BB:', B);
+//     logger.info('BB:', B);
 //     if (A > B) {
-//         console.log('A>b OK');
+//         logger.info('A>b OK');
 //
 //     }else {
-//         console.log('A<=b OK');
+//         logger.info('A<=b OK');
 //     }
 //
-//     console.log('A:', getOriginScore(A));
-//     console.log('B:', getOriginScore(B));
+//     logger.info('A:', getOriginScore(A));
+//     logger.info('B:', getOriginScore(B));
 //
 // }, 10000);
 

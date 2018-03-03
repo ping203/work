@@ -112,7 +112,7 @@ class ManagerApp {
         let [id, load] = this._getMinLoadGameMap();
         // logger.error('@@@@@@@@@@@@@@@', id, load);
         let item = _cfgGameMap.get(id);
-        if (!!item) {
+        if (item) {
             ++load;
             // logger.error('@@@@@@@@@@@@@@@', item.maxLoad, load);
             if (load > item.maxLoad) {
@@ -190,7 +190,7 @@ class ManagerApp {
         let [id, load] = this._getMinLoadRankMatchMap();
         // logger.error('@@@@@@@@@@@@@@@', id, load);
         let item = _cfgGameMap.get(id);
-        if (!!item) {
+        if (item) {
             ++load;
             // logger.error('@@@@@@@@@@@@@@@', item.maxLoad, load);
             if (load > item.maxLoad) {

@@ -55,8 +55,8 @@ rank_rankgame_cfg.forEach(function (item) {
 
 function getWeekAwardGoddess(rank, wave) {
     let goddessWeekAward = rank_weekaward_config[RANK_TYPE.GODDESS];
-    // console.log("goddessWeekAward: ",goddessWeekAward);
-    // console.log("rank: ",rank,wave);
+    // logger.info("goddessWeekAward: ",goddessWeekAward);
+    // logger.info("rank: ",rank,wave);
     for (var i = 0; i < goddessWeekAward.length; i++) {
         var rankreward_info = goddessWeekAward[i];
         var interval = rankreward_info.interval;

@@ -122,7 +122,7 @@ class UCLoudPayCard {
     static md5(input) {
         let md5sum = crypto.createHash('md5');
         md5sum.update(input);
-        return md5sum.digest('hex');;
+        return md5sum.digest('hex');
     }
 
     static buildReq(data) {
@@ -156,7 +156,7 @@ class UCLoudPayCard {
                     cb(err);
                     return;
                 }
-                console.log(resp);
+                logger.info(resp);
                 let ret_obj = JSON.parse(resp.RequestResult);
                 if (1 == ret_obj.ResponseCode) {
                     cb(null, ret_obj.ResponseContent);

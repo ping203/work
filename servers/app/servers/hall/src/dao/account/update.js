@@ -102,7 +102,7 @@ function updateAccount(pool, data, account, cb) {
 function _handleUpdate(pool, data, cb, type, my_account) {
     const FUNC = TAG + "_handleUpdate() --- ";
 
-    if (DEBUG) console.log(FUNC + "(account_id:" + my_account.id + ")(type:" + type + "):", getTypeName(type));
+    if (DEBUG) logger.info(FUNC + "(account_id:" + my_account.id + ")(type:" + type + "):", getTypeName(type));
 
     if (type == UPDATE_TYPE_MISSION_DAILY_RESET) {
         // BuzzUtil.cacheLinkDataApi(data, "update_account_mission_daily_reset");

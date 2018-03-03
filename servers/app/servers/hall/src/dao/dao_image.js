@@ -84,7 +84,7 @@ function create(pool, data, cb) {
             cb(err);
             return;
         }
-        console.log("results:", results);
+        logger.info("results:", results);
         var id = results.insertId;
         if (data.no_id) {
             cb(null, data.local_url, id);
@@ -93,7 +93,7 @@ function create(pool, data, cb) {
             // 根据插入的数值改写local_url
             _updateLocalImageName(pool, id, function () {
                 
-                console.log(FUNC + "id:\n", id);
+                logger.info(FUNC + "id:\n", id);
 
                 cb(null, data.local_url + id + ".jpg", id);
             });
@@ -121,7 +121,7 @@ function _updateLocalImageName(pool, id, cb) {
             cb(err);
             return;
         }
-        console.log("results:", results);
+        logger.info("results:", results);
         cb(null);
     });
-};
+}

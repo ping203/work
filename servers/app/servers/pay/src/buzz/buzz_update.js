@@ -59,7 +59,7 @@ exports.updateAccount = updateAccount;
  */
 function updateAccount(req, data, cb) {
     const FUNC = TAG + "updateAccount() --- ";
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
     //----------------------------------
 
     if (!_prepare(data, cb)) return;
@@ -98,10 +98,10 @@ function _prepare(data, cb) {
     var token = data['token'];
     var type = data['type'];
 
-    if (DEBUG) console.log("token:", token);
+    if (DEBUG) logger.info("token:", token);
 
     if (!CommonUtil.isParamExist("buzz_update", token, "接口调用请传参数token, 更新类型:" + type, cb)) {
-        if (ERROR) console.error("接口调用请传参数token, 更新类型:", type);
+        if (ERROR) logger.error("接口调用请传参数token, 更新类型:", type);
         return false;
     }
 
@@ -120,7 +120,7 @@ function getGiftDEBUGFromId(id) {
 function _updateGetCard(req, data, cb, account) {
     var FUNC = TAG + "_updateGetCard() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
 
     var uid = data['account_id'];
     var token = data['token'];
@@ -128,9 +128,9 @@ function _updateGetCard(req, data, cb, account) {
     var get_card_old = ObjUtil.str2Data(account['get_card']);
     var card = ObjUtil.str2Data(account['card']);
 
-    console.log(FUNC + "get_card_new: ", get_card_new);
-    console.log(FUNC + "get_card_old: ", get_card_old);
-    console.log(FUNC + "card: ", card);
+    logger.info(FUNC + "get_card_new: ", get_card_new);
+    logger.info(FUNC + "get_card_old: ", get_card_old);
+    logger.info(FUNC + "card: ", card);
 
     // var everyday = 0;
     let reward = [];
@@ -139,10 +139,10 @@ function _updateGetCard(req, data, cb, account) {
     // TODO: 判断card.normal
     if (get_card_new['normal']) {// 更新的是normal
         if (card['normal']) {
-            console.log(FUNC + "玩家的普通月卡有效");
+            logger.info(FUNC + "玩家的普通月卡有效");
             if (get_card_old['normal']) {
                 var err = FUNC + '[ERROR] 玩家今天已经领取了普通月卡奖励, 请勿重复领取';
-                if (ERROR) console.error(err);
+                if (ERROR) logger.error(err);
                 cb(err);
                 return;
             }
@@ -155,7 +155,7 @@ function _updateGetCard(req, data, cb, account) {
         }
         else {
             var err = FUNC + '[ERROR] 玩家没有购买普通月卡';
-            if (ERROR) console.error(err);
+            if (ERROR) logger.error(err);
             cb(err);
             return;
         }
@@ -163,19 +163,19 @@ function _updateGetCard(req, data, cb, account) {
 
     // TODO: 判断card.senior
     if (get_card_new['senior']) {// 更新的是senior
-        console.log(FUNC + "更新玩家的壕月卡领取状态");
-        console.log(FUNC + "card['senior']: ", card['senior']);
+        logger.info(FUNC + "更新玩家的壕月卡领取状态");
+        logger.info(FUNC + "card['senior']: ", card['senior']);
         if (card['senior']) {
-            console.log(FUNC + "玩家的壕月卡有效");
+            logger.info(FUNC + "玩家的壕月卡有效");
             if (get_card_old['senior']) {
                 var err = FUNC + '[ERROR] 玩家今天已经领取了壕月卡奖励, 请勿重复领取';
-                if (ERROR) console.error(err);
+                if (ERROR) logger.error(err);
                 cb(err);
                 return;
             }
             else {
                 // 重写get_card_old
-                console.log(FUNC + "领取壕月卡奖励，改变get_card字段的值");
+                logger.info(FUNC + "领取壕月卡奖励，改变get_card字段的值");
                 get_card_old['senior'] = true;
                 // new version: 使用[["i001", 1], ["i002", 100]]格式表示月卡领取
                 reward = shop_card_cfg[1]['everyday'];
@@ -184,7 +184,7 @@ function _updateGetCard(req, data, cb, account) {
         }
         else {
             var err = FUNC + '[ERROR] 玩家没有购买壕月卡';
-            if (ERROR) console.error(err);
+            if (ERROR) logger.error(err);
             cb(err);
             return;
         }
@@ -222,7 +222,7 @@ function _updateGetCard(req, data, cb, account) {
 function addGameLog(item_list, account, scene, hint) {
     var FUNC = TAG + "addGameLog() --- ";
 
-    console.log(FUNC + "item_list:", item_list);
+    logger.info(FUNC + "item_list:", item_list);
     let goldGain = 0;
     let diamondGain = 0;
     let huafeiGain = 0;
@@ -243,7 +243,7 @@ function addGameLog(item_list, account, scene, hint) {
     let uid = account.id;
     if (goldGain > 0) {
         // yDONE: 金币记录日志
-        console.log(FUNC + uid + hint + '金币');
+        logger.info(FUNC + uid + hint + '金币');
         logGold.push({
             account_id: uid,
             log_at: new Date(),
@@ -258,7 +258,7 @@ function addGameLog(item_list, account, scene, hint) {
     }
     if (diamondGain > 0) {
         // yDONE: 钻石记录日志
-        console.log(FUNC + uid + hint + '钻石');
+        logger.info(FUNC + uid + hint + '钻石');
         logDiamond.push({
             account_id: uid,
             log_at: new Date(),
@@ -271,7 +271,7 @@ function addGameLog(item_list, account, scene, hint) {
     }
     if (huafeiGain > 0) {
         // yDONE: 话费券记录日志
-        console.log(FUNC + uid + hint + '话费券');
+        logger.info(FUNC + uid + hint + '话费券');
         let total = account.package['9']['i003'];
         logHuafei.push({
             uid: uid,

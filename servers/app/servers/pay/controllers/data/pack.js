@@ -73,7 +73,7 @@ class Pack {
             let logString = `${uid} 消耗${cost}个${cost_item}，`;
             logString += `合成${gain_num}个${gain_item}，`;
             logString += `总共消耗金币${gold_cost}。`;
-            console.log(FUNC + logString);
+            logger.info(FUNC + logString);
 
             let gain_item_list = [{
                 item_id: gain_item,
@@ -131,9 +131,9 @@ class Pack {
             // 条件2: 物品没有售价, 有售价的物品不能合成
             if (item.type != item_type || item.saleprice > 0) {
                 {
-                    console.log(FUNC + "item.type:", item.type);
-                    console.log(FUNC + "item_type:", item_type);
-                    console.log(FUNC + "saleprice:", item.saleprice);
+                    logger.info(FUNC + "item.type:", item.type);
+                    logger.info(FUNC + "item_type:", item_type);
+                    logger.info(FUNC + "saleprice:", item.saleprice);
                 }
                 data_util.handleReturn(res, aes, ERROR_OBJ.MIX_WRONG_ITEM, null, HINT);
                 return false;
@@ -212,7 +212,7 @@ class Pack {
             let uid = account.id;
             
             if (isNaN(num) || num <= 0) {
-                console.log(FUNC + `${uid}传入了非法的数量${num}，使用的物品是${itemId}`);
+                logger.info(FUNC + `${uid}传入了非法的数量${num}，使用的物品是${itemId}`);
                 let error = {code:-1, msg:"参数非法"};
                 data_util.handleReturn(res, aes, error, null, HINT);
                 return;
@@ -222,7 +222,7 @@ class Pack {
             if (!account.package
                 || !account.package[itemType]
                 || !account.package[itemType][itemId]) {
-                console.log(FUNC + `${uid}尝试使用不存在的物品${itemId}`);
+                logger.info(FUNC + `${uid}尝试使用不存在的物品${itemId}`);
                 let error = {code:-1, msg:"物品不存在"};
                 data_util.handleReturn(res, aes, error, null, HINT);
                 return;
@@ -230,7 +230,7 @@ class Pack {
             let itemOwn = account.package[itemType][itemId];
 
             if (num > itemOwn) {
-                console.log(FUNC + `${uid}使用的物品${itemId}数量不足，需要${num}个，实际拥有${itemOwn}个`);
+                logger.info(FUNC + `${uid}使用的物品${itemId}数量不足，需要${num}个，实际拥有${itemOwn}个`);
                 let error = {code:-1, msg:"物品数量不足"};
                 data_util.handleReturn(res, aes, error, null, HINT);
                 return;
@@ -249,7 +249,7 @@ class Pack {
                     let skinInfo = newweapon_weapons_cfg[skinId];
                     let pieceInfo = skinInfo.piece;
 
-                    console.log(FUNC + `pieceInfo:${pieceInfo}`);
+                    logger.info(FUNC + `pieceInfo:${pieceInfo}`);
                     if (!account.package[ItemTypeC.SKIN_DEBRIS]) {
                         account.package[ItemTypeC.SKIN_DEBRIS] = {};
                     }
@@ -292,7 +292,7 @@ class Pack {
                 let doneFunc = function () {
                     _afterUse(mysqlPool, account, itemId, num, function (err, reward) {
                         if (err) {
-                            console.log(FUNC + 'err:', err);
+                            logger.info(FUNC + 'err:', err);
                             cb(err);
                         } else {
                             account.package = account.package;
@@ -349,14 +349,14 @@ class Pack {
                     var drop_key = drop_reward[i];
                     var drop_info = BuzzUtil.getDropInfoFromDropKey(drop_key);
 
-                    console.log(FUNC + "drop_key:", drop_key);
-                    console.log(FUNC + "drop_info:", drop_info);
+                    logger.info(FUNC + "drop_key:", drop_key);
+                    logger.info(FUNC + "drop_info:", drop_info);
 
                     // 需要处理有概率掉落的物品使用
                     if (drop_info.item_probability.length > 1) {
                         var drop_list = [[drop_key]];
                         var ret = BuzzUtil.checkDrop(account, drop_list);
-                        console.log(FUNC + "ret:", ret);
+                        logger.info(FUNC + "ret:", ret);
 
                         if (ret != 0 && ret.length > 0) {
                             reward.push([drop_info.item_id, drop_info.item_num]);
@@ -368,11 +368,11 @@ class Pack {
                 }
             }
             reward = _sortReward(reward);
-            console.log(FUNC + "sorted reward:", reward);
+            logger.info(FUNC + "sorted reward:", reward);
 
             DaoReward.getReward(pool, account, reward, function (err, results) {
-                console.log(FUNC + "err:", err);
-                console.log(FUNC + "results:", results);
+                logger.info(FUNC + "err:", err);
+                logger.info(FUNC + "results:", results);
                 cb(err, reward);
 
                 // yDONE: 金币数据记录(使用某些特殊物品后获得金币)
@@ -432,10 +432,10 @@ class Pack {
             for (var i = 0; i < probability.length; i++) {
                 total += probability[i];
             }
-            // console.log(FUNC + "total:", total);
+            // logger.info(FUNC + "total:", total);
 
             var random = utils.randomInt(total);
-            // console.log(FUNC + "random:", random);
+            // logger.info(FUNC + "random:", random);
 
             total = 0;
             var idx = 0;
@@ -446,7 +446,7 @@ class Pack {
                     break;
                 }
             }
-            console.log(FUNC + "drop reward:", droplist[idx]);
+            logger.info(FUNC + "drop reward:", droplist[idx]);
             return droplist[idx];
         }
 
@@ -502,7 +502,7 @@ class Pack {
             let uid = account.id;
             
             if (isNaN(num) || num <= 0) {
-                console.log(FUNC + `${uid}传入了非法的数量${num}，出售物品是${itemId}`);
+                logger.info(FUNC + `${uid}传入了非法的数量${num}，出售物品是${itemId}`);
                 let error = {code:-1, msg:"参数非法"};
                 data_util.handleReturn(res, aes, error, null, HINT);
                 return;
@@ -510,7 +510,7 @@ class Pack {
 
             let itemInfo = item_item_cfg[itemId];
             if (!itemInfo || itemInfo.saleprice <= 0) {
-                console.log(FUNC + `${uid}尝试出售不能出售的物品${itemId}`);
+                logger.info(FUNC + `${uid}尝试出售不能出售的物品${itemId}`);
                 let error = {code:-1, msg:`物品不能出售`};
                 data_util.handleReturn(res, aes, error, null, HINT);
                 return;
@@ -520,7 +520,7 @@ class Pack {
             if (!account.package
                 || !account.package[itemType]
                 || !account.package[itemType][itemId]) {
-                console.log(FUNC + `${uid}尝试出售不存在的物品${itemId}`);
+                logger.info(FUNC + `${uid}尝试出售不存在的物品${itemId}`);
                 let error = {code:-1, msg:"物品不存在"};
                 data_util.handleReturn(res, aes, error, null, HINT);
                 return;
@@ -528,7 +528,7 @@ class Pack {
 
             let itemOwn = account.package[itemType][itemId];
             if (num > itemOwn) {
-                console.log(FUNC + `${uid}出售的物品${itemId}数量不足，需要${num}个，实际拥有${itemOwn}个`);
+                logger.info(FUNC + `${uid}出售的物品${itemId}数量不足，需要${num}个，实际拥有${itemOwn}个`);
                 let error = {code:-1, msg:"物品数量不足"};
                 data_util.handleReturn(res, aes, error, null, HINT);
                 return;
@@ -539,7 +539,7 @@ class Pack {
             let left = account.package[itemType][itemId];
             account.package = account.package;
             account.pearl = sellPrice;
-            console.log(FUNC + `${uid}出售的物品${itemId}总价为${sellPrice}，出售数量${num}，剩余数量${left}`);
+            logger.info(FUNC + `${uid}出售的物品${itemId}总价为${sellPrice}，出售数量${num}，剩余数量${left}`);
 
             logDiamond.push({
                 account_id: uid,

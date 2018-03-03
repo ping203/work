@@ -70,11 +70,11 @@ function mathWater(pool, cb) {
     sql += "AND log_at > '" + oneday + "' ";
     let sql_data = [];
 
-    if (DEBUG) console.log(FUNC + 'sql:\n', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:\n', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:\n', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:\n', sql_data);
 
     pool.query(sql, sql_data, function (err, result) {
-        // console.log(FUNC + 'result:', result);
+        // logger.info(FUNC + 'result:', result);
         if (result == null || result.length == 0) {
             cb(err, 1);
             return;
@@ -144,14 +144,14 @@ function addGoldLogEx(account, data, cb) {
     BuzzUtil.cacheLinkDataApi(data, "add_gold_log");
 
     if (total < 0) {
-        if (ERROR) console.error('------------------------------------------------------');
-        if (ERROR) console.error(FUNC + '玩家金币总数不能为负');
-        if (ERROR) console.error('------------------------------------------------------');
+        if (ERROR) logger.error('------------------------------------------------------');
+        if (ERROR) logger.error(FUNC + '玩家金币总数不能为负');
+        if (ERROR) logger.error('------------------------------------------------------');
         cb(ERROR_OBJ.GOLD_NOT_ENOUGH);
         return;
     }
     doNext(account, data, cb);
-};
+}
 
 
 const CLIENT_UPDATE_SCENE = [
@@ -185,9 +185,9 @@ function addGoldLog(pool, data, cb) {
     BuzzUtil.cacheLinkDataApi(data, "add_gold_log");
     
     if (total < 0) {
-        if (ERROR) console.error('------------------------------------------------------');
-        if (ERROR) console.error(FUNC + '玩家金币总数不能为负');
-        if (ERROR) console.error('------------------------------------------------------');
+        if (ERROR) logger.error('------------------------------------------------------');
+        if (ERROR) logger.error(FUNC + '玩家金币总数不能为负');
+        if (ERROR) logger.error('------------------------------------------------------');
         cb(ERROR_OBJ.GOLD_NOT_ENOUGH);
         return;
     }
@@ -201,12 +201,12 @@ function addGoldLog(pool, data, cb) {
         // if (account_id == 21) {
         //     let uid = account_id;
         //     // addGoldLog() --- 21-玩家等级:
-        //     console.log(FUNC + uid + "-玩家等级:", account.level);
+        //     logger.info(FUNC + uid + "-玩家等级:", account.level);
         // }
         doNext(account, data, cb);
     });
 
-};
+}
 
 
 function doNext(account, data, cb) {
@@ -223,25 +223,25 @@ function doNext(account, data, cb) {
         let exceptionScene = 0;
         for (let i = 0; i < group.length; i++) {
             let one_change = group[i];
-            if (DEBUG) console.log(FUNC + "one_change:", one_change);
+            if (DEBUG) logger.info(FUNC + "one_change:", one_change);
             let gain = parseInt(one_change.gain);
             let cost = parseInt(one_change.cost);
             let scene = parseInt(one_change.scene);
             
             if (isNaN(gain)) {
                 let extraErrInfo = { debug_info: FUNC + "gain字段请勿输入非数值: " + one_change.gain };
-                if (ERROR) console.error('------------------------------------------------------');
-                if (ERROR) console.error(extraErrInfo.debug_info);
-                if (ERROR) console.error('------------------------------------------------------');
+                if (ERROR) logger.error('------------------------------------------------------');
+                if (ERROR) logger.error(extraErrInfo.debug_info);
+                if (ERROR) logger.error('------------------------------------------------------');
                 cb && cb(ObjUtil.merge(extraErrInfo, ERROR_OBJ.PARAM_WRONG_TYPE));
                 return;
             }
             
             if (isNaN(cost)) {
                 let extraErrInfo = { debug_info: FUNC + "cost字段请勿输入非数值: " + one_change.cost };
-                if (ERROR) console.error('------------------------------------------------------');
-                if (ERROR) console.error(extraErrInfo.debug_info);
-                if (ERROR) console.error('------------------------------------------------------');
+                if (ERROR) logger.error('------------------------------------------------------');
+                if (ERROR) logger.error(extraErrInfo.debug_info);
+                if (ERROR) logger.error('------------------------------------------------------');
                 cb && cb(ObjUtil.merge(extraErrInfo, ERROR_OBJ.PARAM_WRONG_TYPE));
                 return;
             }
@@ -260,29 +260,29 @@ function doNext(account, data, cb) {
             return;
         }
 
-        // console.log(FUNC + "===================account_id:", uid);
+        // logger.info(FUNC + "===================account_id:", uid);
         if (temp_total == total) {
             _didAddGoldLog(mysqlPool, account, data, cb, current_total, nickname);
         }
         else {
             let delta_total = total - temp_total;
             let errInfo = FUNC + '用户数据异常: (计算后总量: ' + temp_total + ', 客户端上传总量: ' + total + ', 差额(客户端增量): ' + delta_total + ')';
-            if (ERROR) console.error(errInfo);
+            if (ERROR) logger.error(errInfo);
             if (delta_total > 100000) {
                 // 在有些场景中会事先将account中的金币数进行修改, 这里的检测不准确
-                console.error(FUNC + "[EXCEPTION]客户端居然有" + delta_total + "金币没有同步到服务器, OMG!!!");
+                logger.error(FUNC + "[EXCEPTION]客户端居然有" + delta_total + "金币没有同步到服务器, OMG!!!");
             }
 
             if (exceptionScene > 0) {
-                console.error(FUNC + "客户端不该更新这个场景---exceptionScene:", exceptionScene);
+                logger.error(FUNC + "客户端不该更新这个场景---exceptionScene:", exceptionScene);
                 _didAddGoldLog(mysqlPool, account, data, cb, total, nickname);
             }
             else {
                 if (delta_total > 0) {
                     if (uid == 21 || uid == 49766 || uid == 7926 || (uid <= 69930 && uid >= 69900) || uid == 717730) {
-                        console.error(FUNC + "玩家数据异常, 下线处理-uid:", uid);
-                        console.error(FUNC + "group:", group);
-                        console.error(FUNC + "old_gold:", account.gold);
+                        logger.error(FUNC + "玩家数据异常, 下线处理-uid:", uid);
+                        logger.error(FUNC + "group:", group);
+                        logger.error(FUNC + "old_gold:", account.gold);
                         cb && cb(ERROR_OBJ.TOKEN_INVALID);
                     }
                     else {
@@ -294,7 +294,7 @@ function doNext(account, data, cb) {
                     // 指定玩家进行校验, 其他玩家不做处理
                     _didAddGoldLog(mysqlPool, account, data, cb, total, nickname);
                 }
-                // console.error(FUNC + "玩家数据异常, 下线处理-uid:", uid);
+                // logger.error(FUNC + "玩家数据异常, 下线处理-uid:", uid);
                 // cb && cb(ERROR_OBJ.TOKEN_INVALID);
             }
         }
@@ -315,9 +315,9 @@ function addGoldLogCache(pool, data, cb) {
     BuzzUtil.cacheLinkDataApi(data, "add_gold_log");
 
     if (total < 0) {
-        if (ERROR) console.error('------------------------------------------------------');
-        if (ERROR) console.error(FUNC + '玩家金币总数不能为负');
-        if (ERROR) console.error('------------------------------------------------------');
+        if (ERROR) logger.error('------------------------------------------------------');
+        if (ERROR) logger.error(FUNC + '玩家金币总数不能为负');
+        if (ERROR) logger.error('------------------------------------------------------');
         cb && cb(ERROR_OBJ.GOLD_NOT_ENOUGH);
         return;
     }
@@ -343,24 +343,24 @@ function addGoldLogCache(pool, data, cb) {
 
         // for (let i = 0; i < group.length; i++) {
         //     let one_change = group[i];
-        //     if (DEBUG) console.log(FUNC + "one_change:", one_change);
+        //     if (DEBUG) logger.info(FUNC + "one_change:", one_change);
         //     let gain = parseInt(one_change.gain);
         //     let cost = parseInt(one_change.cost);
 
         //     if (isNaN(gain)) {
         //         let extraErrInfo = { debug_info: FUNC + "gain字段请勿输入非数值: " + one_change.gain };
-        //         if (ERROR) console.error('------------------------------------------------------');
-        //         if (ERROR) console.error(extraErrInfo.debug_info);
-        //         if (ERROR) console.error('------------------------------------------------------');
+        //         if (ERROR) logger.error('------------------------------------------------------');
+        //         if (ERROR) logger.error(extraErrInfo.debug_info);
+        //         if (ERROR) logger.error('------------------------------------------------------');
         //         cb && cb(ObjUtil.merge(extraErrInfo, ERROR_OBJ.PARAM_WRONG_TYPE));
         //         return;
         //     }
 
         //     if (isNaN(cost)) {
         //         let extraErrInfo = { debug_info: FUNC + "cost字段请勿输入非数值: " + one_change.cost };
-        //         if (ERROR) console.error('------------------------------------------------------');
-        //         if (ERROR) console.error(extraErrInfo.debug_info);
-        //         if (ERROR) console.error('------------------------------------------------------');
+        //         if (ERROR) logger.error('------------------------------------------------------');
+        //         if (ERROR) logger.error(extraErrInfo.debug_info);
+        //         if (ERROR) logger.error('------------------------------------------------------');
         //         cb && cb(ObjUtil.merge(extraErrInfo, ERROR_OBJ.PARAM_WRONG_TYPE));
         //         return;
         //     }
@@ -393,16 +393,16 @@ function insert(pool, data, cb, gold_old) {
     let level = data['level'];
     
     if (total < 0) {
-        if (ERROR) console.error('------------------------------------------------------');
-        if (ERROR) console.error(FUNC + '玩家金币总数不能为负');
-        if (ERROR) console.error('------------------------------------------------------');
+        if (ERROR) logger.error('------------------------------------------------------');
+        if (ERROR) logger.error(FUNC + '玩家金币总数不能为负');
+        if (ERROR) logger.error('------------------------------------------------------');
         if (cb) cb(ERROR_OBJ.GOLD_NOT_ENOUGH);
         return;
     }
     if (gold_old != null && gold_old + gain - cost != total) {
-        if (ERROR) console.error('------------------------------------------------------');
-        if (ERROR) console.error(FUNC + '玩家金币数量不匹配');
-        if (ERROR) console.error('------------------------------------------------------');
+        if (ERROR) logger.error('------------------------------------------------------');
+        if (ERROR) logger.error(FUNC + '玩家金币数量不匹配');
+        if (ERROR) logger.error('------------------------------------------------------');
         if (cb) cb(ERROR_OBJ.GOLD_MISSMATCH);
         return;
     }
@@ -416,18 +416,18 @@ function insert(pool, data, cb, gold_old) {
     sql += '(?,?,?,?,?,?,?,?,?)';
     
     let sql_data = [account_id, log_at, gain, cost, total, duration, scene, nickname, level];
-    if (DEBUG) console.log(FUNC + 'sql:', sql);
-    if (DEBUG) console.log(FUNC + 'sql_data:', sql_data);
-    console.log(FUNC + 'sql:', sql);
-    console.log(FUNC + 'sql_data:', sql_data);
+    if (DEBUG) logger.info(FUNC + 'sql:', sql);
+    if (DEBUG) logger.info(FUNC + 'sql_data:', sql_data);
+    logger.info(FUNC + 'sql:', sql);
+    logger.info(FUNC + 'sql_data:', sql_data);
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            if (ERROR) console.error(FUNC + 'err:', err);
+            if (ERROR) logger.error(FUNC + 'err:', err);
             if (cb) cb(err);
             return;
         }
-        if (DEBUG) console.log(FUNC + 'result:', result);
+        if (DEBUG) logger.info(FUNC + 'result:', result);
         if (cb) cb(err, result);
     });
 }
@@ -444,7 +444,7 @@ function _didAddGoldLog(pool, account, data, cb, current_total, nickname, isServ
     // if (account_id == 21) {
     //     let uid = account_id;
     //     // _didAddGoldLog() --- 21-玩家等级:
-    //     console.log(FUNC + uid + "-玩家等级:", account.level);
+    //     logger.info(FUNC + uid + "-玩家等级:", account.level);
     // }
     
 
@@ -472,9 +472,9 @@ function _didAddGoldLog(pool, account, data, cb, current_total, nickname, isServ
 
             // 记录玩家异常数据.
             let rate = Math.round(account.gold / account.weapon);
-            console.log(FUNC + "account.gold:", account.gold);
-            console.log(FUNC + "account.weapon:", account.weapon);
-            console.log(FUNC + "rate:", rate);
+            logger.info(FUNC + "account.gold:", account.gold);
+            logger.info(FUNC + "account.weapon:", account.weapon);
+            logger.info(FUNC + "rate:", rate);
             if (rate > 8000) {
                 let data = {
                     uid: account_id,
@@ -508,7 +508,7 @@ function _didAddGoldLog(pool, account, data, cb, current_total, nickname, isServ
     
     check(pool);
 
-    // console.log(FUNC + "=================++++==account_id:", data.account_id);
+    // logger.info(FUNC + "=================++++==account_id:", data.account_id);
     _updateGoldTable(pool, account, data, cb, total_gain, total_cost, isServer);
     // 设置抽奖通告
     _setBroadcat(account, bonusList);
@@ -523,7 +523,7 @@ function _isPlayerCheat(account) {
     let weapon = account.weapon >= 50;//指标
 
     // if (uid == 21 || uid == 7912) {
-    //     console.log(FUNC + "uid:", uid);
+    //     logger.info(FUNC + "uid:", uid);
     //     return indicator && vip && level && weapon;
     // }
     // else {
@@ -539,8 +539,8 @@ function _setBroadcat(my_account, bonusList) {
         let oneBonus = bonusList[i];
         if (oneBonus > 500000) {
             let charm = my_account.charm_rank && parseInt(my_account.charm_rank) || 0;
-            if (DEBUG) console.log(FUNC + "****************设置抽奖通告******************");
-            if (DEBUG) console.log(FUNC + "charm_rank:", my_account.charm_rank);
+            if (DEBUG) logger.info(FUNC + "****************设置抽奖通告******************");
+            if (DEBUG) logger.info(FUNC + "charm_rank:", my_account.charm_rank);
             let content = {
                 txt: player + ' 在抽奖时获得' + oneBonus + '金币',
                 times: 1,
@@ -575,7 +575,7 @@ function _updateGoldTable(pool, account, data, cb, total_gain, total_cost, isSer
     total = parseInt(total);
 
     if (total < 0) {
-        console.log(FUNC + "【ERROR】客户端传了一个负的金币总量, OMG!!!");
+        logger.info(FUNC + "【ERROR】客户端传了一个负的金币总量, OMG!!!");
     }
     
     //--------------------------------------------------------------------------
@@ -627,7 +627,7 @@ function getOnlineTime(pool, data, cb) {
 function insertMassive(pool, group, num, cb) {
     const FUNC = TAG + "insertMassive() --- ";
 
-    console.log(FUNC + "CALL...");
+    logger.info(FUNC + "CALL...");
     
     if (group.length > 0) {
         
@@ -657,14 +657,14 @@ function insertMassive(pool, group, num, cb) {
             sql_data.push(record.level);
         }
         
-        if (DEBUG) console.log(FUNC + 'sql(' + sql.length + '):\n', sql);
-        if (DEBUG) console.log(FUNC + 'sql_data(' + sql_data.length + '):\n', sql_data);
+        if (DEBUG) logger.info(FUNC + 'sql(' + sql.length + '):\n', sql);
+        if (DEBUG) logger.info(FUNC + 'sql_data(' + sql_data.length + '):\n', sql_data);
         
         pool.query(sql, sql_data, function (err, result) {
             if (err) {
-                if (ERROR) console.error('------------------------------------------------------');
-                if (ERROR) console.error(FUNC + 'err:', err);
-                if (ERROR) console.error('------------------------------------------------------');
+                if (ERROR) logger.error('------------------------------------------------------');
+                if (ERROR) logger.error(FUNC + 'err:', err);
+                if (ERROR) logger.error('------------------------------------------------------');
                 cb && cb(err);
             }
             cb && cb(null, result);
@@ -685,7 +685,7 @@ function insertMassive(pool, group, num, cb) {
 function insertMassiveUserException(pool, group, num, cb) {
     const FUNC = TAG + "insertMassiveUserException() --- ";
 
-    console.log(FUNC + "CALL...");
+    logger.info(FUNC + "CALL...");
     
     if (group.length > 0) {
         
@@ -710,16 +710,16 @@ function insertMassiveUserException(pool, group, num, cb) {
             sql_data.push(record.exception);
         }
         
-        if (DEBUG) console.log(FUNC + 'sql(' + sql.length + '):\n', sql);
-        if (DEBUG) console.log(FUNC + 'sql_data(' + sql_data.length + '):\n', sql_data);
+        if (DEBUG) logger.info(FUNC + 'sql(' + sql.length + '):\n', sql);
+        if (DEBUG) logger.info(FUNC + 'sql_data(' + sql_data.length + '):\n', sql_data);
         
         pool.query(sql, sql_data, function (err, result) {
             if (err && ERROR) {
-                console.error('------------------------------------------------------');
-                console.error(FUNC + 'err:', err);
-                console.log(FUNC + 'sql(' + sql.length + '):\n', sql);
-                console.log(FUNC + 'sql_data(' + sql_data.length + '):\n', sql_data);
-                console.error('------------------------------------------------------');
+                logger.error('------------------------------------------------------');
+                logger.error(FUNC + 'err:', err);
+                logger.info(FUNC + 'sql(' + sql.length + '):\n', sql);
+                logger.info(FUNC + 'sql_data(' + sql_data.length + '):\n', sql_data);
+                logger.error('------------------------------------------------------');
                 cb && cb(err);
             }
             cb && cb(null, result);
@@ -768,9 +768,9 @@ function _isParamExist(param, err_info, cb) {
 
     if (param == null) {
         let extraErrInfo = { debug_info: FUNC + err_info };
-        if (ERROR) console.error('------------------------------------------------------');
-        if (ERROR) console.error(extraErrInfo.debug_info);
-        if (ERROR) console.error('------------------------------------------------------');
+        if (ERROR) logger.error('------------------------------------------------------');
+        if (ERROR) logger.error(extraErrInfo.debug_info);
+        if (ERROR) logger.error('------------------------------------------------------');
         cb(ObjUtil.merge(extraErrInfo, ERROR_OBJ.PARAM_MISSING));
         return false;
     }
@@ -790,15 +790,15 @@ function _didGetOnlineTime(pool, data, cb) {
     
     // let sql_data = [account_id];
 
-    // if (DEBUG) console.log(FUNC + 'sql:', sql);
-    // if (DEBUG) console.log(FUNC + 'sql_data:', sql_data);
+    // if (DEBUG) logger.info(FUNC + 'sql:', sql);
+    // if (DEBUG) logger.info(FUNC + 'sql_data:', sql_data);
     
     // pool.query(sql, sql_data, function (err, result) {
     //     if (err) {
-    //         if (ERROR) console.error(FUNC + 'err:', err);
+    //         if (ERROR) logger.error(FUNC + 'err:', err);
     //         cb(err);
     //     } else {
-    //         if (DEBUG) console.log(FUNC + 'result:', result);
+    //         if (DEBUG) logger.info(FUNC + 'result:', result);
     //         if (result[0].online_time == null) {
     //             result[0].online_time = 0;
     //         }

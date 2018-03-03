@@ -35,9 +35,9 @@ class TaskPool{
      * @param tid
      */
     removeTask(tid){
-        if(!!tid){
+        if(tid){
             let task = this._taskMap.get(tid);
-            if(!!task){
+            if(task){
                 task.cancle();
             }
             this._taskMap.delete(tid);

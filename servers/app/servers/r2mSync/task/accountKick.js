@@ -22,7 +22,7 @@ class AccountKick extends Task {
     _kickAccount(kicked, kickUids, finish) {
         let subUids = kickUids.slice(kicked, kicked + this.taskConf.writeLimit);
         if (subUids.length === 0) {
-            console.log('redis数据同步到mysql成功');
+            logger.info('redis数据同步到mysql成功');
             utils.invokeCallback(finish, null);
             return;
         }
@@ -35,20 +35,20 @@ class AccountKick extends Task {
             });
         }, function (err, accounts) {
             if (err) {
-                console.log('获取account信息失败');
+                logger.info('获取account信息失败');
             }
 
             let account_filter = redisAccountSync.Util.filterInvalidAccount(accounts);
             if (account_filter.length > 0) {
                 mysqlAccountSync.setAccount(account_filter, function (err, results) {
                     if (err) {
-                        console.log('踢出非活跃玩家,同步玩家信息到mysql异常', err);
+                        logger.info('踢出非活跃玩家,同步玩家信息到mysql异常', err);
                         self._kickAccount(next_kick, kickUids, finish);
                     }
                     else {
                         redisAccountSync.delAccount(subUids, function (err, result) {
                             if (err) {
-                                console.log('踢出非活跃玩家,清除redis缓存数据异常', err);
+                                logger.info('踢出非活跃玩家,清除redis缓存数据异常', err);
                                 return;
                             }
                             self._kickAccount(next_kick, kickUids, finish);

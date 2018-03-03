@@ -46,9 +46,9 @@ function resetMaxWaveForAll(pool, id_list, cb) {
     const FUNC = TAG + "resetMaxWaveForAll() --- ";
 
     
-    console.log(FUNC + "pool:\n" , pool);
-    console.log(FUNC + "id_list:\n" , id_list);
-    console.log(FUNC + "cb:\n" , cb);
+    logger.info(FUNC + "pool:\n" , pool);
+    logger.info(FUNC + "id_list:\n" , id_list);
+    logger.info(FUNC + "cb:\n" , cb);
     
     if (DEBUG) console.errlogor(FUNC + "CALL...");
     
@@ -61,11 +61,11 @@ function resetMaxWaveForAll(pool, id_list, cb) {
     
     var sql_data = [0];
 
-    console.log(FUNC + "sql:\n" , sql);
+    logger.info(FUNC + "sql:\n" , sql);
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:", err);
+            if (ERROR) logger.error(FUNC + "err:", err);
             cb(err);
             return;
         }
@@ -80,11 +80,11 @@ function resetMaxWaveForAll(pool, id_list, cb) {
 function putWeekReward(pool, cb) {
     const FUNC = TAG + "putWeekReward() --- ";
     _resetWeekReward(pool, function() {
-        console.log(FUNC + "数据清理完毕");
+        logger.info(FUNC + "数据清理完毕");
         _putWeekRewardByPlatform(pool, 1, function() {
-            console.log(FUNC + "Android平台周奖励发放完毕");
+            logger.info(FUNC + "Android平台周奖励发放完毕");
             _putWeekRewardByPlatform(pool, 2, function() {
-                console.log(FUNC + "iOS平台周奖励发放完毕");
+                logger.info(FUNC + "iOS平台周奖励发放完毕");
                 cb();
             });
         });
@@ -111,11 +111,11 @@ function _resetWeekReward(pool, cb) {
 
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:", err);
+            if (ERROR) logger.error(FUNC + "err:", err);
             cb(err);
             return;
         }
-        console.log("results:", results);
+        logger.info("results:", results);
         cb();
     });
 }
@@ -132,7 +132,7 @@ function _putWeekRewardData(pool, platform, start, stop, cb) {
             return;
         }
 
-        console.log('获取到redis排行数据:', rank_datas);
+        logger.info('获取到redis排行数据:', rank_datas);
 
         let mysqlHelper = new DBMysqlHelper();
 
@@ -156,11 +156,11 @@ function _putWeekRewardData(pool, platform, start, stop, cb) {
 function _putWeekRewardByPlatform(pool, platform, cb) {
     _putWeekRewardData(pool, platform,0, 9999, function (err, result) {
             if(err){
-                console.log('发放周排行奖励失败 err:',err, '平台:', platform);
+                logger.info('发放周排行奖励失败 err:',err, '平台:', platform);
                 cb && cb(err);
                 return;
             }
-            console.log('发放周排行奖励成功 err:',err, '平台:', platform);
+            logger.info('发放周排行奖励成功 err:',err, '平台:', platform);
             cb && cb(null);
     });
 

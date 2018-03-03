@@ -203,7 +203,7 @@ class RedisSync {
         this.__update = [];
 
         RedisUtil.multi(cmds, function (err, result) {
-            if (!!err) {
+            if (err) {
                 utils.invokeCallback(cb, err);
                 return;
             }
@@ -1413,7 +1413,7 @@ function setAccountById(id, data, cb) {
         });
 
         RedisUtil.multi(cmds, function (err, result) {
-            if (!!err) {
+            if (err) {
                 utils.invokeCallback(cb, err);
                 return;
             }
@@ -1425,7 +1425,7 @@ function setAccountById(id, data, cb) {
         for (let key in fields[0]) {
 
             RedisUtil.hset(`pair:uid:${key}`, id, RedisSync.buildValue(key, fields[0][key]), function (err, result) {
-                if (!!err) {
+                if (err) {
                     utils.invokeCallback(cb, err);
                     return;
                 }
@@ -1458,7 +1458,7 @@ function getAccountById(id, fields, cb) {
 
     _exist(id, function (err) {
         if (err) {
-            console.error(FUNC + "_exist----err:", err);
+            logger.error(FUNC + "_exist----err:", err);
             utils.invokeCallback(cb, null, null);
             return;
         }
@@ -1477,7 +1477,7 @@ function getAccountById(id, fields, cb) {
             });
 
             RedisUtil.multi(cmds, function (err, docs) {
-                if (!!err) {
+                if (err) {
                     utils.invokeCallback(cb, err);
                     return;
                 }
@@ -1501,7 +1501,7 @@ function getAccountById(id, fields, cb) {
         }
         else {
             RedisUtil.hget(`pair:uid:${fields[0]}`, id, function (err, doc) {
-                if (!!err) {
+                if (err) {
                     utils.invokeCallback(cb, err);
                     return;
                 }
@@ -1531,7 +1531,7 @@ function delAccount(uid, cb) {
     });
 
     RedisUtil.multi(cmds, function (err, docs) {
-        if (!!err) {
+        if (err) {
             utils.invokeCallback(cb, err);
             return;
         }
@@ -1548,7 +1548,7 @@ function delAccount(uid, cb) {
  */
 function _exist(uid, cb) {
     RedisUtil.hget(`pair:uid:platform`, uid, function (err, result) {
-        if (!!err) {
+        if (err) {
             utils.invokeCallback(cb, err);
             return;
         }

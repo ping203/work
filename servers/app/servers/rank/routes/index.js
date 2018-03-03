@@ -8,7 +8,7 @@ module.exports = (router)=>{
     });
 
     router.get('/string', async (ctx)=>{
-		title: 'Hello Koa 2!';
+		'Hello Koa 2!';
 	});
 	
 	router.get('/json', async (ctx) => {

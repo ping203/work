@@ -77,8 +77,9 @@ Chrome DevTools Protocol: 前端代码调试
 ## 安装
 - ## 全局安装依赖  
 	- 安装eslint 工具：npm i eslint -g
-	- 执行命令：eslint ../../servers/ --ext .js
-	- 自动修复：eslint --fix ../../servers/ --ext .js
+	- 执行命令：eslint ./ --ext .js
+	- 自动修复：eslint --fix ./ --ext .js
+
 ```eslint-config-standard
 eslint-plugin-import
 eslint-plugin-node

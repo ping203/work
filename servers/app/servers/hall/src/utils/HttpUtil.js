@@ -12,15 +12,15 @@ exports.handleReturn = handleReturn;
  * 通用post方法.
  */
 function post(api, host, port, data, cb) {
-    console.log('data:', data);
+    logger.info('data:', data);
 
     data = require('querystring').stringify({
         data:JSON.stringify(data),
         aes:false
     });
 
-    if (DEBUG) console.log("api:", api);
-    if (DEBUG) console.log("data:", data);
+    if (DEBUG) logger.info("api:", api);
+    if (DEBUG) logger.info("data:", data);
 
     // 调用api
     var options = {
@@ -46,10 +46,10 @@ function post(api, host, port, data, cb) {
         });
     });
     req.on('error', function (e) {
-        if (ERROR) console.error('problem with request:', e);
-        if (ERROR) console.error('api:', api);
-        if (ERROR) console.error('host:', host);
-        if (ERROR) console.error('port:', port);
+        if (ERROR) logger.error('problem with request:', e);
+        if (ERROR) logger.error('api:', api);
+        if (ERROR) logger.error('host:', host);
+        if (ERROR) logger.error('port:', port);
         cb(e);
     });
     req.write(data + "\n");
@@ -61,15 +61,15 @@ function post(api, host, port, data, cb) {
  * 通用post方法.
  */
 function postHttps(api, host, port, data, cb) {
-    console.log('data:', data);
+    logger.info('data:', data);
 
     data = require('querystring').stringify({
         data:JSON.stringify(data),
         aes:false
     });
 
-    if (DEBUG) console.log("api:", api);
-    if (DEBUG) console.log("data:", data);
+    if (DEBUG) logger.info("api:", api);
+    if (DEBUG) logger.info("data:", data);
 
     // 调用api
     var options = {
@@ -95,10 +95,10 @@ function postHttps(api, host, port, data, cb) {
         });
     });
     req.on('error', function (e) {
-        if (ERROR) console.error('problem with request:', e);
-        if (ERROR) console.error('api:', api);
-        if (ERROR) console.error('host:', host);
-        if (ERROR) console.error('port:', port);
+        if (ERROR) logger.error('problem with request:', e);
+        if (ERROR) logger.error('api:', api);
+        if (ERROR) logger.error('host:', host);
+        if (ERROR) logger.error('port:', port);
         cb(e);
     });
     req.write(data + "\n");
@@ -126,15 +126,15 @@ function postBalance(api, data, cb) {
  */
 function handleReturn(ret, cb) {
     const FUNC = TAG + "handleReturn() --- ";
-    if (DEBUG) console.log(FUNC + "ret:", ret);
+    if (DEBUG) logger.info(FUNC + "ret:", ret);
     try {
         ret = JSON.parse(ret);
         if (ret.err) {
-            if (ERROR) console.error(FUNC + "err:", ret.err);
+            if (ERROR) logger.error(FUNC + "err:", ret.err);
             cb(ret.err);
         }
         else {
-            if (DEBUG) console.log(FUNC + "data:", ret.data);
+            if (DEBUG) logger.info(FUNC + "data:", ret.data);
             cb(null, ret.data);
         }
     }

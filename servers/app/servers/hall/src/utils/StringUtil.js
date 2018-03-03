@@ -43,7 +43,7 @@ function endsWith(str, suffix) {
 
 function subString(str, start, stop) {
     return str.substring(start, stop);
-};
+}
 
 function strLen(str) {
     var len = 0;
@@ -55,7 +55,7 @@ function strLen(str) {
         }
     }
     return len;
-};
+}
 
 function split(str, seperator) {
     return str.split(seperator);

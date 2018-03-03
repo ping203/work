@@ -131,7 +131,7 @@ function _useSkill(req, dataObj, cb) {
         };
         ret[coinType] = costCoin;
         
-        // console.log('1.' + coinType + ':', costCoin);
+        // logger.info('1.' + coinType + ':', costCoin);
 
         CacheAccount.useSkill(uid, [{sid:sid, num:1}], dataObj);
 
@@ -158,7 +158,7 @@ function _useSkill(req, dataObj, cb) {
 
                     var weapon_laser = weapon_energy;
                     if (weapon_laser < weapon_info.needpower) {
-                        if (ERROR) console.error(FUNC + "玩家激光作弊");
+                        if (ERROR) logger.error(FUNC + "玩家激光作弊");
                         CacheAccount.setOneWeaponEnergy(account, weapon_level, 0);
                         // 作弊直接踢出
                         RedisUtil.del(INCR_LOCK_UID);
@@ -191,12 +191,12 @@ function _useSkill(req, dataObj, cb) {
                         if (costCoin < skill_info.cost) {
                             // 钻石不够, 无法使用技能
                             if (ERROR) {
-                                console.error(FUNC + "钻石不够, 无法使用技能");
-                                console.error(FUNC + "  time:", DateUtil.format(new Date(), "yyy-MM-dd hh:mm:ss"));
-                                console.error(FUNC + "  uid:", uid);
-                                console.error(FUNC + "  skill_id:", sid);
-                                console.error(FUNC + "  skill_cost:", skill_info.cost);
-                                console.error(FUNC + "  costCoin:", costCoin);
+                                logger.error(FUNC + "钻石不够, 无法使用技能");
+                                logger.error(FUNC + "  time:", DateUtil.format(new Date(), "yyy-MM-dd hh:mm:ss"));
+                                logger.error(FUNC + "  uid:", uid);
+                                logger.error(FUNC + "  skill_id:", sid);
+                                logger.error(FUNC + "  skill_cost:", skill_info.cost);
+                                logger.error(FUNC + "  costCoin:", costCoin);
                             }
                             RedisUtil.del(INCR_LOCK_UID);
                             cb(ERROR_OBJ.DIAMOND_NOT_ENOUGH, ret);
@@ -211,7 +211,7 @@ function _useSkill(req, dataObj, cb) {
             }
             account.skill = skill;
             
-            // console.log('2.' + coinType + ':', costCoin);
+            // logger.info('2.' + coinType + ':', costCoin);
 
             BuzzUtil.useCoin(account, coinId, costCoinOld - costCoin, function(err, res) {
                 account.commit();

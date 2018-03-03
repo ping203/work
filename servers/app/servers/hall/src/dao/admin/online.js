@@ -51,13 +51,13 @@ exports.getOnlineStatus = getOnlineStatus;
 //     sql += "BETWEEN DATE_SUB(STR_TO_DATE('" + date + "','%Y-%m-%d'), INTERVAL 0 DAY) ";
 //     sql += "AND DATE_ADD(STR_TO_DATE('" + date + "','%Y-%m-%d'), INTERVAL 1 DAY) ";
 //     sql += "GROUP BY timekey ";
-//     console.log('sql: ', sql);
+//     logger.info('sql: ', sql);
     
 //     var sql_data = [];
     
 //     pool.query(sql, sql_data, function (err, result) {
 //         if (err) {
-//             console.log(JSON.stringify(err));
+//             logger.info(JSON.stringify(err));
 //             cb(err);
 //         } else {
 //             var link_count = _.max(result, function(link){ return link.link_count; });
@@ -90,19 +90,19 @@ function getOnlineStatus(pool, data, cb) {
     sql += "`time`>'" + start_time + "' ";
     sql += "AND `time`<'" + end_time + "' ";
     sql += "GROUP BY time ";
-    if (DEBUG) console.log('sql: ', sql);
+    if (DEBUG) logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            if (ERROR) console.error(FUNC + "err:\n", err);
-            if (ERROR) console.error(FUNC + "sql:\n", sql);
-            if (ERROR) console.error(FUNC + "sql_data:\n", sql_data);
+            if (ERROR) logger.error(FUNC + "err:\n", err);
+            if (ERROR) logger.error(FUNC + "sql:\n", sql);
+            if (ERROR) logger.error(FUNC + "sql_data:\n", sql_data);
             cb(err);
             return;
         }
-        console.log(FUNC + "results:\n", results);
+        logger.info(FUNC + "results:\n", results);
 
         var ret = [];
         for (var i = 0; i < results.length; i++) {

@@ -35,13 +35,13 @@ exports.update = _update;
 function _update(pool, data, cb, my_account) {
     const FUNC = TAG + "_update() --- ";
 
-    if (DEBUG) console.log(FUNC + "CALL...");
+    if (DEBUG) logger.info(FUNC + "CALL...");
     
     var uid = my_account.id;
     var token = my_account.token;
 
     if (!data.all) {
-        if (ERROR) console.error(FUNC + "全部更新数据中没有all字段");
+        if (ERROR) logger.error(FUNC + "全部更新数据中没有all字段");
         cb(new Error("全部更新数据中没有all字段"));
         return;
     }
@@ -49,17 +49,17 @@ function _update(pool, data, cb, my_account) {
     var all = ObjUtil.str2Data(data.all);
 
     if (ObjUtil.isNull(all.mission_daily_reset)) {
-        if (ERROR) console.error(FUNC + "全部更新数据中没有mission_daily_reset字段");
+        if (ERROR) logger.error(FUNC + "全部更新数据中没有mission_daily_reset字段");
         cb(new Error("全部更新数据中没有mission_daily_reset字段"));
         return;
     }
     if (ObjUtil.isNull(all.mission_only_once)) {
-        if (ERROR) console.error(FUNC + "全部更新数据中没有mission_only_once字段");
+        if (ERROR) logger.error(FUNC + "全部更新数据中没有mission_only_once字段");
         cb(new Error("全部更新数据中没有mission_only_once字段"));
         return;
     }
     if (ObjUtil.isNull(all.achieve_point)) {
-        if (ERROR) console.error(FUNC + "全部更新数据中没有achieve_point字段");
+        if (ERROR) logger.error(FUNC + "全部更新数据中没有achieve_point字段");
         cb(new Error("全部更新数据中没有achieve_point字段"));
         return;
     }
@@ -81,7 +81,7 @@ function _update(pool, data, cb, my_account) {
     var json_mission_daily_reset_new = update_mdr.checkMissionDailyReset(my_account, all);
     var mission_daily_reset_new = ObjUtil.data2String(json_mission_daily_reset_new);
 
-    if (DEBUG)console.log(FUNC + "json_mission_daily_reset_new:", json_mission_daily_reset_new);
+    if (DEBUG)logger.info(FUNC + "json_mission_daily_reset_new:", json_mission_daily_reset_new);
 
     //--------------------------------------------------------------------------
     // 更新缓存中的数据(重要:数据库操作将会被删除)

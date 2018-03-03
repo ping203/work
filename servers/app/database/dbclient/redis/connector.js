@@ -66,15 +66,15 @@ class Connector {
     }
 
     stop() {
-        if (!!this.cmd_client) {
+        if (this.cmd_client) {
             this.cmd_client.end();
             this.cmd_client = null;
         }
-        if (!!this.sub_client) {
+        if (this.sub_client) {
             this.sub_client.end();
             this.sub_client = null;
         }
-        if (!!this.pub_client) {
+        if (this.pub_client) {
             this.pub_client.end();
             this.pub_client = null;
         }

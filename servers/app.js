@@ -161,7 +161,7 @@ app.configure('production|development', 'game', function () {
 app.start();
 
 process.on('uncaughtException', function (err) {
-  console.error(' Caught exception: ' + err.stack);
+  logger.error(' Caught exception: ' + err.stack);
 });
 
 process.on('unhandledRejection', (reason, p) => {

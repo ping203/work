@@ -57,22 +57,22 @@ function _getPayUserData(pool, data, cb) {
     sql += "WHERE log_date ";
     sql += "BETWEEN STR_TO_DATE('" + start_date + "','%Y-%m-%d') ";
     sql += "AND STR_TO_DATE('" + end_date + "','%Y-%m-%d')";
-    console.log('sql: ', sql);
+    logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             if (result == null) {
-                console.log('查询结果为空');
+                logger.info('查询结果为空');
             }
             if (result.length == 0) {
-                console.log('查询结果长度为0');
+                logger.info('查询结果长度为0');
             }
-            console.log("result: ", result);
+            logger.info("result: ", result);
             // 格式化数据
             for (var i = 0; i < result.length; i++) {
                 var log_date = result[i]['log_date'];
@@ -116,13 +116,13 @@ function getUserPayData(pool, cb) {
     sql += "AND o.game_account_id=a.id ";
     sql += "GROUP BY o.channel_account_id ";
     sql += "ORDER BY total_money DESC ";
-    console.log('sql: ', sql);
+    logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             cb(null, results);
@@ -148,13 +148,13 @@ function getCardUserList(pool, cb) {
     sql += "FROM tbl_account AS a, tbl_account_server AS s ";
     sql += "WHERE a.card<>'{}' ";
     sql += "AND a.id=s.uid ";
-    console.log('sql: ', sql);
+    logger.info('sql: ', sql);
     
     var sql_data = [];
     
     pool.query(sql, sql_data, function (err, results) {
         if (err) {
-            console.error(FUNC + "err:\n", err);
+            logger.error(FUNC + "err:\n", err);
             cb(err);
         } else {
             cb(null, results);
@@ -249,21 +249,21 @@ function _queryAccountId(pool, data, cb) {
 // 处理查询tbl_order表的结果
 function _handleQueryTblOder(pool, sql, sql_data, cb) {
     
-    console.log('sql: ', sql);
-    console.log('sql_data: ', sql_data);
+    logger.info('sql: ', sql);
+    logger.info('sql_data: ', sql_data);
 
     pool.query(sql, sql_data, function (err, result) {
         if (err) {
-            console.log(JSON.stringify(err));
+            logger.info(JSON.stringify(err));
             cb(err);
         } else {
             if (result == null) {
-                console.log('查询结果为空');
+                logger.info('查询结果为空');
             }
             if (result.length == 0) {
-                console.log('查询结果长度为0');
+                logger.info('查询结果长度为0');
             }
-            //console.log("result: ", result);
+            //logger.info("result: ", result);
             // 格式化数据
             for (var i = 0; i < result.length; i++) {
                 var created_at = result[i]['created_at'];
@@ -272,7 +272,7 @@ function _handleQueryTblOder(pool, sql, sql_data, cb) {
                     result[i]['channel_cb'] = JSON.parse(result[i]['channel_cb']);
                 }
             }
-            console.log("result: ", result);
+            logger.info("result: ", result);
             cb(null, result);
         }
     });

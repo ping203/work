@@ -45,7 +45,7 @@ exports.update = _update;
  * 3. got字段只能由false变为true
  */
 function _update(pool, data, cb, my_account) {
-    if (DEBUG) console.log("CALL bonus.update()");
+    if (DEBUG) logger.info("CALL bonus.update()");
     
     var account_id = my_account['id'];
     var token = my_account['token'];
@@ -69,33 +69,33 @@ function _update(pool, data, cb, my_account) {
         if (bonus_new != null && bonus_new != "") {
             var json_bonus_new = bonus_new;
             if (StringUtil.isString(bonus_new)) {
-                if (DEBUG) console.log('StringUtil.isString(bonus_new)');
+                if (DEBUG) logger.info('StringUtil.isString(bonus_new)');
                 json_bonus_new = ObjUtil.str2Data(bonus_new);
             }
             var fish_count_new = json_bonus_new["fish_count"];
             gold_count_new = json_bonus_new["gold_count"];
             got_new = json_bonus_new["got"];
                 
-            if (DEBUG) console.log('bonus_new: ', bonus_new);
-            if (DEBUG) console.log('json_bonus_new: ', json_bonus_new);
-            if (DEBUG) console.log('---got_new: ', got_new);
+            if (DEBUG) logger.info('bonus_new: ', bonus_new);
+            if (DEBUG) logger.info('json_bonus_new: ', json_bonus_new);
+            if (DEBUG) logger.info('---got_new: ', got_new);
         }
     }
     catch (err_parse) {
-        if (ERROR) console.error(err_parse);
-        if (ERROR) console.error(JSON.stringify(err_parse));
+        if (ERROR) logger.error(err_parse);
+        if (ERROR) logger.error(JSON.stringify(err_parse));
     }
         
     // 领取奖金，重置数据
     var gold_gain = 0;
-    if (DEBUG) console.log('got_new: ', got_new);
+    if (DEBUG) logger.info('got_new: ', got_new);
     if (got_new) {
         gold_new = gold_old + gold_count_new;
         gold_gain = gold_count_new;
         // 注意: 存储的是字符串
         bonus_new = '{"fish_count":0, "gold_count":0, "got":false}';
     }
-    if (DEBUG) console.log('bonus_new: ', bonus_new);
+    if (DEBUG) logger.info('bonus_new: ', bonus_new);
     
     
     //--------------------------------------------------------------------------

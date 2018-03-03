@@ -23,7 +23,7 @@ exports.handleDbError = handleDbError;
  */
 function checkError(condition, err_info, cb) {
     if (condition) {
-        console.error(err_info);
+        logger.error(err_info);
         cb(new Error(err_info));
     }
     return condition;
@@ -31,9 +31,9 @@ function checkError(condition, err_info, cb) {
 
 function throwNullError(field_name, value) {
     if (ObjUtil.isNull(value)) {
-        console.error("============================================================================");
-        console.error("【ERROR】" + field_name + " is null");
-        console.error("============================================================================");
+        logger.error("============================================================================");
+        logger.error("【ERROR】" + field_name + " is null");
+        logger.error("============================================================================");
         // 正式版本中不能有如下语句引起crash
         throw new Error(field_name + " is null");
     }
@@ -44,9 +44,9 @@ function throwNullError(field_name, value) {
  */
 function handleDbError(err, sql, sql_data, ERROR, FUNC) {
     if (err) {
-        if (ERROR) console.error(FUNC + "err:\n", err);
-        if (ERROR) console.error(FUNC + "sql:\n", sql);
-        if (ERROR) console.error(FUNC + "sql_data:\n", sql_data);
+        if (ERROR) logger.error(FUNC + "err:\n", err);
+        if (ERROR) logger.error(FUNC + "sql:\n", sql);
+        if (ERROR) logger.error(FUNC + "sql_data:\n", sql_data);
     }
 }
 

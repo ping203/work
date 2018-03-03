@@ -28,7 +28,7 @@ exports.update = _update;
  */
 function _update(pool, data, cb, account) {
     const FUNC = TAG + "_update() --- ";
-    if (DEBUG) console.log("CALL first_buy_gift.update()");
+    if (DEBUG) logger.info("CALL first_buy_gift.update()");
     
     let uid = account['id'];
     let token = account['token'];
@@ -45,7 +45,7 @@ function _update(pool, data, cb, account) {
             item_num: gift[1]
         });
     }
-    console.log(FUNC + 'item_list:', item_list);
+    logger.info(FUNC + 'item_list:', item_list);
 
     let req = {pool: mysqlPool, dao: myDao};
     BuzzUtil.putIntoPack(req, account, item_list, function(err, res) {
@@ -65,7 +65,7 @@ function _update(pool, data, cb, account) {
 // 玩家首充状态只能从false设置为true, 不能从true设置为false.
 function _isStatusFalse(data, cb) {
     let first_buy_gift = data['first_buy_gift'];
-    console.log("first_buy_gift: " + first_buy_gift);
+    logger.info("first_buy_gift: " + first_buy_gift);
     if (first_buy_gift == "false") {
         first_buy_gift = false;
     }

@@ -78,7 +78,7 @@ class EventHandler {
     //计算盈亏系数
     _calcGainLoss(account) {
         if (isNaN(account.cash) || isNaN(account.gold) || isNaN(account.cost) || isNaN(account.recharge)) {
-            console.error('_calcGainLoss--- 参数异常');
+            logger.error('_calcGainLoss--- 参数异常');
             return null;
         }
 

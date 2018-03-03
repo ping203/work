@@ -8,15 +8,15 @@ class GooglePlusUser extends User {
   }
 
   getUserInfo(data) {
-    console.log('----GooglePlusUser', data);
+    logger.info('----GooglePlusUser', data);
     return new Promise(function (resolve, reject) {
       https.get(`${this._baseInfo_url}?id_token=` + data.sdkAuthResponse.id_token, (res) => {
-        console.log('状态码：', res.statusCode);
-        console.log('请求头：', res.headers);
+        logger.info('状态码：', res.statusCode);
+        logger.info('请求头：', res.headers);
         res.on('data', (d) => {
           try {
             let sdk_user_info = JSON.parse(d.toString());
-            console.log('----GooglePlusUser sdk_user_info', sdk_user_info);
+            logger.info('----GooglePlusUser sdk_user_info', sdk_user_info);
             let info = {};
             if (sdk_user_info) {
               info.nickname = sdk_user_info.name;
@@ -26,7 +26,7 @@ class GooglePlusUser extends User {
               info.openid = sdk_user_info.sub;
               resolve(info);
             } else {
-              console.error('----------------------sdk_user_info is empty');
+              logger.error('----------------------sdk_user_info is empty');
               reject('sdk_user_info is empty');
             }
           } catch (err) {

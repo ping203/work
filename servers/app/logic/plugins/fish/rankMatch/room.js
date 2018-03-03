@@ -419,7 +419,7 @@ class RankMatchRoom {
         // 真实玩家才记录
         if (uid1 > 0) {
             redisClient.cmd.hget(redisKey.RECENT_ENEMY_10, uid1, function (err, res) {
-                if (err) console.error(FUNC + 'err:', err);
+                if (err) logger.error(FUNC + 'err:', err);
                 if (!res) {
                     res = '[]';
                 }
@@ -436,9 +436,9 @@ class RankMatchRoom {
     _handlePoolQuery(sql, sql_data, FUNC, cb) {
         mysqlClient.query(sql, sql_data, function (err, results) {
             if (err) {
-                console.error(FUNC + 'err:\n', err);
-                console.error(FUNC + 'sql:\n', sql);
-                console.error(FUNC + 'sql_data:\n', sql_data);
+                logger.error(FUNC + 'err:\n', err);
+                logger.error(FUNC + 'sql:\n', sql);
+                logger.error(FUNC + 'sql_data:\n', sql_data);
                 cb(err);
                 return;
             }

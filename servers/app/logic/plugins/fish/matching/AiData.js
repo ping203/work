@@ -48,8 +48,8 @@ class AiData {
 
         mysqlConnector.query(sql, function (err, results) {
             if (err) {
-                console.log(FUNC + "err:\n", err);
-                console.log(FUNC + "sql:\n", sql);
+                logger.info(FUNC + "err:\n", err);
+                logger.info(FUNC + "sql:\n", sql);
                 return;
             }
 

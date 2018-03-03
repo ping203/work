@@ -70,7 +70,7 @@ function setItemGetAt(account, reward) {
             }
         });
     }
-};
+}
 
 /**
  * 检查限时道具是否到期,并及时清理

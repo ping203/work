@@ -48,7 +48,7 @@ class Task {
      * 取消定时任务
      */
     cancle() {
-        if (!!this.schedule) {
+        if (this.schedule) {
             this.schedule.cancel();
             this.schedule = null;
         }
@@ -80,15 +80,15 @@ class Task {
                 cmds.push(['hset', task.redisKey, uid, value]);
             });
             try {
-                console.log(cmds);
+                logger.info(cmds);
                 await redisAccountSync.multiAsync(cmds);
             }
             catch (err) {
-                console.error(`执行${task.redisKey}重置异常:${err}`);
+                logger.error(`执行${task.redisKey}重置异常:${err}`);
             }
             next();
         }, function (err) {
-            console.log(`执行${task.redisKey}重置完成`);
+            logger.info(`执行${task.redisKey}重置完成`);
             utils.invokeCallback(cb, null);
         });
     }

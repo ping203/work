@@ -42,7 +42,7 @@ exports.update = _update;
  * 账户数据更新(每日任务完成度).
  */
 function _update(pool, data, cb, my_account) {
-    if (DEBUG) console.log("CALL pirate.update()");
+    if (DEBUG) logger.info("CALL pirate.update()");
     
     var uid = my_account['id'];
     var token = my_account['token'];

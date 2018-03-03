@@ -19,6 +19,6 @@ class AuthSdk {
         let sdkApi = new platformConfig.Class(platformConfig.sdk);
         this._sdkMap.set(type, sdkApi);
     }
-};
+}
 
 module.exports = new AuthSdk();

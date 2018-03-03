@@ -70,7 +70,7 @@ function _copy(src, dst) {
     var writable = fs.createWriteStream(dst);
     // 通过管道来传输流
     readable.pipe(writable);
-};
+}
 
 function _hasFile(path) {
     var ret = false;
@@ -79,7 +79,7 @@ function _hasFile(path) {
     file_list.forEach(function (filename) {
         var full_path = path + '/' + filename;
         let stats = fs.statSync(full_path);
-        console.log(full_path + ': ' + stats.isFile());
+        logger.info(full_path + ': ' + stats.isFile());
         if (stats.isFile()) {
             // 只要文件夹下存在一个文件就返回true.
             ret = true;
@@ -98,11 +98,11 @@ function _listDir(path, hasFile, keepOriPath) {
     var ret = [];
     
     readDir(path);
-    console.log(FUNC + "ret:", ret);
+    logger.info(FUNC + "ret:", ret);
     
     // 同步版本
     function readDir(src_path) {
-        console.log(FUNC + "readDir()...");
+        logger.info(FUNC + "readDir()...");
         
         try {
             var file_list = fs.readdirSync(src_path);
@@ -129,12 +129,12 @@ function _listDir(path, hasFile, keepOriPath) {
             });
         }
         catch(err) {
-            console.error(FUNC + "err:", err);
+            logger.error(FUNC + "err:", err);
         }
     }
 
     return ret;
-};
+}
 
 /**
  * 将指定目录(src_path)下文件列表写入指定文件(target_file)中
@@ -157,15 +157,15 @@ function _dir(src_path, target_file, write_version, cb, postfix) {
     //读取文件目录
     function readDir() {
         
-        //console.log("readDir()...");
+        //logger.info("readDir()...");
         
         fs.readdir(src_path, function (err, files) {
             if (err) {
-                console.log(err);
+                logger.info(err);
                 return;
             }
             var count = files.length;
-            //console.log("count:" + count);
+            //logger.info("count:" + count);
             var results = {};
             files.forEach(function (filename) {
                 fs.stat(path.join(src_path, filename), function (err, stats) {
@@ -175,7 +175,7 @@ function _dir(src_path, target_file, write_version, cb, postfix) {
                         if (getdir(filename) == postfix) {
                             var newUrl = remotePath + filename;
                             if (write_version) {
-                                //console.log("stats: ", stats);
+                                //logger.info("stats: ", stats);
                                 var mtime = stats.mtime;
                                 var time_version = new Date(mtime).format("yyyyMMddhhmmss");
                                 fileArr.push('"' + newUrl + '":' + time_version + ',');
@@ -196,7 +196,7 @@ function _dir(src_path, target_file, write_version, cb, postfix) {
     
     //获取后缀名
     function getdir(url) {
-        //console.log("getdir()...");
+        //logger.info("getdir()...");
         var arr = url.split('.');
         var len = arr.length;
         return arr[len - 1];
@@ -204,19 +204,19 @@ function _dir(src_path, target_file, write_version, cb, postfix) {
     
     //获取文件数组
     function readFile(readurl, name) {
-        //console.log("readFile()...");
-        //console.log(name);
+        //logger.info("readFile()...");
+        //logger.info(name);
         var name = name;
         fs.readdir(readurl, function (err, files) {
-            if (err) { console.log(err); return; }
+            if (err) { logger.info(err); return; }
 
             var count = files.length;
-            //console.log("---count:" + count);
+            //logger.info("---count:" + count);
             
             files.forEach(function (filename) {
                 fs.stat(path.join(readurl, filename), function (err, stats) {
                     if (err) throw err;
-                    console.log("stats: ", stats);
+                    logger.info("stats: ", stats);
                     //是文件
                     if (stats.isFile()) {
                         var newUrl = remotePath + name + '/' + filename;
@@ -242,11 +242,11 @@ function _dir(src_path, target_file, write_version, cb, postfix) {
     
     // 写入到filelisttxt文件
     function writeFile(data) {
-        //console.log("writeFile()...");
+        //logger.info("writeFile()...");
         var data = data.join("\n");
         fs.writeFile(target_file, data + '\n', function (err) {
             if (err) {
-                console.error("写入失败: ", err);
+                logger.error("写入失败: ", err);
             }
         });
     }
@@ -255,7 +255,7 @@ function _dir(src_path, target_file, write_version, cb, postfix) {
     if (cb != null) {
         cb();
     }
-};
+}
 
 /**
  * 异步方式读取指定文件的内容.

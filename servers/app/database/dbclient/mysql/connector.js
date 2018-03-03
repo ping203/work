@@ -21,7 +21,7 @@ class Connector {
                 return;
             }
 
-            if (!!this.pool) {
+            if (this.pool) {
                 utils.invokeCallback(cb, null);
                 resolve(false);
                 return;
@@ -137,7 +137,7 @@ class Connector {
     _query(sql, args, cb) {
         return new Promise(function (resolve, reject) {
             this.pool.getConnection(function (err, connection) {
-                if (!!connection) {
+                if (connection) {
                     connection.query(sql, args, function (error, results) {
                         connection.release();
                         utils.invokeCallback(cb, error, results);

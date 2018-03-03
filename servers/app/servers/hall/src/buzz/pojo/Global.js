@@ -104,10 +104,10 @@ function _recursiveMathWater(pool, time1, time2, time3, x, addvalue, reducevalue
     weight_time3 = time3 * random;
 
     if (DEBUG) {
-        console.log(FUNC + "random:", random);
-        console.log(FUNC + "weight_time1:", weight_time1);
-        console.log(FUNC + "weight_time2:", weight_time2);
-        console.log(FUNC + "weight_time3:", weight_time3);
+        logger.info(FUNC + "random:", random);
+        logger.info(FUNC + "weight_time1:", weight_time1);
+        logger.info(FUNC + "weight_time2:", weight_time2);
+        logger.info(FUNC + "weight_time3:", weight_time3);
     }
     
     _mathWater(pool, function(err, extract) {
@@ -127,12 +127,12 @@ function _recursiveMathWater(pool, time1, time2, time3, x, addvalue, reducevalue
 }
 
 function _countDown(FUNC, hint, target_pump_water, timeout) {
-    if (DEBUG) console.log(FUNC + hint);
+    if (DEBUG) logger.info(FUNC + hint);
     pump_water = target_pump_water;
 
     time_special = new Date().getTime();
     setTimeout(function() {
-        if (DEBUG) console.log(FUNC + "进入普通周期");
+        if (DEBUG) logger.info(FUNC + "进入普通周期");
         pump_water = 1;
     }, timeout);
 }

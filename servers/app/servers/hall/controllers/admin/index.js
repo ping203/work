@@ -12,7 +12,7 @@ function _makeVar() {
         title: 'Dashboard',
         expanded_id: 'menu_dashboard'
     });
-    console.log(data.title);
+    logger.info(data.title);
     return data;
 }
 
