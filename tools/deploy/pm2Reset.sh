@@ -7,8 +7,6 @@ do
     eval "$line"
 done < config.cfg
 
-
-
 echo 'PACK_DIR:'$PACK_DIR
 echo 'INSTALLER_ZIP:'$INSTALLER_ZIP
 echo 'INSTALL_DIR:'$INSTALL_DIR
