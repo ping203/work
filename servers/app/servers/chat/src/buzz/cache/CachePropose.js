@@ -136,7 +136,7 @@ function query(request_uid, timestamp, count, need_hot4) {
     const FUNC = TAG + "query() --- ";
 
     var msg_list = [];
-    for (var i = gProposeCache.length - 1; i >= 0; i--) {
+    for (let i = gProposeCache.length - 1; i >= 0; i--) {
         var propose = gProposeCache[i];
         if (propose.time < timestamp) {
             var ret_propose = ObjPropose.getPropose(request_uid,propose);
@@ -160,10 +160,10 @@ function query(request_uid, timestamp, count, need_hot4) {
                 return a.like_count - b.like_count;
             }
         });
-        var count = 0;
-        for (var i = sortList.length - 1; i >= 0; i--) {
-            var propose = sortList[i];
-            var ret_propose = ObjPropose.getPropose(request_uid, propose);
+        let count = 0;
+        for (let i = sortList.length - 1; i >= 0; i--) {
+            let propose = sortList[i];
+            let ret_propose = ObjPropose.getPropose(request_uid, propose);
             hot4.push(ret_propose);
             count++;
             if (count >= 4) {

@@ -100,11 +100,11 @@ function sort(data) {
 /**
  * 平台相关的签名.
  */
-function sig(data, path) {
+function sig(data, _path) {
     const FUNC = TAG + "sig() --- ";
     
     // 第1步：将请求的URI路径进行URL编码，得到： %2Fv3%2Fuser%2Fget_info
-    var path = encodeURIComponent(path);
+    let path = encodeURIComponent(_path);
     
     // 第2步：将除“sig”外的所有参数按key进行字典升序排列，排列结果为：appid，format，openid，openkey，pf，userip 
     var sortData = sort(data);
@@ -114,13 +114,13 @@ function sig(data, path) {
     logger.info("=========================================================");
     
     // 第3步： 将第2步中排序后的参数(key = value) 用 & 拼接起来
-    var params = '';
+    let params = '';
     for (var i = 0; i < sortData.length; i++) {
         if (i > 0) params += "&";
         params += sortData[i][0] + '=' + sortData[i][1];
     }
     
-    var params = encodeURIComponent(params);
+    params = encodeURIComponent(params);
     
     // 第4步： 将HTTP请求方式， 第1步以及第3步中的到的字符串用 & 拼接起来， 得到源串
     // TODO: 这里有硬编码的GET, 如有需要, 需要根据实际API进行修改
@@ -327,9 +327,9 @@ function getCommonContent(data) {
 //------------------------------------------------------------------------------
 // handler(验证openid并进行联网请求)
 //------------------------------------------------------------------------------
-function _handleInfo(data, action, req_client, cb) {
+function _handleInfo(datas, action, req_client, cb) {
     
-    var data = ObjUtil.str2Data(data);
+    let data = ObjUtil.str2Data(datas);
     if (!_checkOpenId(data.openid, cb)) return;
     
     // 联网请求
@@ -337,9 +337,9 @@ function _handleInfo(data, action, req_client, cb) {
     _httpRequest(options, cb);
 }
 
-function _handleBuy(data, action, req_client, cb) {
+function _handleBuy(datas, action, req_client, cb) {
     
-    var data = ObjUtil.str2Data(data);
+    let data = ObjUtil.str2Data(datas);
     if (!_checkOpenId(data.openid, cb)) return;
     
     // 联网请求
@@ -347,9 +347,9 @@ function _handleBuy(data, action, req_client, cb) {
     _httpRequest(options, cb);
 }
 
-function _handleIsLogin(data, action, req_client, cb) {
+function _handleIsLogin(datas, action, req_client, cb) {
     
-    var data = ObjUtil.str2Data(data);
+    let data = ObjUtil.str2Data(datas);
     if (!_checkOpenId(data.openid, cb)) return;
     
     // 联网请求
@@ -357,11 +357,11 @@ function _handleIsLogin(data, action, req_client, cb) {
     _httpRequest(options, cb);
 }
 
-function _handleFriends(data, action, req_client, cb) {
+function _handleFriends(datas, action, req_client, cb) {
     logger.info("【CALL】 _handleFriends()");
     const FUNC = TAG + "_handleFriends() --- ";
     
-    var data = ObjUtil.str2Data(data);
+    var data = ObjUtil.str2Data(datas);
     if (!_checkOpenId(data.openid, cb)) return;
     
     // 联网请求

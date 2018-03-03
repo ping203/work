@@ -82,13 +82,13 @@ exports.updateWay = updateWay;
 function init(data) {
     if(!data) return;
     const FUNC = TAG + "init() --- ";
-    for (var i = 0; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
         // if (DEBUG) logger.info(FUNC + "data[i]:", data[i]);
         gChangeLogCache.push(data[i]);
     }
     // 初始化sn
-    for (var i = 0; i < gChangeLogCache.length; i++) {
-        var change = gChangeLogCache[i];
+    for (let i = 0; i < gChangeLogCache.length; i++) {
+        let change = gChangeLogCache[i];
         if (DEBUG) logger.info(FUNC + "today DateString:", new Date().toDateString());
         if (DEBUG) logger.info(FUNC + "change DateString:", new Date(change.created_at).toDateString());
         if (new Date(change.created_at).toDateString() == new Date().toDateString()) {

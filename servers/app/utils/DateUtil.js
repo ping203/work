@@ -307,8 +307,8 @@ function getHourIdx() {
 /**
  * 获取指定日期的下一天
  */
-function getNextDay(d) {
-    var d = new Date(d);
+function getNextDay(nd) {
+    let d = new Date(nd);
     d = +d + 1000 * 60 * 60 * 24;
     d = new Date(d);
     return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();

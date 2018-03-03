@@ -45,7 +45,7 @@ const ERROR = {
         code: -335,
         desc: '卡serial无效'
     },
-    CARD_TYPE_INVALID: {
+    CARD_TYPE_PARAM_INVALID: {
         code: -336,
         desc: '卡type参数无效'
     },

@@ -408,10 +408,10 @@ function _resultList(table, fields) {
 }
 
 function transformSql2Redis(account) {
-    var result = {};
+    let result = {};
     const FUNC = TAG + "transformSql2Redis() --- ";
 
-    for (var i in AccountDefault) {
+    for (let i in AccountDefault) {
         if (account[i]!=null) {
             if (AccountDefault[i].type == 'object') {
                 if (account[i].substring(0, 1) != '{' && account[i].substring(0, 1) != '[') {
@@ -424,7 +424,7 @@ function transformSql2Redis(account) {
         }
     }
 
-    for (var i in AccountOtherDef) {
+    for (let i in AccountOtherDef) {
         if (account[i]!=null) {
             if (AccountOtherDef[i].type == 'object') {
                 if (account[i].substring(0, 1) != '{' && account[i].substring(0, 1) != '[') {
